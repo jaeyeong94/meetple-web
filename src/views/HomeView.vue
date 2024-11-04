@@ -12,8 +12,8 @@ import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
 
 const user = {
-  name: '일론',
-  message: '쏘맥 고?',
+  name: '일론 머스크',
+  message: '안녕하세요! 저는 일론 머스크입니다.',
   age: 26,
   job: '테슬라 CEO',
   mbti: 'ENTJ',
