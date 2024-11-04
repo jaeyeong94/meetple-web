@@ -19,7 +19,7 @@ const user = {
   mbti: 'ENTJ',
   location: '서울특별시',
   school: '한양대학교',
-  profile_image_url: 'https://futureoflife.org/wp-content/uploads/2020/08/elon_musk_royal_society.jpg'
+  profile_image_url: 'https://img.khan.co.kr/news/2024/10/03/rcv.YNA.20241001.PRU20241001125701009_P1.jpg'
 }
 
 const questions = [
