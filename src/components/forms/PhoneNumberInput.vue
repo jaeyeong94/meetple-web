@@ -23,6 +23,7 @@ const formatPhoneNumber = (value: string): string => {
 
 <template>
   <input
+    type="tel"
     :placeholder="PLACEHOLDER"
     :value="props.value"
     @input="(e) => {

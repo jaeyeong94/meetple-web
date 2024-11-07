@@ -1,11 +1,15 @@
 <script setup lang="ts">
 const props = defineProps({
   disabled: Boolean,
-})
+  style: {
+    type: Object,
+    default: () => ({}),
+  }},
+)
 </script>
 
 <template>
-  <button class="submit-button" :disabled="props.disabled">
+  <button class="submit-button" :disabled="props.disabled" :style="props.style">
     <slot />
   </button>
 </template>

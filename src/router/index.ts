@@ -1,3 +1,4 @@
+import LoginView from '@/views/LoginView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ProfileView from '@/views/ProfileView.vue'
@@ -6,22 +7,40 @@ import FormView from '@/views/FormView.vue'
 import PointView from '@/views/PointView.vue'
 import NotificationView from '@/views/NotificationView.vue'
 import AgreementView from '@/views/AgreementView.vue'
-import SignUpView from '@/views/SignUpView.vue'
+import SignUpView from '@/views/LoginView.vue'
 import StartView from '@/views/StartView.vue'
+import DemoView from '@/views/DemoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/demo',
+      name: 'demo',
+      component: DemoView
+    },
+    {
       path: '/',
+      name: 'start',
+      component: StartView
+    },
+    {
+      path: '/home',
       name: 'home',
       component: HomeView
     },
     {
-      path: '/start',
-      name: 'start',
-      component: StartView
+      path: '/login',
+      name: 'login',
+      component: LoginView
     },
+    {
+      path: '/login/code',
+      name: 'login-code',
+      component: LoginView
+    },
+
+
     {
       path: '/profile',
       name: 'profile',
@@ -52,11 +71,6 @@ const router = createRouter({
       name: 'agreement',
       component: AgreementView
     },
-    {
-      path: '/sign-up',
-      name: 'sign-up',
-      component: SignUpView
-    }
   ]
 })
 

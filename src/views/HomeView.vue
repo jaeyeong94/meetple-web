@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import http from '@/lib/http'
 import Tabs from '@/components/Tabs.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
 import Questions from '@/components/Questions.vue'
@@ -10,6 +11,9 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+
+const match = http.get('/match');
+console.log(match);
 
 const user = {
   name: '일론 머스크',
@@ -61,7 +65,7 @@ const questions = [
     <Gap :height="20" />
     <Questions :data="questions"/>
     <Gap :height="20" />
-    <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." />
+<!--    <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." />-->
     <Gap :height="20" />
     <PartnerProfileInfo :name="user.name"
                         :message="user.message"

@@ -12,17 +12,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <h2 class="title">{{props.title}}</h2>
-  <p class="description">{{props.description}}</p>
+  <h2 class="title" v-html="props.title"></h2>
+  <p class="description" v-html="props.description"></p>
 </template>
 
 <style scoped>
 .title {
+  white-space: pre-line;
   font-size: 28px;
   font-weight: 700;
   color: #000;
 }
 .description {
+  white-space: pre-line;
   margin-top: 10px;
   font-size: 14px;
   font-weight: 500;

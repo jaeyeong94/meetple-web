@@ -19,7 +19,6 @@ const onResize = () => {
   timeout = setTimeout(() => {
     const pagePosition = page.value.getBoundingClientRect()
     position.value = { left: `${pagePosition.left}px`, width: `${pagePosition.width}px` }
-
     const background = document.querySelector('.background') as HTMLImageElement
     if (window.innerWidth / window.innerHeight < 1426 / 1920) {
       background.classList.add('height')
@@ -36,23 +35,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', onResize);
 })
-
-const data = {
-  name: '트럼프',
-  onClickSubmit: () => {},
-  onClickCancel: () => {}
-}
-const data2 = {
-  name: '트럼프',
-  partnerProfileImageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/56/Donald_Trump_official_portrait.jpg',
-  myProfileImageUrl: 'https://futureoflife.org/wp-content/uploads/2020/08/elon_musk_royal_society.jpg',
-  onClickSubmit: () => {}
-}
-const data3 = {
-  point: 15,
-  onClickSubmit: () => {},
-  onClickCancel: () => {}
-}
 </script>
 
 <template>

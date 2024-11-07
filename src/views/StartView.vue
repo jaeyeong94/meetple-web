@@ -35,7 +35,7 @@ onUnmounted(() => {
       <span class="subtitle">내 친구들과 함께 만나는 미팅 매칭</span>
       <IcMainLogo />
     </div>
-    <SubmitButton>서비스 시작하기</SubmitButton>
+    <SubmitButton><router-link to="/home">서비스 시작하기</router-link></SubmitButton>
     <img src="@/assets/images/background.png" class="background" alt="" />
   </div>
 </template>
