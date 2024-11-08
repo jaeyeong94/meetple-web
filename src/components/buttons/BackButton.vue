@@ -12,8 +12,8 @@ import IcBack from '@/components/icons/IcBack.vue'
 
 <style scoped>
 .btn-back {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   background: none;
   border: none;
 }

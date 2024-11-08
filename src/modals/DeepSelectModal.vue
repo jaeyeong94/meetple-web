@@ -76,11 +76,13 @@ const category = computed(() => {
   border: 1px solid #E2E2E2;
   border-radius: 10px;
   overflow: hidden;
+  height: 200px;
 }
 .category-list {
   display: flex;
   flex-direction: column;
   background-color: #F9F9F9;
+  overflow: auto;
 }
 .category-list button {
   padding: 14px 40px 14px 17px;
@@ -97,6 +99,7 @@ const category = computed(() => {
 .item-list {
   flex: 1;
   padding: 0 24px;
+  overflow: auto;
 }
 .item-list button {
   font-size: 14px;

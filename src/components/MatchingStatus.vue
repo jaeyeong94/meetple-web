@@ -8,7 +8,7 @@ const props = defineProps({
 })
 
 const color = props.status === 'matched' ? '#F742AF' : '#7542FD'
-const title = props.status === 'matched' ? '상대가 매칭을 요청했어요.' : '매칭 대기중'
+const title = props.status === 'matched' ? '상대가 매칭을 수락했어요.' : '매칭 대기중'
 const description = props.status === 'matched' ? '내가 수락하면 매칭이 성사됩니다.' : '상대방이 수락하면 매칭이 성사됩니다.'
 </script>
 

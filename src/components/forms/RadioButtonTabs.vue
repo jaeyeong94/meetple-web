@@ -51,16 +51,19 @@ const emit = defineEmits(['change'])
   font-weight: 700;
   color: #2A2A2A;
   margin-bottom: 8px;
+  cursor: pointer;
 }
 .label > span {
   font-size: 13px;
   font-weight: 600;
   color: #9B9B9B;
+  cursor: pointer;
 }
 .label > span.required {
   color: #FF334B;
 }
 .radio-button-tabs {
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   align-items: center;

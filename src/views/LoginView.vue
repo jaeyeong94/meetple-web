@@ -8,6 +8,7 @@ import Gap from '@/components/Gap.vue'
 import DeepSelect from '@/components/forms/DeepSelect.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import router from '@/router'
+import { useModalStore } from '@/stores/modal'
 import { ref } from 'vue'
 import { TEST_DEEP_SELECT_OPTIONS } from '@/consts/testData'
 import http from '@/lib/http'
@@ -15,17 +16,29 @@ import http from '@/lib/http'
 const phoneNumber = ref('')
 const authPhoneNumber = ref('')
 const btnState = ref(false)
+const token = localStorage.getItem('token')
+
+if(token) {
+  router.push('/home')
+}
 
 const action = () => {
   http.post('/account/verification', { phoneNumber: authPhoneNumber.value })
     .then((data: any) => {
-      console.log(data);
+      localStorage.setItem('authPhoneNumber', authPhoneNumber.value)
+      router.push('/login/code')
     })
     .catch((error: any) => {
       console.log(error, 'error')
     })
 }
 
+// useModalStore().setModal({
+//   type: 'alert',
+//   data: {
+//     message: '확인!'
+//   }
+// })
 </script>
 
 <template>

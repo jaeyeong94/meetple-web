@@ -7,6 +7,14 @@ const props = defineProps({
   question: String,
   placeholder: String,
   required: Boolean,
+  requiredMessageVisible: {
+    type: Boolean,
+    default: true,
+  },
+  requiredMessage: {
+    type: String,
+    required: false,
+  },
   value: {
     type: String,
     required: true,
@@ -19,8 +27,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['input'])
-
+const val = ref(props.value)
 const error = ref(false)
+
+const textAreaUpdate = (e: any) => {
+  val.value = e.target.value
+  emit('input', props.maxLength ? val.value.slice(0, props.maxLength) : val)
+  if (props.maxLength) {
+    error.value = val.value.length > props.maxLength
+  }
+}
 </script>
 
 <template>
@@ -31,25 +47,21 @@ const error = ref(false)
   <label v-if="props.question">
     <p class="question"><IcQuestion />{{props.question}}</p>
     <span class="required" v-if="props.required">*</span>
-    <span v-else>(선택사항)</span>
+    <span v-else-if="!props.required && requiredMessageVisible && requiredMessage">{{ requiredMessage }}</span>
+    <span v-else-if="!props.required && requiredMessageVisible">(선택사항)</span>
   </label>
   <textarea
     class="text-area"
     :class="{ error: error }"
     :rows="props.numLines"
     :value="props.value"
-    @input="(e) => {
-      const val = e.target.value
-      emit('input', props.maxLength ? val.slice(0, props.maxLength) : val)
-      if (props.maxLength) {
-        error = val.length > props.maxLength
-      }
-    }"
+    :placeholder="props.placeholder"
+    @input="textAreaUpdate"
   />
   <div class="max-length" v-if="props.maxLength">
     <p class="message">{{error ? '' : ''}}</p>
     <p class="length" >
-      <span :class="{ error: error }" >{{props.value.length}}</span>/{{props.maxLength}}
+      <span :class="{ error: error }" >{{val.length}}</span>/{{props.maxLength}}
     </p>
   </div>
 </template>

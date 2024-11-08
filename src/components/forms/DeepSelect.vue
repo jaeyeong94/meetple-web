@@ -8,13 +8,14 @@ const props = defineProps({
   label: String,
   required: Boolean,
   modalTitle: String,
+  placeholder: String,
   options: {
     type: Array as PropType<DeepSelectOption[]>,
     required: true,
   },
   value: {
     type: String,
-    required: true,
+    required: false,
   },
 })
 
@@ -47,7 +48,8 @@ const selected = computed(() => {
   </label>
   <div class="container">
     <button class="select" @click="onClick">
-      <span>{{selected?.label}}</span>
+      <span v-if="props.value">{{selected?.label}}</span>
+      <span v-else style="color: #C2C2C2">{{props.placeholder}}</span>
       <div class="arrow">
         <IcGrayArrow />
       </div>

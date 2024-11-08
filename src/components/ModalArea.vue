@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import Alert from '@/modals/Alert.vue'
+import CodeRetry from '@/modals/CodeRetry.vue'
+import RequestMatchAcceptModal from '@/modals/RequestMatchAcceptModal.vue'
 import RequestMatchModal from '@/modals/RequestMatchModal.vue'
 import RejectMatchModal from '@/modals/RejectMatchModal.vue'
 import MatchedModal from '@/modals/MatchedModal.vue'
@@ -32,17 +35,19 @@ const emit = defineEmits(['close'])
            :class="{ dimmed: props.activeModal !== null}"
            :style="props.modalPosition">
     <div class="dim" @click.stop="() => emit('close')" />
-    <RequestMatchModal v-if="props.activeModal === 'request-match'" :data="props.data" />
+    <RequestMatchModal v-if="props.activeModal === 'request-match'" :data="props.data" @close="() => emit('close')" />
+    <RequestMatchAcceptModal v-if="props.activeModal === 'request-accept-match'" :data="props.data" @close="() => emit('close')" />
     <RejectMatchModal v-if="props.activeModal === 'reject-match'" :data="props.data" />
     <MatchedModal v-if="props.activeModal === 'matched'" :data="props.data" />
     <BlockPartnerModal v-if="props.activeModal === 'block-partner'" :data="props.data" />
     <DeletePartnerModal v-if="props.activeModal === 'delete-partner'" :data="props.data" />
     <LogoutModal v-if="props.activeModal === 'logout'" :data="props.data" />
     <DeleteAccountModal v-if="props.activeModal === 'delete-account'" :data="props.data" />
-    <PurchasePointModal v-if="props.activeModal === 'purchase-point'" :data="props.data" />
+    <PurchasePointModal v-if="props.activeModal === 'purchase-point'" :data="props.data" @close="() => emit('close')" />
     <SelectModal v-if="props.activeModal === 'select'" :data="props.data" @close="() => emit('close')" />
     <DeepSelectModal v-if="props.activeModal === 'deep-select'" :data="props.data" @close="() => emit('close')" />
-
+    <CodeRetry v-if="props.activeModal === 'code-retry'" :data="props.data" @close="() => emit('close')" />
+    <Alert v-if="props.activeModal === 'alert'" :data="props.data" @close="() => emit('close')" />
   </section>
 </template>
 

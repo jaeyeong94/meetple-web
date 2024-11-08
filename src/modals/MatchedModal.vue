@@ -19,7 +19,7 @@ const props = defineProps({
       <span class="title">{{props.data?.name}}님과의 매칭을 성사되었습니다.</span>
       <p class="description">상대방의 연락처를 확인하고 미팅을 진행하세요</p>
     </div>
-    <SubmitButton :style="{backgroundColor: '#6751FF'}" @click="props.data?.onClickSubmit">매칭 확인하기</SubmitButton>
+    <SubmitButton :style="{backgroundColor: '#6751FF'}" @click="props.data?.onClickSubmit">연락처 확인하기</SubmitButton>
   </Modal>
 </template>
 

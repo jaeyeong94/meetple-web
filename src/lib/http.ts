@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://api.meetple.co.kr',
+  // baseURL: 'https://api.meetple.co.kr',
+  baseURL: 'http://localhost:3000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -43,6 +44,13 @@ export default {
   },
   post(url: any, data: any) {
     return apiClient.post(url, data);
+  },
+  upload(url: any, data: any) {
+    return apiClient.post(url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
   put(url: any, data: any) {
     return apiClient.put(url, data);

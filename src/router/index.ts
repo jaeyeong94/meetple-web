@@ -1,5 +1,7 @@
+import HistoryView from '@/views/HistoryView.vue'
 import LoginView from '@/views/LoginView.vue'
 import PhoneNumberCodeAuth from '@/views/PhoneNumberCodeAuth.vue'
+import RegisterView from '@/views/RegisterView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ProfileView from '@/views/ProfileView.vue'
@@ -7,19 +9,13 @@ import ProfileEditView from '@/views/ProfileEditView.vue'
 import FormView from '@/views/FormView.vue'
 import PointView from '@/views/PointView.vue'
 import NotificationView from '@/views/NotificationView.vue'
-import AgreementView from '@/views/AgreementView.vue'
+import AgreementView from '@/views/RegisterView.vue'
 import SignUpView from '@/views/LoginView.vue'
 import StartView from '@/views/StartView.vue'
-import DemoView from '@/views/DemoView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/demo',
-      name: 'demo',
-      component: DemoView
-    },
     {
       path: '/',
       name: 'start',
@@ -31,6 +27,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/history',
+      name: 'history',
+      component: HistoryView
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView
@@ -40,8 +41,18 @@ const router = createRouter({
       name: 'login-code',
       component: PhoneNumberCodeAuth
     },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterView
+    },
 
 
+    {
+      path: '/notification',
+      name: 'notification',
+      component: NotificationView
+    },
     {
       path: '/profile',
       name: 'profile',
@@ -52,25 +63,12 @@ const router = createRouter({
       name: 'profile-edit',
       component: ProfileEditView
     },
-    {
-      path: '/form',
-      name: 'form',
-      component: FormView
-    },
+
+
     {
       path: '/point',
       name: 'point',
       component: PointView
-    },
-    {
-      path: '/notification',
-      name: 'notification',
-      component: NotificationView
-    },
-    {
-      path: '/agreement',
-      name: 'agreement',
-      component: AgreementView
     },
   ]
 })

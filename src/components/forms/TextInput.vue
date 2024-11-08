@@ -54,7 +54,7 @@ const onBlur = () => {
       :class="{error: validate}"
       :placeholder="props.placeholder"
       :value="props.value"
-      @input="(e) => emit('input', e.target.value)"
+      @input="(e) => emit('input', e.target.value, validate)"
       @focus="onFocus"
       @blur="onBlur"
     />

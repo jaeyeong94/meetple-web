@@ -25,7 +25,7 @@ const onImageChange = (e: Event) => {
         selected.value = true
         image.value.src = e.target?.result as string
       }
-      emit('change', e.target?.result as string)
+      emit('change', e.target?.result as string, file)
     }
     reader.readAsDataURL(file)
   }

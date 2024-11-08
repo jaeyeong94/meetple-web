@@ -11,74 +11,194 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import { calculateAge } from '@/lib/utils'
+import router from '@/router'
+import { useModalStore } from '@/stores/modal'
+import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
-const match = http.get('/match');
-console.log(match);
+const account: any = reactive({});
+const match: any = reactive({});
+const notification: any = reactive([]);
 
-const user = {
-  name: '일론 머스크',
-  message: '안녕하세요! 저는 일론 머스크입니다.',
-  age: 26,
-  job: '테슬라 CEO',
-  mbti: 'ENTJ',
-  location: '서울특별시',
-  school: '한양대학교',
-  profile_image_url: 'https://img.khan.co.kr/news/2024/10/03/rcv.YNA.20241001.PRU20241001125701009_P1.jpg'
+const photos: Ref<any> = ref([]);
+const jobs: Ref<any> = ref([]);
+
+const tabIndex: Ref<number> = ref(0);
+
+const accountUpdate = async () => {
+  const accountResponse = await http.get('/account');
+  const matchResponse = await http.get('/match');
+  Object.assign(account, accountResponse.data);
+  Object.assign(match, matchResponse.data);
+
+  account.data.accountProfiles.forEach((profile: any) => {
+    if(profile.type === 'photo') {
+      photos.value.push(profile)
+    } else if(profile.type === 'job') {
+      jobs.value.push(profile)
+    }
+  })
 }
 
-const questions = [
-  {
-    question: '좋아하는 음식은 무엇인가요?',
-    answer: '피자'
-  },
-  {
-    question: '좋아하는 취미는 무엇인가요?',
-    answer: '로켓 만들기'
-  },
-  {
-    question: '좋아하는 동물은 무엇인가요?',
-    answer: '개'
+onMounted(async () => {
+  await accountUpdate()
+
+  // 튕겨내기
+  if(account.data.accountMeta.stage !== 'approve') {
+    await router.push('/register')
   }
-]
+})
+
+const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
+  // 캔디부족 따로 처리
+
+  const action = async () => {
+    http.post('/match/answer', {
+      matchId,
+      attitude: true
+    })
+      .then((data: any) => {
+        const response = data.data;
+        accountUpdate()
+      })
+      .catch((error: any) => {
+        useModalStore().setModal({
+          type: 'alert',
+          data: {
+            message: error.response.data.message
+          }
+        })
+        console.log(error, 'error')
+      })
+  }
+
+  if(hit_answer) {
+    useModalStore().setModal({
+      type: 'request-accept-match',
+      data: {
+        name: nickname,
+        onClickCancel: () => {
+          useModalStore().setModal({ type: null })
+        },
+        onClickSubmit: () => {
+          action()
+          useModalStore().setModal({
+            type: 'matched',
+            data: {
+              name: nickname,
+              partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
+              myProfileImageUrl: photos.value[photos.value.length - 1]?.image_path,
+              onClickClose: () => {
+                useModalStore().setModal({ type: null })
+                // router.push('/chat')
+              }
+            }
+          })
+        }
+      }
+    })
+  } else {
+    useModalStore().setModal({
+      type: 'request-match',
+      data: {
+        name: nickname,
+        onClickCancel: () => {
+          useModalStore().setModal({ type: null })
+        },
+        onClickSubmit: () => {
+          action()
+          useModalStore().setModal({ type: null })
+        }
+      }
+    })
+  }
+}
+
+const answerRejectAction = (matchId: number, nickname: string) => {
+  const action = async () => {
+    http.post('/match/answer', {
+      matchId,
+      attitude: false
+    })
+      .then((data: any) => {
+        const response = data.data;
+        accountUpdate()
+      })
+      .catch((error: any) => {
+        useModalStore().setModal({
+          type: 'alert',
+          data: {
+            message: error.response.data.message
+          }
+        })
+        console.log(error, 'error')
+      })
+  }
+
+  useModalStore().setModal({
+    type: 'reject-match',
+    data: {
+      name: nickname,
+      onClickCancel: () => {
+        useModalStore().setModal({ type: null })
+      },
+      onClickSubmit: () => {
+        action()
+        useModalStore().setModal({ type: null })
+      }
+    }
+  })
+}
+
 </script>
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <MainHeader :image-url="TEST_PROFILE_URL" @notification="() => {}" @profile="() => {}" />
-    <Tabs :tabs="TEST_TABS" :current-index="1" />
+    <MainHeader :image-url="photos[photos.length - 1]?.image_path" @notification="() => {}" @profile="() => {}" />
+    <Tabs :tabs="TEST_TABS" :current-index="tabIndex" />
   </StickyArea>
   <div class="page">
-    <MatchingStatus status="waiting" />
-    <Gap :height="20" />
-    <MatchingStatus status="matched" />
-    <Gap :height="20" />
-    <UserProfileInfo
-      :name="user.name"
-      :message="user.message"
-      :age="user.age"
-      :job="user.job"
-      :mbti="user.mbti"
-      :location="user.location"
-      :school="user.school"
-      :image-url="user.profile_image_url"
-    />
-    <Gap :height="20" />
-    <Questions :data="questions"/>
-    <Gap :height="20" />
-<!--    <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." />-->
-    <Gap :height="20" />
-    <PartnerProfileInfo :name="user.name"
-                        :message="user.message"
-                        :age="user.age"
-                        :job="user.job"
-                        :mbti="user.mbti"
-                        :location="user.location"
-                        :school="user.school"
-                        :image-url="user.profile_image_url" />
+    <div v-if="match.data?.recommended.length > 0">
+      <div v-for="matchProfile in match.data.recommended">
+        <div v-if="matchProfile.hit_answer">
+          <MatchingStatus status="matched" />
+          <Gap :height="20" />
+        </div>
+
+        <UserProfileInfo
+          :name="matchProfile.hit_account.accountMeta.nick_name"
+          :message="matchProfile.hit_account.accountMeta.self_introduction"
+          :age="calculateAge(matchProfile.hit_account.birth_date)"
+          :job="matchProfile.hit_account.accountMeta.job"
+          :mbti="matchProfile.hit_account.accountMeta.mbti"
+          :location="`${matchProfile.hit_account.accountMeta.occupied_area_high}, ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
+          :school="matchProfile.hit_account.school || '미입력'"
+          :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path"
+        />
+        <Gap :height="20" />
+        <Questions :data="matchProfile.hit_account.accountMeta.descriptions.map((line: any) => {
+          return {
+            question: line.title,
+            answer: line.answer
+          }
+        })"/>
+
+        <div :style="{
+          position: 'absolute',
+          bottom: '16px',
+          width: 'calc(100% - 32px)',
+          display: 'flex', justifyContent: 'center', paddingBottom: '16px'
+        }">
+          <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
+          <ProfileActions v-else @close="answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)" @heart="answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)" />
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
+    </div>
   </div>
-  <StickyArea position="bottom" :style="{ display: 'flex', justifyContent: 'center', paddingBottom: '16px' }">
-    <ProfileActions @close="() => {}" @heart="() => {}" />
-  </StickyArea>
 </template>
 
 <style scoped>

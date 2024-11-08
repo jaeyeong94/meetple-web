@@ -8,8 +8,8 @@ export type NotificationType =
   'matched' |
   'match-reject';
 
-export type ModalType = 'request-match' | 'reject-match' | 'matched' | 'block-partner' | 'delete-partner' |
-  'logout' | 'delete-account' | 'purchase-point' | null;
+export type ModalType = 'request-match' | 'request-accept-match' | 'reject-match' | 'matched' | 'block-partner' | 'delete-partner' |
+  'logout' | 'delete-account' | 'purchase-point' | 'code-retry' | 'select' | 'deep-select' | 'alert' | null;
 
 
 export type SelectOption = {

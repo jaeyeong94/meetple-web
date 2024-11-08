@@ -9,13 +9,14 @@ const props = defineProps({
   required: Boolean,
   modalTitle: String,
   modalOptionCols: Number,
+  placeholder: String,
   options: {
     type: Array as PropType<SelectOption[]>,
     required: true,
   },
   value: {
     type: String,
-    required: true,
+    required: false,
   },
 })
 
@@ -44,7 +45,8 @@ const onClick = () => {
   </label>
   <div class="container">
     <button class="select" @click="onClick">
-      <span>{{props.options.find(option => option.value === props.value)?.label}}</span>
+      <span v-if="props.value">{{props.options.find(option => option.value === props.value)?.label}}</span>
+      <span v-else style="color: #C2C2C2">{{props.placeholder}}</span>
       <div class="arrow">
         <IcGrayArrow />
       </div>
