@@ -54,10 +54,13 @@ const accountDataUpdate = async () => {
   const response = await http.get('/account')
   Object.assign(account, response.data)
 
-  console.log(account);
-
-  if(!account.data || !account.data.id) {
+  if(!account.data) {
+    localStorage.removeItem('token')
     await router.push('/login')
+  }
+
+  if(account.data.accountMeta.stage === 'approve') {
+    await router.push('/home')
   }
 
   profileData.termsRequired = account.data.terms_required
@@ -177,9 +180,9 @@ const ProfileUpdateAction = (stage: string) => {
     stage,
     data: toRaw(profileData)
   })
-    .then((data: any) => {
-      accountDataUpdate()
-      progressUpdate()
+    .then(async (data: any) => {
+      await accountDataUpdate()
+      await progressUpdate()
     })
     .catch((error: any) => {
       console.log(error)

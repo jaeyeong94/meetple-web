@@ -46,8 +46,6 @@ const router = createRouter({
       name: 'register',
       component: RegisterView
     },
-
-
     {
       path: '/notification',
       name: 'notification',
@@ -63,13 +61,16 @@ const router = createRouter({
       name: 'profile-edit',
       component: ProfileEditView
     },
-
-
     {
       path: '/point',
       name: 'point',
       component: PointView
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      redirect: '/',
+    }
   ]
 })
 

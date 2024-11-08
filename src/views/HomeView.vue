@@ -36,8 +36,12 @@ onMounted(async () => {
   await accountUpdate()
 
   // 튕겨내기
-  if(!account.data || account.data.accountMeta.stage !== 'approve') {
-    // localStorage.removeItem('token')
+  if(!account.data) {
+    localStorage.removeItem('token')
+    await router.push('/login')
+  }
+
+  if(account.data.accountMeta.stage !== 'approve') {
     await router.push('/register')
   }
 
@@ -52,6 +56,7 @@ onMounted(async () => {
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
   // 캔디부족 따로 처리
+  // 프로필, 상점, 히스토리, 문자정리
 
   const action = async () => {
     http.post('/match/answer', {
@@ -155,7 +160,11 @@ const answerRejectAction = (matchId: number, nickname: string) => {
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <MainHeader :image-url="photos[photos.length - 1]?.image_path" @notification="() => {}" @profile="() => {}" />
+    <MainHeader :image-url="photos[photos.length - 1]?.image_path" @notification="() => {
+      router.push('/notification')
+    }" @profile="() => {
+      router.push('/profile')
+    }" />
     <Tabs :tabs="TEST_TABS" :current-index="tabIndex" />
   </StickyArea>
   <div class="page">
