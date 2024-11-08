@@ -31,4 +31,7 @@ const props = defineProps({
 .submit-button:disabled {
   background-color: #C8C8C8 !important;
 }
+.submit-button {
+  pointer-events: auto; /* 반드시 클릭 이벤트를 허용하도록 설정 */
+}
 </style>

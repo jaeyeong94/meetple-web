@@ -57,7 +57,6 @@ const submitAction = () => {
       console.log(error, 'error')
     })
 }
-
 </script>
 
 <template>

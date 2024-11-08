@@ -44,6 +44,10 @@ input, button, textarea, select {
   min-height: 100dvh;
 }
 
+.page {
+  z-index: 1000 !important;
+}
+
 @media (max-width: 960px) {
   #app {
     padding: 0;
