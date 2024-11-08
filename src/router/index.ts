@@ -1,4 +1,5 @@
 import LoginView from '@/views/LoginView.vue'
+import PhoneNumberCodeAuth from '@/views/PhoneNumberCodeAuth.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import ProfileView from '@/views/ProfileView.vue'
@@ -37,7 +38,7 @@ const router = createRouter({
     {
       path: '/login/code',
       name: 'login-code',
-      component: LoginView
+      component: PhoneNumberCodeAuth
     },
 
 

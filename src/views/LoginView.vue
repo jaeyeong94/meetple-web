@@ -7,6 +7,7 @@ import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import Gap from '@/components/Gap.vue'
 import DeepSelect from '@/components/forms/DeepSelect.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
+import router from '@/router'
 import { ref } from 'vue'
 import { TEST_DEEP_SELECT_OPTIONS } from '@/consts/testData'
 import http from '@/lib/http'
@@ -18,7 +19,7 @@ const btnState = ref(false)
 const action = () => {
   http.post('/account/verification', { phoneNumber: authPhoneNumber.value })
     .then((data: any) => {
-      console.log(data, 'data')
+      console.log(data);
     })
     .catch((error: any) => {
       console.log(error, 'error')
