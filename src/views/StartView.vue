@@ -16,7 +16,7 @@ const resizeBackground = () => {
     } else {
       background.classList.remove('height')
     }
-  }, 150)
+  }, 1)
 }
 
 onMounted(() => {
@@ -94,4 +94,12 @@ onUnmounted(() => {
   width: auto;
   height: 100%;
 }
+
+@media (max-width: 960px) {
+  .banner {
+    width: 100%;
+  }
+}
+
+
 </style>

@@ -55,8 +55,7 @@ onMounted(async () => {
 })
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
-  // 캔디부족 따로 처리
-  // 프로필, 상점, 히스토리, 문자정리
+  // 프로필, 상점, 히스토리
 
   const action = async () => {
     http.post('/match/answer', {

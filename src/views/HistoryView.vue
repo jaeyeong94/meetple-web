@@ -24,7 +24,6 @@ onMounted(async () => {
   Object.assign(match, matchResponse.data);
 })
 
-
 const user = {
   name: '일론 머스크',
   message: '안녕하세요! 저는 일론 머스크입니다.',
