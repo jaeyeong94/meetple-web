@@ -16,14 +16,17 @@ const props = defineProps({
     required: false,
   },
   value: {
-    type: String,
+    type: [String, null],
     required: true,
   },
   numLines: {
     type: Number,
     default: 4,
   },
-  maxLength: Number,
+  maxLength: {
+    type: Number,
+    required: false,
+  },
 })
 
 const emit = defineEmits(['input'])
@@ -31,10 +34,11 @@ const val = ref(props.value)
 const error = ref(false)
 
 const textAreaUpdate = (e: any) => {
-  val.value = e.target.value
-  emit('input', props.maxLength ? val.value.slice(0, props.maxLength) : val)
-  if (props.maxLength) {
-    error.value = val.value.length > props.maxLength
+  if(val.value) {
+    emit('input', props.maxLength ? val.value.slice(0, props.maxLength) : val)
+    if (props.maxLength) {
+      error.value = val.value.length > props.maxLength
+    }
   }
 }
 </script>
@@ -54,7 +58,7 @@ const textAreaUpdate = (e: any) => {
     class="text-area"
     :class="{ error: error }"
     :rows="props.numLines"
-    :value="props.value"
+    v-model="val"
     :placeholder="props.placeholder"
     @input="textAreaUpdate"
   />

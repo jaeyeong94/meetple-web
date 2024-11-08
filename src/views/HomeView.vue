@@ -30,6 +30,16 @@ const accountUpdate = async () => {
   const matchResponse = await http.get('/match');
   Object.assign(account, accountResponse.data);
   Object.assign(match, matchResponse.data);
+}
+
+onMounted(async () => {
+  await accountUpdate()
+
+  // 튕겨내기
+  if(!account.data || account.data.accountMeta.stage !== 'approve') {
+    // localStorage.removeItem('token')
+    await router.push('/register')
+  }
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -38,15 +48,6 @@ const accountUpdate = async () => {
       jobs.value.push(profile)
     }
   })
-}
-
-onMounted(async () => {
-  await accountUpdate()
-
-  // 튕겨내기
-  if(account.data.accountMeta.stage !== 'approve') {
-    await router.push('/register')
-  }
 })
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {

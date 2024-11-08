@@ -54,7 +54,9 @@ const accountDataUpdate = async () => {
   const response = await http.get('/account')
   Object.assign(account, response.data)
 
-  if(!account.data.id) {
+  console.log(account);
+
+  if(!account.data || !account.data.id) {
     await router.push('/login')
   }
 
@@ -71,8 +73,8 @@ const accountDataUpdate = async () => {
   profileData.school = account.data.accountMeta.school
   profileData.job = account.data.accountMeta.job
   profileData.descriptions = account.data.accountMeta.descriptions ?? []
-  profileData.descriptions[0] = profileData.descriptions[0] ?? { title: '', answer: '' }
-  profileData.descriptions[1] = profileData.descriptions[1] ?? { title: '', answer: '' }
+  profileData.descriptions[0] = profileData.descriptions[0] ?? { title: question1, answer: '' }
+  profileData.descriptions[1] = profileData.descriptions[1] ?? { title: question2, answer: '' }
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -135,8 +137,6 @@ const ProfileUploader = (base64: string, file: any) => {
   formData.append('type', 'photo');
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
-      const response = data.data;
-      accountDataUpdate()
       photoRequired.value = true;
     })
     .catch((error: any) => {
@@ -159,8 +159,6 @@ const JobUploader = (base64: string, file: any) => {
   formData.append('type', 'job');
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
-      const response = data.data;
-      accountDataUpdate()
       jobRequired.value = true;
     })
     .catch((error: any) => {
@@ -180,11 +178,11 @@ const ProfileUpdateAction = (stage: string) => {
     data: toRaw(profileData)
   })
     .then((data: any) => {
-      const response = data.data;
       accountDataUpdate()
       progressUpdate()
     })
     .catch((error: any) => {
+      console.log(error)
       useModalStore().setModal({
         type: 'alert',
         data: {
@@ -325,7 +323,7 @@ const ProfileUpdateAction = (stage: string) => {
         } else {
           profileData.nickName = '';
         }
-      }" :value="profileData.nickName" />
+      }" :value="profileData.nickName || ''" />
       <Gap :height="20" />
 
       <Select label="MBTI" :required="true" placeholder="MBTI를 선택해주세요." @change="(val: string) => {
@@ -339,9 +337,9 @@ const ProfileUpdateAction = (stage: string) => {
       }" :value="profileData.occupiedAreaLow" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
       <Gap :height="20" />
 
-      <TextArea label="자개소개" :required="true" placeholder="MBTI를 선택해주세요." @input="(val: string) => {
+      <TextArea label="자기소개" :max-length="120" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
         profileData.selfIntroduction = val
-      }" :value="profileData.selfIntroduction" />
+      }" :value="profileData.selfIntroduction || ''" />
 
       <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
         backgroundColor: '#6726FE',
