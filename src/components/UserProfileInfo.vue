@@ -24,16 +24,16 @@ const props = defineProps({
         <p class="value">{{props.job}}</p>
       </li>
       <li class="info-item">
-        <span class="title">MBTI</span>
-        <p class="value">{{props.mbti}}</p>
+        <span class="title">학교</span>
+        <p class="value">{{props.school}}</p>
       </li>
       <li class="info-item">
         <span class="title">거주 지역</span>
         <p class="value">{{props.location}}</p>
       </li>
       <li class="info-item">
-        <span class="title">학교</span>
-        <p class="value">{{props.school}}</p>
+        <span class="title">MBTI</span>
+        <p class="value">{{props.mbti}}</p>
       </li>
       <li class="info-item">
         <span class="title">나이</span>

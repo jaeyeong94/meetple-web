@@ -11,7 +11,7 @@ const props = defineProps({
   <div class="empty">
     <IcHeart />
     <span class="title">{{props.title}}</span>
-    <p class="description" style="text-align: center;">{{props.description}}</p>
+    <p class="description" style="text-align: center;" v-html="props.description"></p>
   </div>
 </template>
 

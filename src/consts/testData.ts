@@ -310,50 +310,15 @@ export const TEST_RADIO_OPTIONS = [
 
 export const TEST_NOTIFICATIONS = [
   {
-    id: 1,
-    type: 'sign-up',
-    content: '회원가입 완료 내용',
-    date: '2024-10-01',
-  },
-  {
-    id: 2,
-    type: 'verification-success',
-    content: '인증 성공 내용',
-    date: '2024-10-02',
-  },
-  {
-    id: 3,
-    type: 'verification-failure',
-    content: '인증 실패 내용',
-    date: '2024-10-02',
-  },
-  {
-    id: 4,
-    type: 'recommended-meeting',
-    content: '추천 미팅 내용',
-    date: '2024-10-03',
-  },
-  {
     id: 5,
-    type: 'match-request',
-    content: '상대방 매칭 승낙 내용',
-    date: '2024-10-05',
-  },
-  {
-    id: 5,
-    type: 'match-request-remind',
-    content: '상대방 매칭 O 기다림 내용',
-    date: '2024-10-05',
-  },
-  {
-    id: 6,
     type: 'matched',
-    content: '매칭 성사 내용',
-    date: '2024-10-06',
-  },{
+    content: '미팅이 성사되었어요. 축하드려요! 상대의 연락처를 확인한 후, 미팅을 조율하세요.',
+    date: '2023.03.29',
+  },
+  {
     id: 6,
-    type: 'match-reject',
-    content: '상대방 매칭 거절 내용',
-    date: '2024-10-07',
+    type: 'recommended-meeting',
+    content: '상대방의 프로필을 확인하고, 매칭을 수락해보세요!',
+    date: '2024.11.12',
   }
 ]

@@ -7,7 +7,7 @@ const props = defineProps({
 
 <template>
   <button class="btn-profile">
-    <img :src="props.imageUrl" alt="User profile" class="profile-image" />
+    <img v-if="props.imageUrl" :src="props.imageUrl" alt="User profile" class="profile-image" />
   </button>
 </template>
 

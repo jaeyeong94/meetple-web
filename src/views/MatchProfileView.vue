@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SubHeader from '@/components/SubHeader.vue'
 import http from '@/lib/http'
 import Tabs from '@/components/Tabs.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
@@ -13,11 +14,15 @@ import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
 import { calculateAge } from '@/lib/utils'
 import router from '@/router'
+import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
+const route = useRoute();
+
 const account: any = reactive({});
 const match: any = reactive({});
+const matchProfile: any = reactive({});
 const notification: any = reactive([]);
 
 const photos: Ref<any> = ref([]);
@@ -52,10 +57,23 @@ onMounted(async () => {
       jobs.value.push(profile)
     }
   })
+
+  // 매치 프로필 확인
+  const matchId = route.params.id;
+  const findMatchProfile = match.data.recommended.find((match: any) => {
+    return match.id === Number(matchId);
+  });
+
+  Object.assign(matchProfile, findMatchProfile);
+
+  if(!Object.keys(matchProfile).length) {
+    await router.push('/match')
+  }
 })
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
   // 프로필, 상점, 히스토리
+  // 캔디부족
 
   const action = async () => {
     http.post('/match/answer', {
@@ -159,53 +177,46 @@ const answerRejectAction = (matchId: number, nickname: string) => {
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <MainHeader :image-url="photos[photos.length - 1]?.image_path" @notification="() => {
-      router.push('/notification')
-    }" @profile="() => {
-      router.push('/profile')
-    }" />
-    <Tabs :tabs="TEST_TABS" :current-index="tabIndex" />
+    <SubHeader title="" :show-back-button="true" @back="() => {
+  router.back();
+}" />
   </StickyArea>
   <div class="page">
     <div v-if="match.data?.recommended.length > 0">
-      <div v-for="matchProfile in match.data.recommended">
-        <div v-if="matchProfile.hit_answer">
-          <MatchingStatus status="matched" />
-          <Gap :height="20" />
-        </div>
-
-        <UserProfileInfo
-          :name="matchProfile.hit_account.accountMeta.nick_name"
-          :message="matchProfile.hit_account.accountMeta.self_introduction"
-          :age="calculateAge(matchProfile.hit_account.birth_date)"
-          :job="matchProfile.hit_account.accountMeta.job"
-          :mbti="matchProfile.hit_account.accountMeta.mbti"
-          :location="`${matchProfile.hit_account.accountMeta.occupied_area_high}, ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
-          :school="matchProfile.hit_account.school || '미입력'"
-          :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path"
-        />
+      <div v-if="matchProfile.hit_answer">
+        <MatchingStatus status="matched" />
         <Gap :height="20" />
-        <Questions :data="matchProfile.hit_account.accountMeta.descriptions.map((line: any) => {
+      </div>
+
+      <UserProfileInfo
+        :name="matchProfile.hit_account?.accountMeta.nick_name"
+        :message="matchProfile.hit_account?.accountMeta.self_introduction"
+        :age="calculateAge(matchProfile.hit_account?.birth_date)"
+        :job="matchProfile.hit_account?.accountMeta.job"
+        :mbti="matchProfile.hit_account?.accountMeta.mbti"
+        :location="`${matchProfile.hit_account?.accountMeta.occupied_area_high}, ${matchProfile.hit_account?.accountMeta.occupied_area_low}`"
+        :school="matchProfile.hit_account?.school || '미입력'"
+        :image-url="matchProfile.hit_account?.accountProfiles[0]?.image_path"
+      />
+      <Gap :height="20" />
+      <Questions :data="matchProfile.hit_account?.accountMeta.descriptions.map((line: any) => {
           return {
             question: line.title,
             answer: line.answer
           }
         })"/>
+      <Gap :height="120" />
 
-        <div :style="{
-          position: 'absolute',
+      <div :style="{
+          position: 'fixed',
+          left: '0',
           bottom: '16px',
-          width: 'calc(100% - 32px)',
+          width: 'calc(100%)',
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
-          <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
-          <ProfileActions v-else @close="answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)" @heart="answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)" />
-        </div>
+        <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
+        <ProfileActions v-else @close="answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)" @heart="answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)" />
       </div>
-    </div>
-
-    <div v-else>
-      <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
     </div>
   </div>
 </template>

@@ -35,8 +35,6 @@ const accountUpdate = async () => {
 onMounted(async () => {
   await accountUpdate()
 
-  console.log(match);
-
   // 튕겨내기
   if(!account.data) {
     localStorage.removeItem('token')
@@ -157,6 +155,10 @@ const answerRejectAction = (matchId: number, nickname: string) => {
   })
 }
 
+const multipleProfileMove = (id: string) => {
+  router.push(`/match/profile/${id}`);
+}
+
 </script>
 
 <template>
@@ -169,7 +171,7 @@ const answerRejectAction = (matchId: number, nickname: string) => {
     <Tabs :tabs="TEST_TABS" :current-index="tabIndex" />
   </StickyArea>
   <div class="page">
-    <div v-if="match.data?.recommended.length > 0">
+    <div v-if="match.data?.recommended.length === 1">
       <div v-for="matchProfile in match.data.recommended">
         <div v-if="matchProfile.hit_answer">
           <MatchingStatus status="matched" />
@@ -193,11 +195,13 @@ const answerRejectAction = (matchId: number, nickname: string) => {
             answer: line.answer
           }
         })"/>
+        <Gap :height="120" />
 
         <div :style="{
-          position: 'absolute',
+          position: 'fixed',
+          left: '0',
           bottom: '16px',
-          width: 'calc(100% - 32px)',
+          width: 'calc(100%)',
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
           <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
@@ -206,8 +210,23 @@ const answerRejectAction = (matchId: number, nickname: string) => {
       </div>
     </div>
 
+    <div v-else-if="match.data?.recommended.length >= 2">
+      <div v-for="matchProfile in match.data.recommended">
+        <PartnerProfileInfo @click="multipleProfileMove(matchProfile.id)"
+                            :name="matchProfile.hit_account.accountMeta.nick_name"
+                            :message="matchProfile.hit_account.accountMeta.self_introduction"
+                            :age="calculateAge(matchProfile.hit_account.birth_date)"
+                            :job="matchProfile.hit_account.accountMeta.job"
+                            :mbti="matchProfile.hit_account.accountMeta.mbti"
+                            :location="`${matchProfile.hit_account.accountMeta.occupied_area_high}, ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
+                            :school="matchProfile.hit_account.school || '미입력'"
+                            :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path" />
+        <Gap :height="20" />
+      </div>
+    </div>
+
     <div v-else>
-      <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
+      <Empty v-if="match.data" title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
     </div>
   </div>
 </template>

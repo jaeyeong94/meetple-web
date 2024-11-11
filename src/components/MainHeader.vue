@@ -14,7 +14,7 @@ const emit = defineEmits(['notification', 'profile'])
 <template>
   <header class="header">
     <div class="logo-wrapper">
-      <IcLogo />
+      <router-link to="/match"><IcLogo /></router-link>
     </div>
     <NotificationButton :showIndicator="props.hasUnreadNotification" @click="() => emit('notification')" />
     <UserProfileButton :imageUrl="props.imageUrl" @click="() => emit('profile')" />

@@ -10,7 +10,7 @@ const props = defineProps({
 })
 
 const category =
-  props.type === 'matched' || props.type === 'recommended-meeting'
+  props.type === 'recommended-meeting'
     ? 'match-success' :
   props.type === 'match-reject'
     ? 'match-failure' :

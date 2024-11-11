@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import PhoneNumberCopy from '@/components/PhoneNumberCopy.vue'
+import ProgressBar from '@/components/ProgressBar.vue'
+import SubHeader from '@/components/SubHeader.vue'
 import http from '@/lib/http'
 import Tabs from '@/components/Tabs.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
@@ -10,84 +13,167 @@ import PartnerProfileInfo from '@/components/PartnerProfileInfo.vue'
 import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
-import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
-import { onMounted, reactive, ref, type Ref } from 'vue'
+import { TEST_ACTION_DATA, TEST_MORE_DATA, TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import { calculateAge, formatPhoneNumber } from '@/lib/utils'
+import router from '@/router'
+import { useRoute } from 'vue-router'
+import { useModalStore } from '@/stores/modal'
+import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
+
+const route = useRoute();
 
 const account: any = reactive({});
 const match: any = reactive({});
-const tabIndex: Ref<number> = ref(1);
+const hitProfile: any = reactive({});
+const notification: any = reactive([]);
 
-onMounted(async () => {
+const photos: Ref<any> = ref([]);
+const jobs: Ref<any> = ref([]);
+
+const tabIndex: Ref<number> = ref(0);
+
+const accountUpdate = async () => {
   const accountResponse = await http.get('/account');
   const matchResponse = await http.get('/match');
   Object.assign(account, accountResponse.data);
   Object.assign(match, matchResponse.data);
-})
-
-const user = {
-  name: '일론 머스크',
-  message: '안녕하세요! 저는 일론 머스크입니다.',
-  age: 26,
-  job: '테슬라 CEO',
-  mbti: 'ENTJ',
-  location: '서울특별시',
-  school: '한양대학교',
-  profile_image_url: 'https://img.khan.co.kr/news/2024/10/03/rcv.YNA.20241001.PRU20241001125701009_P1.jpg'
 }
 
-const questions = [
-  {
-    question: '좋아하는 음식은 무엇인가요?',
-    answer: '피자'
-  },
-  {
-    question: '좋아하는 취미는 무엇인가요?',
-    answer: '로켓 만들기'
-  },
-  {
-    question: '좋아하는 동물은 무엇인가요?',
-    answer: '개'
+onMounted(async () => {
+  await accountUpdate()
+
+  // 튕겨내기
+  if(!account.data) {
+    localStorage.removeItem('token')
+    await router.push('/login')
   }
-]
+
+  if(account.data.accountMeta.stage !== 'approve') {
+    await router.push('/register')
+  }
+
+  account.data.accountProfiles.forEach((profile: any) => {
+    if(profile.type === 'photo') {
+      photos.value.push(profile)
+    } else if(profile.type === 'job') {
+      jobs.value.push(profile)
+    }
+  })
+
+  // 매치 프로필 확인
+  const matchId = route.params.id;
+  const findMatchProfile = match.data.hit.find((match: any) => {
+    return match.id === Number(matchId);
+  });
+
+  Object.assign(hitProfile, findMatchProfile);
+
+  if(!Object.keys(hitProfile).length) {
+    await router.push('/history')
+  }
+})
+
+const actionRemove = async (nickname: string) => {
+  useModalStore().setModal({
+    type: 'delete-partner',
+    data: {
+      name: nickname,
+      onClickCancel: () => {
+        useModalStore().setModal({ type: null })
+      },
+      onClickSubmit: async () => {
+        const response = await http.post(`/match/hit/remove`, {
+          hitId: hitProfile.id
+        });
+        useModalStore().setModal({ type: null })
+        if(response.data.message === 'success') {
+          await router.push('/history')
+        }
+      }
+    }
+  })
+}
+
+const actionBlock = async (nickname: string) => {
+  useModalStore().setModal({
+    type: 'block-partner',
+    data: {
+      name: nickname,
+      onClickCancel: () => {
+        useModalStore().setModal({ type: null })
+      },
+      onClickSubmit: async () => {
+        const response = await http.post(`/match/hit/block`, {
+          hitId: hitProfile.id
+        });
+        useModalStore().setModal({ type: null })
+        if(response.data.message === 'success') {
+          await router.push('/history')
+        }
+      }
+    }
+  })
+  // const response = await http.post(`/match/block/${hitProfile.id}`, {});
+  // if(response.status === 200) {
+  //   await router.push('/match')
+  // }
+}
+
 </script>
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <MainHeader :image-url="TEST_PROFILE_URL" @notification="() => {}" @profile="() => {}" />
-    <Tabs :tabs="TEST_TABS" :current-index="tabIndex" />
+    <SubHeader title="" :more-button-data="[
+      {
+        title: '삭제하기',
+        onClick: () => actionRemove(hitProfile.account?.accountMeta.nick_name)
+      },
+      {
+        title: '차단하기',
+        warning: true,
+        onClick: () => actionBlock(hitProfile.account?.accountMeta.nick_name)
+      }
+]" :show-back-button="true" @back="() => {
+  router.back();
+}" />
   </StickyArea>
   <div class="page">
-    <MatchingStatus status="waiting" />
-    <Gap :height="20" />
-    <MatchingStatus status="matched" />
-    <Gap :height="20" />
-    <UserProfileInfo
-      :name="user.name"
-      :message="user.message"
-      :age="user.age"
-      :job="user.job"
-      :mbti="user.mbti"
-      :location="user.location"
-      :school="user.school"
-      :image-url="user.profile_image_url"
-    />
-    <Gap :height="20" />
-    <Questions :data="questions"/>
-    <Gap :height="20" />
-    <Empty title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." />
-    <Gap :height="20" />
-    <PartnerProfileInfo :name="user.name"
-                        :message="user.message"
-                        :age="user.age"
-                        :job="user.job"
-                        :mbti="user.mbti"
-                        :location="user.location"
-                        :school="user.school"
-                        :image-url="user.profile_image_url" />
+    <div v-if="match.data?.recommended.length > 0">
+      <div v-if="hitProfile.hit_answer">
+        <MatchingStatus status="matched" />
+        <Gap :height="20" />
+      </div>
+
+      <UserProfileInfo
+        :name="hitProfile.account?.accountMeta.nick_name"
+        :message="hitProfile.account?.accountMeta.self_introduction"
+        :age="calculateAge(hitProfile.account?.birth_date)"
+        :job="hitProfile.account?.accountMeta.job"
+        :mbti="hitProfile.account?.accountMeta.mbti"
+        :location="`${hitProfile.account?.accountMeta.occupied_area_high}, ${hitProfile.hit_account?.accountMeta.occupied_area_low}`"
+        :school="hitProfile.account?.school || '미입력'"
+        :image-url="hitProfile.account?.accountProfiles[0]?.image_path"
+      />
+      <Gap :height="20" />
+      <Questions :data="hitProfile.account?.accountMeta.descriptions.map((line: any) => {
+          return {
+            question: line.title,
+            answer: line.answer
+          }
+        })"/>
+      <Gap :height="120" />
+
+      <div :style="{
+          position: 'fixed',
+          left: '0',
+          bottom: '16px',
+          width: 'calc(100%)',
+          display: 'flex', justifyContent: 'center', paddingBottom: '16px'
+        }">
+        <PhoneNumberCopy :phone-number="hitProfile.account?.phone_number" />
+      </div>
+    </div>
   </div>
-  <StickyArea position="bottom" :style="{ display: 'flex', justifyContent: 'center', paddingBottom: '16px' }">
-    <ProfileActions @close="() => {}" @heart="() => {}" />
-  </StickyArea>
 </template>
 
 <style scoped>

@@ -33,7 +33,7 @@ const getType = () => {
     case 'match-request-remind':
       return '상대방 매칭 요청'
     case 'matched':
-      return '매칭 완료'
+      return '미팅 성사'
     case 'match-reject':
       return '상대방 매칭 거절'
     default:
@@ -41,7 +41,7 @@ const getType = () => {
   }
 }
 
-const matchSuccess = props.type === 'matched' || props.type === 'recommended-meeting'
+const matchSuccess = props.type === 'recommended-meeting'
 const matchFailure = props.type === 'match-reject'
 </script>
 
@@ -69,6 +69,7 @@ const matchFailure = props.type === 'match-reject'
   display: flex;
   flex-direction: column;
   gap: 5px;
+  width: 277px;
 }
 .top {
   display: flex;
