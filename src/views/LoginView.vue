@@ -19,7 +19,7 @@ const btnState = ref(false)
 const token = localStorage.getItem('token')
 
 if(token) {
-  router.push('/home')
+  router.push('/match')
 }
 
 const action = () => {

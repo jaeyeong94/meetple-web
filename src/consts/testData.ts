@@ -18,7 +18,7 @@ export const TEST_ACTION_DATA = {
 }
 
 export const TEST_TABS = [
-  { title: '추천', to: '/home' },
+  { title: '추천', to: '/match' },
   { title: '매칭', to: '/history' },
 ]
 
