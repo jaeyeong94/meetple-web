@@ -13,7 +13,7 @@ export const TEST_MORE_DATA = [
 ]
 
 export const TEST_ACTION_DATA = {
-  title: '채팅하기',
+  title: '미리보기',
   onClick: () => {}
 }
 
@@ -304,8 +304,8 @@ export const TEST_DEEP_SELECT_OPTIONS = [
 ];
 
 export const TEST_RADIO_OPTIONS = [
-  { value: 'man', label: '남자', color: '#6726FE' },
-  { value: 'woman', label: '여자', color: "#F742AF" },
+  { value: 'man', label: '남성', color: '#6726FE' },
+  { value: 'woman', label: '여성', color: "#F742AF" },
 ]
 
 export const TEST_NOTIFICATIONS = [

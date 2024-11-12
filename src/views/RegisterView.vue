@@ -436,7 +436,7 @@ const ProfileUpdateAction = (stage: string) => {
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'reject'">
-      <Empty title="인증이 거절되었습니다." description="인증을 위한 문서나 직장 및 직무 텍스트를 수정하신 후 인증을 다시 진행해주세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
+      <Empty title="인증이 거절되었습니다." description="인증을 위한 문서나 직장 및 직무 텍스트를<br>수정하신 후 인증을 다시 진행해주세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
     </div>
   </div>
 

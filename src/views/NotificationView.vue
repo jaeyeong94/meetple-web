@@ -5,6 +5,7 @@ import NotificationItem from '@/components/NotificationItem.vue'
 import { TEST_ACTION_DATA, TEST_NOTIFICATIONS } from '@/consts/testData'
 import http from '@/lib/http'
 import router from '@/router'
+import dayjs from 'dayjs'
 import { onMounted, reactive, ref, type Ref } from 'vue'
 
 const account: any = reactive({});
@@ -40,7 +41,7 @@ onMounted(async () => {
   </StickyArea>
   <div class="page">
     <div v-for="n in notification" :key="notification.id">
-      <NotificationItem :type="n.type" :content="n.description" :date="n.created_at" @click="() => {
+      <NotificationItem :type="n.type" :content="n.description" :date="dayjs(n.created_at).format('YYYY-MM-DD')" @click="() => {
         router.push(`/match/profile/${n.behavior}`)
       }" />
     </div>

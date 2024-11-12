@@ -5,11 +5,11 @@ import { ref } from 'vue'
 const props = defineProps({
   name: {
     type: String,
-    required: true,
+    required: false,
   },
   message: {
     type: String,
-    required: true,
+    required: false,
   },
   imageUrl: {
     type: String,
