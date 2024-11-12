@@ -38,7 +38,7 @@ const defaultData = reactive({
   gender: '',
 })
 
-// 이미지
+const termsRequired = ref( false);
 const photoRequired: Ref<any> = ref(false);
 const jobRequired: Ref<any> = ref(false);
 const photos: Ref<any> = ref([]);
@@ -50,6 +50,29 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
 
 // 서버정보
 const account: any = reactive({})
+
+const accountUpdateDefault = async () => {
+  const response = await http.get('/account')
+  Object.assign(account, response.data)
+
+  if (!account.data) {
+    localStorage.removeItem('token')
+    await router.push('/login')
+  }
+
+  if (account.data.accountMeta.stage === 'approve') {
+    await router.push('/match')
+  }
+
+  account.data.accountProfiles.forEach((profile: any) => {
+    if(profile.type === 'photo') {
+      photos.value.push(profile)
+    } else if(profile.type === 'job') {
+      jobs.value.push(profile)
+    }
+  })
+}
+
 const accountDataUpdate = async () => {
   const response = await http.get('/account')
   Object.assign(account, response.data)
@@ -82,10 +105,20 @@ const accountDataUpdate = async () => {
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
       photos.value.push(profile)
+      photoRequired.value = true
     } else if(profile.type === 'job') {
       jobs.value.push(profile)
+      jobRequired.value = true
     }
   })
+
+  // 이용약관 상태 저장
+  if(profileData.termsRequired) {
+    termsRequired.value = true;
+  }
+
+  profileData.termsRequired = true;
+  profileData.termsOptional = true;
 }
 
 const progressUpdate = async () => {
@@ -112,7 +145,6 @@ onMounted(async () => {
 
 // 이용약관
 const agreement = reactive([true, true, true]);
-let termsRequired = ref( false);
 watch(agreement, (val) => {
   profileData.termsRequired = !!(val[0] && val[1]);
   profileData.termsOptional = !!val[2];
@@ -120,6 +152,8 @@ watch(agreement, (val) => {
 const termsAccept = () => {
   termsRequired.value = true;
 }
+
+console.log();
 
 function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
   const byteCharacters = atob(base64);
@@ -141,6 +175,7 @@ const ProfileUploader = (base64: string, file: any) => {
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
       photoRequired.value = true;
+      accountUpdateDefault();
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -164,6 +199,7 @@ const JobUploader = (base64: string, file: any) => {
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
       jobRequired.value = true;
+      accountUpdateDefault();
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -202,17 +238,18 @@ const ProfileUpdateAction = (stage: string) => {
 </script>
 
 <template>
-  <ProgressBar :progress="progress" :processing="processing" />
   <div class="page">
     <div v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-close-button="true" @close="() => {
           router.push('/')
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="<img src='/meetple-mini-logo.png' style='width:110px; vertical-align: bottom;' /> 의 서비스<br>이용약관에 동의해주세요." description="" />
-      <Gap :height="40" />
-      <Checkbox :main="true" name="all" title="전체 동의 하기 (선택 정보 포함)" @change="(b) => {
+      <div class="content-container">
+        <PageTitleAndDescription title="<img src='/meetple-mini-logo.png' style='width:110px; vertical-align: bottom;' /> 의 서비스<br>이용약관에 동의해주세요." description="" />
+        <Gap :height="40" />
+        <Checkbox :main="true" name="all" title="전체 동의 하기 (선택 정보 포함)" @change="(b) => {
       if(b) {
         agreement[0] = true
         agreement[1] = true
@@ -223,216 +260,236 @@ const ProfileUpdateAction = (stage: string) => {
         agreement[2] = false
       }
     }" :value="agreement.reduce((acc, cur) => acc && cur, true)" />
-      <Gap :height="16" />
-      <Divider />
-      <Gap :height="16" />
-      <Checkbox name="agreement1" title="[필수] 서비스 이용약관 동의" @change="(val: boolean) => {
+        <Gap :height="16" />
+        <Divider />
+        <Gap :height="16" />
+        <Checkbox name="agreement1" title="[필수] 서비스 이용약관 동의" @change="(val: boolean) => {
       agreement[0] = val
     }" :value="agreement[0]" :show-detail-button="true" @detail="() => {}" link="https://seen-bison-bae.notion.site/135c10e8cd2c80fa9eaac5a035090c22?pvs=4" />
-      <Gap :height="20" />
-      <Checkbox name="agreement2" title="[필수] 개인정보 수집 및 이용 동의" @change="(val: boolean) => {
+        <Gap :height="20" />
+        <Checkbox name="agreement2" title="[필수] 개인정보 수집 및 이용 동의" @change="(val: boolean) => {
       agreement[1] = val
     }" :value="agreement[1]" :show-detail-button="true" @detail="() => {}" link="https://seen-bison-bae.notion.site/135c10e8cd2c80b28684f91f7df41e35?pvs=4" />
-      <Gap :height="20" />
-      <Checkbox name="agreement3" title="[선택] 마케팅 목적의 개인정보 수집 및 이용 동의" @change="(val: boolean) =>{
+        <Gap :height="20" />
+        <Checkbox name="agreement3" title="[선택] 마케팅 목적의 개인정보 수집 및 이용 동의" @change="(val: boolean) =>{
       agreement[2] = val
     }" :value="agreement[2]" :show-detail-button="true" @detail="() => {}" link="https://seen-bison-bae.notion.site/135c10e8cd2c80d5b5d8e9a72ee125aa?pvs=4" />
+      </div>
+
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           termsRequired = false
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="가입에 필요한 기본정보를<br>입력해주세요." description="이름은 프로필에 공개되지 않으며, 인증을 위한 정보입니다." />
-      <Gap :height="40" />
+      <div class="content-container">
+        <PageTitleAndDescription title="가입에 필요한 기본정보를<br>입력해주세요." description="이름은 프로필에 공개되지 않으며, 인증을 위한 정보입니다." />
+        <Gap :height="40" />
 
-      <TextInput label="이름" placeholder="이름을 입력하세요" :required="true" :validate="(val: string) => {
-        if (val && !(/^[ㄱ-힣]+$/.test(val))) {
-          return '이름에는 특수문자, 숫자, 알파벳이 포함될 수 없습니다.';
-        }
+        <TextInput label="이름" placeholder="이름을 입력하세요" :required="true" :validate="(val: string) => {
+          if (val && !(/^[ㄱ-힣]+$/.test(val))) {
+            return '이름에는 특수문자, 숫자, 알파벳이 포함될 수 없습니다.';
+          }
 
-        if (val && val.length >= 10) {
-          return '이름은 10자 이내로 입력해주세요.';
-        }
+          if (val && val.length >= 10) {
+            return '이름은 10자 이내로 입력해주세요.';
+          }
 
-        return null;
-      }" @input="(val: string, validateValue: any) => {
-        defaultData.name = val;
-        if (validateValue === null && val.length > 1) {
-          profileData.name = val;
-        } else {
-          profileData.name = '';
-        }
-      }" :value="defaultData.name" />
-      <Gap :height="20" />
+          return null;
+        }" @input="(val: string, validateValue: any) => {
+          defaultData.name = val;
+          if (validateValue === null && val.length > 1) {
+            profileData.name = val;
+          } else {
+            profileData.name = '';
+          }
+        }" :value="profileData.name" />
+        <Gap :height="20" />
 
-      <TextInput label="생년월일" placeholder="2000-01-30" :required="true" :validate="(val: string) => {
-        if (!val) return null;
-        if (val.length < 11 && validateDate(val)) return null;
-        return '생년월일이 올바르지 않습니다';
-      }" @input="(val: string, validateValue: any) => {
-        defaultData.birthDate = val;
-        if (validateValue && val.length > 0) {
-          profileData.birthDate = val;
-        } else {
-          profileData.birthDate = '';
-        }
-      }" :value="defaultData.birthDate" />
-      <Gap :height="20" />
+        <TextInput label="생년월일" placeholder="2000-01-30" :required="true" :validate="(val: string) => {
+          if (!val) return null;
+          if (val.length < 11 && validateDate(val)) return null;
+          return '생년월일이 올바르지 않습니다';
+        }" @input="(val: string, validateValue: any) => {
+          defaultData.birthDate = val;
+          if (validateValue && val.length > 0) {
+            profileData.birthDate = val;
+          } else {
+            profileData.birthDate = '';
+          }
+        }" :value="profileData.birthDate" />
+        <Gap :height="20" />
 
-      <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {
-        defaultData.gender = val;
-        profileData.gender = val;
-      }" :value="defaultData.gender" :options="TEST_RADIO_OPTIONS" />
+        <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {
+          defaultData.gender = val;
+          profileData.gender = val;
+        }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />
+        </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'normal'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           account.data.accountMeta.stage = 'default';
           progressUpdate();
 
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
-      <Gap :height="40" />
+      <div class="content-container">
+        <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
+        <Gap :height="40" />
 
-      <ProfileImage label="프로필 이미지" :required="true" @change="ProfileUploader" />
-      <Gap :height="20" />
+        <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" />
+        <Gap :height="20" />
 
-      <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
-        if (val && val.length >= 10) {
-          return '닉네임은 10자 이내로 입력해주세요.';
-        }
+        <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
+          if (val && val.length >= 10) {
+            return '닉네임은 10자 이내로 입력해주세요.';
+          }
 
-        return null;
-      }" @input="(val: string, validateValue: any) => {
-        profileData.nickName = val;
-        if (validateValue === null && val.length > 0) {
+          return null;
+        }" @input="(val: string, validateValue: any) => {
           profileData.nickName = val;
-        } else {
-          profileData.nickName = '';
-        }
-      }" :value="profileData.nickName || ''" />
-      <Gap :height="20" />
+          if (validateValue === null && val.length > 0) {
+            profileData.nickName = val;
+          } else {
+            profileData.nickName = '';
+          }
+        }" :value="profileData.nickName || ''" />
+        <Gap :height="20" />
 
-      <Select label="MBTI" :required="true" placeholder="MBTI를 선택해주세요." @change="(val: string) => {
-        profileData.mbti = val
-      }" :value="profileData.mbti" :options="TEST_SELECT_OPTIONS" :modal-option-cols="4" />
-      <Gap :height="20" />
+        <Select label="MBTI" :required="true" placeholder="MBTI를 선택해주세요." @change="(val: string) => {
+          profileData.mbti = val
+        }" :value="profileData.mbti" :options="TEST_SELECT_OPTIONS" :modal-option-cols="4" />
+        <Gap :height="20" />
 
-      <DeepSelect label="거주지역" placeholder="거주지역을 선택해주세요." modalTitle="거주지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
-        profileData.occupiedAreaHigh = val
-        profileData.occupiedAreaLow = val2
-      }" :value="profileData.occupiedAreaLow" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
-      <Gap :height="20" />
+        <DeepSelect label="거주지역" placeholder="거주지역을 선택해주세요." modalTitle="거주지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
+          profileData.occupiedAreaHigh = val
+          profileData.occupiedAreaLow = val2
+        }" :value="profileData.occupiedAreaLow" :view-value="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
+        <Gap :height="20" />
 
-      <TextArea label="자기소개" :max-length="120" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
-        profileData.selfIntroduction = val
-      }" :value="profileData.selfIntroduction || ''" />
+        <TextArea label="자기소개" :max-length="120" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
+          profileData.selfIntroduction = val
+        }" :value="profileData.selfIntroduction || ''" />
+      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'job'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('default')
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="프로필에 등록될<br>직장 및 직무를 인증해주세요." description="Meetple은 인증 기반의 서비스입니다.<br>공개 가능한 선에서 구체적으로 직장 및 직무를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요." />
-      <Gap :height="40" />
+      <div class="content-container">
+        <PageTitleAndDescription title="프로필에 등록될<br>직장 및 직무를 인증해주세요." description="Meetple은 인증 기반의 서비스입니다.<br>공개 가능한 선에서 구체적으로 직장 및 직무를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요." />
+        <Gap :height="40" />
 
-      <TextInput label="직장 및 직무" placeholder="최대한 구체적으로 작성해주세요." :required="true" :validate="(val: string) => {
-        if (val && val.length >= 50) {
-          return '50자 이내로 입력해주세요.';
-        }
+        <TextInput label="직장 및 직무" placeholder="최대한 구체적으로 작성해주세요." :required="true" :validate="(val: string) => {
+          if (val && val.length >= 50) {
+            return '50자 이내로 입력해주세요.';
+          }
 
-        return null;
-      }" @input="(val: string, validateValue: any) => {
-        profileData.job = val;
-        if (validateValue === null && val.length > 0) {
+          return null;
+        }" @input="(val: string, validateValue: any) => {
           profileData.job = val;
-        } else {
-          profileData.job = '';
-        }
-      }" :value="profileData.job" />
-      <Gap :height="20" />
+          if (validateValue === null && val.length > 0) {
+            profileData.job = val;
+          } else {
+            profileData.job = '';
+          }
+        }" :value="profileData.job" />
+        <Gap :height="20" />
 
-      <Image label="증빙 이미지 등록" :required="true" @change="JobUploader" description="증빙 이미지를 업로드해요" />
-      <Gap :height="20" />
+        <Image label="증빙 이미지 등록" :required="true" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" />
+        <Gap :height="20" />
+      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'school'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('normal')
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="프로필에 등록될 재학 및<br>졸업 대학을 입력해주세요." description="나와 더 잘 맞는 상대와 매칭될 수 있어요." />
-      <Gap :height="40" />
+      <div class="content-container">
+          <PageTitleAndDescription title="프로필에 등록될 재학 및<br>졸업 대학을 입력해주세요." description="나와 더 잘 맞는 상대와 매칭될 수 있어요." />
+          <Gap :height="40" />
 
-      <TextInput label="학교명" placeholder="학교명을 입력해주세요." :required="false" :validate="(val: string) => {
-        if (val && val.length >= 20) {
-          return '학교명은 20자 이내로 입력해주세요.';
-        }
+          <TextInput label="학교명" placeholder="학교명을 입력해주세요." :required="false" :validate="(val: string) => {
+            if (val && val.length >= 20) {
+              return '학교명은 20자 이내로 입력해주세요.';
+            }
 
-        return null;
-      }" @input="(val: string, validateValue: any) => {
-        profileData.school = val;
-        if (validateValue === null && val.length > 0) {
-          profileData.school = val;
-        } else {
-          profileData.school = '';
-        }
-      }" :value="profileData.school" />
-    </div>
+            return null;
+          }" @input="(val: string, validateValue: any) => {
+            profileData.school = val;
+            if (validateValue === null && val.length > 0) {
+              profileData.school = val;
+            } else {
+              profileData.school = '';
+            }
+          }" :value="profileData.school" />
+        </div>
+      </div>
 
     <div v-if="account.data?.accountMeta.stage === 'answer'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('job')
         }" />
       </StickyArea>
-      <PageTitleAndDescription title="프로필에 등록될<br>질문에 답변해주세요." description="보다 잘 맞는 상대와 미팅을 진행하기 위한 질문이에요.<br>상세하게 작성할 수록 매칭 확률이 올라가요!" />
-      <Gap :height="40" />
+      <div class="content-container">
+        <PageTitleAndDescription title="프로필에 등록될<br>질문에 답변해주세요." description="보다 잘 맞는 상대와 미팅을 진행하기 위한 질문이에요.<br>상세하게 작성할 수록 매칭 확률이 올라가요!" />
+        <Gap :height="40" />
 
-      <TextArea :question="question1" @input="(val: string) => {
-        profileData.descriptions[0].title = question1;
-        profileData.descriptions[0].answer = val;
-      }" :num-lines="6" :max-length="500" :value="profileData.descriptions[0].answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
-      <Gap :height="20" />
+        <TextArea :question="question1" @input="(val: string) => {
+          profileData.descriptions[0].title = question1;
+          profileData.descriptions[0].answer = val;
+        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[0].answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
+        <Gap :height="20" />
 
-      <TextArea :question="question2" @input="(val: string) => {
-        profileData.descriptions[1].title = question2;
-        profileData.descriptions[1].answer = val;
-      }" :num-lines="6" :max-length="500" :value="profileData.descriptions[1].answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
-      <Gap :height="20" />
+        <TextArea :question="question2" @input="(val: string) => {
+          profileData.descriptions[1].title = question2;
+          profileData.descriptions[1].answer = val;
+        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[1].answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
+        <Gap :height="20" />
+      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'request'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="false" @back="() => {}" />
       </StickyArea>
-      <PageTitleAndDescription title="가입 승인을 위해<br>인증 심사중이에요." description="신뢰도 기반의 미팅을 위해 인증 절차를 진행하고 있어요.<br>인증이 승인되면 문자를 통해 안내해드릴게요!" />
-      <Gap :height="40" />
-      <UserProfileInfo
-        :name="profileData.name"
-        :message="profileData.selfIntroduction"
-        :age="calculateAge(profileData.birthDate)"
-        :job="profileData.job"
-        :mbti="profileData.mbti"
-        :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
-        :school="profileData.school || '미입력'"
-        :image-url="photos[photos.length - 1].image_path"
-      />
-      <Gap :height="20" />
-      <Questions :data="profileData.descriptions.map((line: any) => {
-        return {
-          question: line.title,
-          answer: line.answer
-        }
-      })"/>
+      <div class="content-container">
+        <PageTitleAndDescription title="가입 승인을 위해<br>인증 심사중이에요." description="신뢰도 기반의 미팅을 위해 인증 절차를 진행하고 있어요.<br>인증이 승인되면 문자를 통해 안내해드릴게요!" />
+        <Gap :height="40" />
+        <UserProfileInfo
+          :name="profileData.name"
+          :message="profileData.selfIntroduction"
+          :age="calculateAge(profileData.birthDate)"
+          :job="profileData.job"
+          :mbti="profileData.mbti"
+          :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
+          :school="profileData.school || '미입력'"
+          :image-url="photos[photos.length - 1].image_path"
+        />
+        <Gap :height="20" />
+        <Questions :data="profileData.descriptions.map((line: any) => {
+          return {
+            question: line.title,
+            answer: line.answer
+          }
+        })"/>
+      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'reject'">
@@ -516,7 +573,11 @@ const ProfileUpdateAction = (stage: string) => {
 
 <style scoped>
 .page {
-  padding: 16px 16px 120px;
+  //padding: 16px 16px 120px;
   min-height: 100dvh;
+}
+
+.content-container {
+  padding: 16px 16px 120px;
 }
 </style>

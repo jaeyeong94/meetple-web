@@ -17,6 +17,10 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  viewValue: {
+    type: String,
+    required: false,
+  },
 })
 
 const { setModal } = useModalStore()
@@ -29,7 +33,7 @@ const onClick = () => {
     data: {
       modalTitle: props.modalTitle,
       options: props.options,
-      selected: props.value,
+      selected: props.value || '강남구',
       onChange: (val1, val2) => emit('change', val1, val2),
     }
   })
@@ -48,7 +52,7 @@ const selected = computed(() => {
   </label>
   <div class="container">
     <button class="select" @click="onClick">
-      <span v-if="props.value">{{selected?.label}}</span>
+      <span v-if="props.value">{{ viewValue }}</span>
       <span v-else style="color: #C2C2C2">{{props.placeholder}}</span>
       <div class="arrow">
         <IcGrayArrow />

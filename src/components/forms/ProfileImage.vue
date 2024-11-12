@@ -6,6 +6,7 @@ import { ref } from 'vue'
 const props = defineProps({
   label: String,
   required: Boolean,
+  imageUrl: String,
 })
 
 const emit = defineEmits(['change'])
@@ -37,14 +38,15 @@ const onImageChange = (e: Event) => {
     <span v-else>(선택사항)</span>
   </label>
   <div class="profile-image">
-    <div class="thumbnail" v-if="!selected">
+    <div class="thumbnail" v-if="!imageUrl">
       <IcProfile />
     </div>
-    <img ref="image" src="" alt="User profile" />
+    <img ref="image" v-else-if="imageUrl" :src="imageUrl" alt="User profile"  />
     <UploadButton class="btn-upload" @click="() => input?.click()" />
     <input
       ref="input"
       class="input"
+      accept="images/*"
       type="file"
       @change="onImageChange"
     />
@@ -73,6 +75,8 @@ label > span.required {
 .profile-image {
   display: inline-block;
   position: relative;
+  width: 120px;
+  height: 120px;
 }
 .profile-image img {
   width: 116px;

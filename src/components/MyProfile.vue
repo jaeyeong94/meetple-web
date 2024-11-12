@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import EditButton from '@/components/buttons/EditButton.vue'
+import UploadButton from '@/components/buttons/UploadButton.vue'
 import { ref } from 'vue'
 
 const props = defineProps({
@@ -44,7 +45,8 @@ const onImageChange = (e: Event) => {
   <div class="my-profile">
     <div class="profile-image">
       <img :src="props.imageUrl" alt="User profile" />
-      <EditButton class="btn-edit" @click="() => input?.click()" />
+<!--      <EditButton class="btn-edit" @click="() => input?.click()" />-->
+      <UploadButton class="btn-upload" @click="() => input?.click()" />
       <input
         ref="input"
         class="input"
@@ -72,7 +74,7 @@ const onImageChange = (e: Event) => {
   border-radius: 58px;
   object-fit: cover;
 }
-.btn-edit {
+.btn-upload {
   position: absolute;
   bottom: 0;
   right: 0;

@@ -7,6 +7,7 @@ const props = defineProps({
   label: String,
   required: Boolean,
   description: String,
+  imageUrl: String,
 })
 
 const emit = defineEmits(['change'])
@@ -41,11 +42,12 @@ const onImageChange = (e: Event) => {
     <input
       ref="input"
       class="input"
+      accept="images/*"
       type="file"
       @change="onImageChange"
     />
-    <img ref="image" class="thumbnail" src="" alt="Thumbnail" />
-    <div class="empty" v-if="!selected">
+    <img ref="image" class="thumbnail" :src="imageUrl" alt="Thumbnail" />
+    <div class="empty" v-if="!imageUrl">
       <button class="new-button" @click="() => input?.click()">
         <div class="icon">
           <IcImage width="43" height="43" />
@@ -54,7 +56,7 @@ const onImageChange = (e: Event) => {
       </button>
       <p class="description" v-if="props.description">{{props.description}}</p>
     </div>
-    <Button class="change-button" @click="() => input?.click()" v-if="selected">
+    <Button class="change-button" @click="() => input?.click()">
       <IcImage width="24" height="24" />
       <span>이미지 교체하기</span>
     </Button>
