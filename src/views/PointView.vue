@@ -27,7 +27,11 @@ const accountUpdate = async () => {
 }
 
 onMounted(async () => {
-  await accountUpdate()
+  try {
+    await accountUpdate()
+  } catch(e: any) {
+    console.log(e, 'error')
+  }
 
   // 튕겨내기
   if(!account.data) {
