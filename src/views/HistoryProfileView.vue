@@ -113,10 +113,6 @@ const actionBlock = async (nickname: string) => {
       }
     }
   })
-  // const response = await http.post(`/match/block/${hitProfile.id}`, {});
-  // if(response.status === 200) {
-  //   await router.push('/match')
-  // }
 }
 
 </script>
@@ -138,7 +134,7 @@ const actionBlock = async (nickname: string) => {
 }" />
   </StickyArea>
   <div class="page">
-    <div v-if="match.data?.recommended.length > 0">
+    <div v-if="match.data?.hit.length > 0">
       <div v-if="hitProfile.hit_answer">
         <MatchingStatus status="matched" />
         <Gap :height="20" />

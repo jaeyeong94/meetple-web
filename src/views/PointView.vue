@@ -51,9 +51,17 @@ onMounted(async () => {
 const pointCharge = async (id: number) => {
   const action = async () => {
     http.post('/payment/buy', { itemId: id })
-      .then((data: any) => {
+      .then(async (data: any) => {
         const response = data.data;
-        accountUpdate()
+        const candyCurrency = items.data.find((item: any) => item.id === id).charge_currency
+        await accountUpdate();
+        useModalStore().setModal({
+          type: 'alert',
+          data: {
+            title: '캔디 충전완료',
+            message: `${candyCurrency} 캔디가 충전되었습니다.`
+          }
+        })
       })
       .catch((error: any) => {
         useModalStore().setModal({

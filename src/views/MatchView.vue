@@ -55,15 +55,12 @@ onMounted(async () => {
 })
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
-  // 프로필, 상점, 히스토리
-
   const action = async () => {
     http.post('/match/answer', {
       matchId,
       attitude: true
     })
       .then((data: any) => {
-        const response = data.data;
         accountUpdate()
       })
       .catch((error: any) => {
@@ -87,16 +84,22 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
           useModalStore().setModal({ type: null })
         },
         onClickSubmit: () => {
+          if(account.data.currency < 30) {
+            useModalStore().setModal({ type: null })
+            return router.push('/point')
+          }
+
           action()
+
           useModalStore().setModal({
             type: 'matched',
             data: {
               name: nickname,
               partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
               myProfileImageUrl: photos.value[photos.value.length - 1]?.image_path,
-              onClickClose: () => {
+              onClickSubmit: () => {
                 useModalStore().setModal({ type: null })
-                // router.push('/chat')
+                router.push(`/history/profile/${match.data.hit[0].id}`);
               }
             }
           })
@@ -112,7 +115,13 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
           useModalStore().setModal({ type: null })
         },
         onClickSubmit: () => {
+          if(account.data.currency < 30) {
+            useModalStore().setModal({ type: null })
+            return router.push('/point')
+          }
+
           action()
+
           useModalStore().setModal({ type: null })
         }
       }
@@ -228,7 +237,7 @@ const multipleProfileMove = (id: string) => {
     </div>
 
     <div v-else>
-      <Empty v-if="match.data" title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요! 매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
+      <Empty v-if="match.data" title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요!<br>매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
     </div>
   </div>
 </template>
