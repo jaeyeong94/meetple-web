@@ -47,6 +47,7 @@ const submitAction = () => {
       useModalStore().setModal({
         type: 'alert',
         data: {
+          title: error.response.data.title,
           message: error.response.data.message
         }
       })
