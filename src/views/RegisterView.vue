@@ -433,12 +433,6 @@ const ProfileUpdateAction = (stage: string) => {
 
     <div v-if="account.data?.accountMeta.stage === 'reject'">
       <Empty title="인증이 거절되었습니다." description="인증을 위한 문서나 직장 및 직무 텍스트를 수정하신 후 인증을 다시 진행해주세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
-      <SubmitButton @click="ProfileUpdateAction('normal')" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">인증 다시 진행하기</SubmitButton>
     </div>
   </div>
 
@@ -506,6 +500,12 @@ const ProfileUpdateAction = (stage: string) => {
         padding: '0 32px',
         backgroundColor: '#6726FE',
       }">등록하고 다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
+    <SubmitButton @click="ProfileUpdateAction('normal')" :style="{
+        backgroundColor: '#6726FE',
+      }">인증 다시 진행하기</SubmitButton>
   </StickyArea>
 
 </template>

@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import Tabs from '@/components/Tabs.vue'
 import MyProfile from '@/components/MyProfile.vue'
 import MyPointWithButton from '@/components/MyPointWithButton.vue'
 import Settings from '@/components/Settings.vue'
-import AlertBanner from '@/components/AlertBanner.vue'
-import AccountSettings from '@/components/AccountSettings.vue'
 import Divider from '@/components/Divider.vue'
-import ButtonWithDetail from '@/components/buttons/ButtonWithDetail.vue'
 import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
-import { TEST_MORE_DATA, TEST_TABS, TEST_USER } from '@/consts/testData'
+import { TEST_USER } from '@/consts/testData'
 import http from '@/lib/http'
 import router from '@/router'
 import { onMounted, reactive, ref, type Ref } from 'vue'
@@ -95,5 +91,6 @@ onMounted(async () => {
 <style scoped>
 .page {
   padding: 16px;
+  min-height: 100dvh;
 }
 </style>
