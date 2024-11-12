@@ -17,6 +17,7 @@ const props = defineProps({
     required: true,
   },
   showDetailButton: Boolean,
+  link: String
 })
 
 const emit = defineEmits(['change', 'detail'])
@@ -33,7 +34,8 @@ const emit = defineEmits(['change', 'detail'])
     <label :for="props.name" :class="{main: props.main}">
       <IcCheckActive v-if="props.value" />
       <IcCheck v-else />
-      {{props.title}}
+      <span v-if="props.link"><a :href="props.link" target="_blank">{{props.title}}</a></span>
+      <span v-else>{{props.title}}</span>
     </label>
     <button @click="() => emit('detail')" v-if="!!props.showDetailButton">
     </button>
