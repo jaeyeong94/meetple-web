@@ -17,6 +17,7 @@ import Checkbox from '@/components/forms/Checkbox.vue'
 import Divider from '@/components/Divider.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
+import ProfileImage from '@/components/forms/ProfileImage.vue'
 import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS } from '@/consts/testData'
 import http from '@/lib/http'
 import { calculateAge, validateDate } from '@/lib/utils'
@@ -295,7 +296,7 @@ const ProfileUpdateAction = (stage: string) => {
       <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
       <Gap :height="40" />
 
-      <Image label="프로필 이미지" :required="true" @change="ProfileUploader" description="프로필 이미지를 업로드해요" />
+      <ProfileImage label="프로필 이미지" :required="true" @change="ProfileUploader" />
       <Gap :height="20" />
 
       <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {

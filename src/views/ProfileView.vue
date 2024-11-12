@@ -73,7 +73,7 @@ onMounted(async () => {
 <!--    <Tabs :tabs="TEST_TABS" :current-index="1" />-->
   </StickyArea>
   <div class="page">
-    <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[photos.length - 1]?.image_path" />
+    <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[photos.length - 1]?.image_path" @change="() => {}" />
 <!--    <Gap :height="20" />-->
 <!--    <AlertBanner title="카카오톡 오픈 프로필을 등록해주세요." description="링크된 상대방과 대화할 수 있습니다." />-->
     <Gap :height="20" />
