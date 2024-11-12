@@ -111,7 +111,7 @@ onMounted(async () => {
 })
 
 // 이용약관
-const agreement = reactive([false, false, false]);
+const agreement = reactive([true, true, true]);
 let termsRequired = ref( false);
 watch(agreement, (val) => {
   profileData.termsRequired = !!(val[0] && val[1]);
@@ -146,6 +146,7 @@ const ProfileUploader = (base64: string, file: any) => {
       useModalStore().setModal({
         type: 'alert',
         data: {
+          title: error.response.data.title,
           message: error.response.data.message
         }
       })
@@ -168,6 +169,7 @@ const JobUploader = (base64: string, file: any) => {
       useModalStore().setModal({
         type: 'alert',
         data: {
+          title: error.response.data.title,
           message: error.response.data.message
         }
       })
@@ -189,6 +191,7 @@ const ProfileUpdateAction = (stage: string) => {
       useModalStore().setModal({
         type: 'alert',
         data: {
+          title: error.response.data.title,
           message: error.response.data.message
         }
       })
@@ -246,7 +249,7 @@ const ProfileUpdateAction = (stage: string) => {
       <Gap :height="40" />
 
       <TextInput label="이름" placeholder="이름을 입력하세요" :required="true" :validate="(val: string) => {
-        if (val && !(/^[가-힣]+$/.test(val))) {
+        if (val && !(/^[ㄱ-힣]+$/.test(val))) {
           return '이름에는 특수문자, 숫자, 알파벳이 포함될 수 없습니다.';
         }
 

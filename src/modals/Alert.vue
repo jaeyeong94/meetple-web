@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
-import SubmitButton from '@/components/SubmitButton.vue'
 import CancelButton from '@/components/CancelButton.vue'
 
 const props = defineProps({
@@ -12,7 +11,7 @@ const emit = defineEmits(['close'])
 
 <template>
   <Modal>
-    <span class="title">문제가 있습니다..</span>
+    <span class="title">{{props.data?.title}}</span>
     <p class="description">{{props.data?.message}}</p>
     <CancelButton :style="{marginTop: '20px'}" @click="() => {
           emit('close')
