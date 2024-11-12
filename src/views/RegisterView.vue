@@ -17,6 +17,7 @@ import Checkbox from '@/components/forms/Checkbox.vue'
 import Divider from '@/components/Divider.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
+import ProfileImage from '@/components/forms/ProfileImage.vue'
 import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS } from '@/consts/testData'
 import http from '@/lib/http'
 import { calculateAge, validateDate } from '@/lib/utils'
@@ -295,7 +296,7 @@ const ProfileUpdateAction = (stage: string) => {
       <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
       <Gap :height="40" />
 
-      <Image label="프로필 이미지" :required="true" @change="ProfileUploader" description="프로필 이미지를 업로드해요" />
+      <ProfileImage label="프로필 이미지" :required="true" @change="ProfileUploader" />
       <Gap :height="20" />
 
       <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
@@ -433,12 +434,6 @@ const ProfileUpdateAction = (stage: string) => {
 
     <div v-if="account.data?.accountMeta.stage === 'reject'">
       <Empty title="인증이 거절되었습니다." description="인증을 위한 문서나 직장 및 직무 텍스트를 수정하신 후 인증을 다시 진행해주세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px;" />
-      <SubmitButton @click="ProfileUpdateAction('normal')" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">인증 다시 진행하기</SubmitButton>
     </div>
   </div>
 
@@ -506,6 +501,12 @@ const ProfileUpdateAction = (stage: string) => {
         padding: '0 32px',
         backgroundColor: '#6726FE',
       }">등록하고 다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
+    <SubmitButton @click="ProfileUpdateAction('normal')" :style="{
+        backgroundColor: '#6726FE',
+      }">인증 다시 진행하기</SubmitButton>
   </StickyArea>
 
 </template>
