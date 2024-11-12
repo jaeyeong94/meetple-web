@@ -48,6 +48,20 @@ input, button, textarea, select {
   z-index: 1000 !important;
 }
 
+@media (max-width: 499px) {
+  html, body, #app {
+    position: fixed;
+    min-height: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  #app {
+    overflow: scroll;
+  }
+}
+
 @media (max-width: 960px) {
   #app {
     padding: 0;

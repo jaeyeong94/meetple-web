@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
-import PhoneNumberInput from '@/components/forms/PhoneNumberInput.vue'
 import CodeInput from '@/components/forms/CodeInput.vue'
 import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import Gap from '@/components/Gap.vue'
-import DeepSelect from '@/components/forms/DeepSelect.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import http from '@/lib/http'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
 import { ref } from 'vue'
-import { TEST_DEEP_SELECT_OPTIONS } from '@/consts/testData'
 
 const phoneNumber = localStorage.getItem('authPhoneNumber')
-const code = ref('')
 const authCode = ref('')
 const btnState = ref(false)
 
@@ -73,12 +69,10 @@ const submitAction = () => {
     <Gap :height="40" />
     <CodeInput
       @input="(val: string) => {
-        const newVal = val.replace(/[^0-9]/g, '')
-        btnState = newVal.length === 6
-        authCode = newVal
-        code = val
+        btnState = val.length === 6
+        authCode = val
       }"
-      :value="code"
+      :value="authCode"
     />
     <Gap :height="20" />
     <SubmitButton @click="submitAction" :disabled="!btnState" :fixed="true" :style="{

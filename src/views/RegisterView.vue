@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ButtonWithDetail from '@/components/buttons/ButtonWithDetail.vue'
+import Button from '@/components/Button.vue'
 import Empty from '@/components/Empty.vue'
 import DeepSelect from '@/components/forms/DeepSelect.vue'
 import Image from '@/components/forms/Image.vue'
@@ -26,7 +26,6 @@ import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch } from 
 
 const progress = ref(0)
 const processing = ref(false)
-const currentStage = ref('')
 const profileData: Reactive<{
   [key: string]: any
 }> = reactive({})
@@ -234,13 +233,6 @@ const ProfileUpdateAction = (stage: string) => {
       <Checkbox name="agreement3" title="[선택] 마케팅 목적의 개인정보 수집 및 이용 동의" @change="(val: boolean) =>{
       agreement[2] = val
     }" :value="agreement[2]" :show-detail-button="true" @detail="() => {}" link="https://seen-bison-bae.notion.site/135c10e8cd2c80d5b5d8e9a72ee125aa?pvs=4" />
-
-      <SubmitButton @click="termsAccept" :disabled="!agreement[0] || !agreement[1]" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">다음</SubmitButton>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
@@ -290,13 +282,6 @@ const ProfileUpdateAction = (stage: string) => {
         defaultData.gender = val;
         profileData.gender = val;
       }" :value="defaultData.gender" :options="TEST_RADIO_OPTIONS" />
-
-      <SubmitButton @click="ProfileUpdateAction('default')" :disabled="!profileData.name || !profileData.birthDate || !profileData.gender" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">다음</SubmitButton>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'normal'">
@@ -343,13 +328,6 @@ const ProfileUpdateAction = (stage: string) => {
       <TextArea label="자기소개" :max-length="120" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
         profileData.selfIntroduction = val
       }" :value="profileData.selfIntroduction || ''" />
-
-      <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">다음</SubmitButton>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'job'">
@@ -379,13 +357,6 @@ const ProfileUpdateAction = (stage: string) => {
 
       <Image label="증빙 이미지 등록" :required="true" @change="JobUploader" description="증빙 이미지를 업로드해요" />
       <Gap :height="20" />
-
-      <SubmitButton @click="ProfileUpdateAction('job')" :disabled="!profileData.job || !jobRequired" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        width: 'calc(100% - 32px)',
-      }">다음</SubmitButton>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'school'">
@@ -411,29 +382,6 @@ const ProfileUpdateAction = (stage: string) => {
           profileData.school = '';
         }
       }" :value="profileData.school" />
-
-      <div>
-        <SubmitButton @click="() => {
-        profileData.school = '';
-        ProfileUpdateAction('school')
-      }" :style="{
-        backgroundColor: '#fff',
-        position: 'absolute',
-        bottom: '16px',
-        left: '16px',
-        width: 'calc(166px)',
-        color: '#000',
-        border: '1px solid #E0E0E0',
-      }">건너뛰기</SubmitButton>
-
-        <SubmitButton @click="ProfileUpdateAction('school')" :disabled="!profileData.school" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        right: '16px',
-        width: 'calc(166px)',
-      }">등록하고 다음</SubmitButton>
-      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'answer'">
@@ -456,32 +404,6 @@ const ProfileUpdateAction = (stage: string) => {
         profileData.descriptions[1].answer = val;
       }" :num-lines="6" :max-length="500" :value="profileData.descriptions[1].answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
       <Gap :height="20" />
-
-      <div>
-        <SubmitButton @click="() => {
-        profileData.descriptions[0].title = question1;
-        profileData.descriptions[0].answer = '';
-        profileData.descriptions[1].title = question2
-        profileData.descriptions[1].answer = '';
-        ProfileUpdateAction('answer')
-      }" :style="{
-        backgroundColor: '#fff',
-        position: 'absolute',
-        bottom: '16px',
-        left: '16px',
-        width: 'calc(166px)',
-        color: '#000',
-        border: '1px solid #E0E0E0',
-      }">건너뛰기</SubmitButton>
-
-        <SubmitButton @click="ProfileUpdateAction('answer')" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
-        backgroundColor: '#6726FE',
-        position: 'absolute',
-        bottom: '16px',
-        right: '16px',
-        width: 'calc(166px)',
-      }">등록하고 다음</SubmitButton>
-      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'request'">
@@ -520,10 +442,77 @@ const ProfileUpdateAction = (stage: string) => {
     </div>
   </div>
 
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
+    <SubmitButton @click="termsAccept" :disabled="!agreement[0] || !agreement[1]" :style="{
+          backgroundColor: '#6726FE',
+        }">다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
+    <SubmitButton @click="ProfileUpdateAction('default')" :disabled="!profileData.name || !profileData.birthDate || !profileData.gender" :style="{
+          backgroundColor: '#6726FE',
+        }">다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
+    <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
+          backgroundColor: '#6726FE',
+        }">다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
+    <SubmitButton @click="ProfileUpdateAction('job')" :disabled="!profileData.job || !jobRequired" :style="{
+          backgroundColor: '#6726FE',
+        }">다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
+    <Button @click="() => {
+          profileData.school = '';
+          ProfileUpdateAction('school')
+        }" :style="{
+          width: 'auto',
+          padding: '0 32px',
+          height: '52px',
+          borderRadius: '26px',
+          fontSize: '17px'
+        }">건너뛰기</Button>
+    <div :style="{flex: 1}" />
+    <SubmitButton @click="ProfileUpdateAction('school')" :disabled="!profileData.school" :style="{
+          width: 'auto',
+          padding: '0 32px',
+          backgroundColor: '#6726FE',
+        }">등록하고 다음</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
+    <Button @click="() => {
+        profileData.descriptions[0].title = question1;
+        profileData.descriptions[0].answer = '';
+        profileData.descriptions[1].title = question2
+        profileData.descriptions[1].answer = '';
+        ProfileUpdateAction('answer')
+      }" :style="{
+        width: 'auto',
+        padding: '0 32px',
+        height: '52px',
+        borderRadius: '26px',
+        fontSize: '17px'
+      }">건너뛰기</Button>
+    <div :style="{flex: 1}" />
+    <SubmitButton @click="ProfileUpdateAction('answer')" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
+        width: 'auto',
+        padding: '0 32px',
+        backgroundColor: '#6726FE',
+      }">등록하고 다음</SubmitButton>
+  </StickyArea>
+
 </template>
 
 <style scoped>
 .page {
   padding: 16px 16px 120px;
+  min-height: 100dvh;
 }
 </style>

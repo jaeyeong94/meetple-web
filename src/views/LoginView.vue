@@ -2,15 +2,11 @@
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import PhoneNumberInput from '@/components/forms/PhoneNumberInput.vue'
-import CodeInput from '@/components/forms/CodeInput.vue'
 import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import Gap from '@/components/Gap.vue'
-import DeepSelect from '@/components/forms/DeepSelect.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import router from '@/router'
-import { useModalStore } from '@/stores/modal'
 import { ref } from 'vue'
-import { TEST_DEEP_SELECT_OPTIONS } from '@/consts/testData'
 import http from '@/lib/http'
 
 const phoneNumber = ref('')

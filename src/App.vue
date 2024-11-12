@@ -39,7 +39,7 @@ onUnmounted(() => {
 
 <template>
   <div class="app-container">
-    <div class="banner">
+    <div class="banner-container">
       <span class="subtitle">내 친구들과 함께 만나는 미팅 매칭</span>
       <IcMainLogo width="383" height="100" />
     </div>
@@ -68,7 +68,7 @@ onUnmounted(() => {
   align-items: center;
   background: linear-gradient(to bottom, #FFFFFF, #EAE1FF);
 }
-.banner {
+.banner-container {
   position: relative;
   width: 565px;
   margin-right: 375px;
@@ -123,12 +123,19 @@ onUnmounted(() => {
 }
 
 @media (max-width: 499px) {
+  .app-container {
+    position: relative;
+    background: none;
+  }
   .page-container {
     width: 100%;
   }
+  .background {
+    display: none;
+  }
 }
 @media (max-width: 960px) {
-  .banner {
+  .banner-container {
     display: none;
   }
   .page-container {
