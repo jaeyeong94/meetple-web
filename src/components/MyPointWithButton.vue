@@ -15,7 +15,7 @@ const emit = defineEmits(['charge'])
 <template>
   <div class="my-point">
     <div class="container">
-      <span class="title">나의 포인트</span>
+      <span class="title">나의 캔디</span>
       <span class="point">
         <img src="@/assets/images/candy.png" alt="Point" />
         {{formatNumber(props.point)}}

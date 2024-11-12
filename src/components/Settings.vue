@@ -10,7 +10,7 @@ const props = defineProps({
   <span class="title">설정</span>
   <ul class="settings">
     <li class="setting-item" :key="index" v-for="(item, index) in props.options">
-      <button>
+      <button @click="item.onClick()">
         <span class="label">{{item.title}}</span>
         <IcGrayArrow />
       </button>

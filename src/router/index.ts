@@ -1,3 +1,4 @@
+import ProfileSettingView from '@/views/ProfileSettingView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HistoryProfileView from '@/views/HistoryProfileView.vue'
 import HistoryView from '@/views/HistoryView.vue'
@@ -64,6 +65,11 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileView
+    },
+    {
+      path: '/profile-setting',
+      name: 'profile-setting',
+      component: ProfileSettingView
     },
     {
       path: '/profile-edit',

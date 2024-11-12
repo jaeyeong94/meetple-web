@@ -6,11 +6,10 @@ import { formatNumber } from '@/lib/utils'
 
 const emit = defineEmits(['click'])
 
-const items = [
-  { id: 1, point: 5, price: 1000 },
-  { id: 2, point: 10, price: 2000 },
-  { id: 3, point: 15, price: 3000 },
-]
+const props = defineProps({
+  items: Array,
+})
+
 </script>
 
 <template>
@@ -19,9 +18,9 @@ const items = [
     <IcPointLogo />
   </div>
   <ul class="point-items">
-    <li v-for="(item) in items" :key="item.id">
+    <li v-for="(item) in props.items" :key="item.id">
       <img class="icon" src="@/assets/images/logo.png" alt="Point" />
-      <p class="point"><span>{{item.point}}</span> 포인트</p>
+      <p class="point"><span>{{item.charge_currency}}</span> 캔디</p>
       <SubmitButton class="button" @click="() => emit('click', item.id)">₩ {{formatNumber(item.price)}}</SubmitButton>
     </li>
   </ul>

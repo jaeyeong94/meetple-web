@@ -60,7 +60,7 @@ const accountDataUpdate = async () => {
   }
 
   if(account.data.accountMeta.stage === 'approve') {
-    await router.push('/home')
+    await router.push('/match')
   }
 
   profileData.termsRequired = account.data.terms_required
