@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  // baseURL: 'https://api.meetple.co.kr',
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://api.meetple.co.kr',
+  // baseURL: 'http://localhost:3000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
