@@ -4,23 +4,68 @@ import IcImage from '@/components/icons/IcImage.vue'
 import Button from '@/components/Button.vue'
 
 const props = defineProps({
-  label: String,
-  required: Boolean,
-  description: String,
-  imageUrl: String,
+  label: {
+    type: String,
+    default: '',
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+  imageUrl: {
+    type: String,
+    default: '',
+  },
 })
 
-const emit = defineEmits(['change'])
+// `defineEmits`를 타입스크립트로 정의하여 'change'와 'error' 이벤트를 명시
+const emit = defineEmits<{
+  (e: 'change', imageSrc: string, file: File): void
+  (e: 'error', errorMessage: string): void
+}>()
 
-const input = ref<HTMLInputElement>()
-const image = ref<HTMLImageElement>()
+const input = ref<HTMLInputElement | null>(null)
+const image = ref<HTMLImageElement | null>(null)
 const selected = ref(false)
 const loading = ref(false)
+
+// 허용할 이미지 확장자 목록
+const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
+
+// 최대 파일 크기 (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 const onImageChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   const file = target.files?.[0]
+
   if (file) {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase()
+
+    // 파일 확장자 검증
+    if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+      emit('error', '지원되지 않는 파일 형식입니다. (허용된 형식: jpg, jpeg, png, gif, bmp, webp)')
+      // 파일 선택 초기화
+      if (input.value) {
+        input.value.value = ''
+      }
+      return
+    }
+
+    // 파일 크기 검증
+    if (file.size > MAX_FILE_SIZE) {
+      emit('error', '파일 크기가 너무 큽니다. (최대 10MB)')
+      // 파일 선택 초기화
+      if (input.value) {
+        input.value.value = ''
+      }
+      return
+    }
+
     loading.value = true
     const reader = new FileReader()
     reader.onload = (e) => {

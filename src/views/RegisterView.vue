@@ -346,7 +346,15 @@ const ProfileUpdateAction = (stage: string) => {
         <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
         <Gap :height="40" />
 
-        <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" />
+        <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" @error="(message: string) => {
+          useModalStore().setModal({
+            type: 'alert',
+            data: {
+              title: '이미지 업로드 실패',
+              message
+            }
+          })
+        }" />
         <Gap :height="20" />
 
         <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
@@ -409,7 +417,15 @@ const ProfileUpdateAction = (stage: string) => {
         }" :value="profileData.job" />
         <Gap :height="20" />
 
-        <Image label="증빙 이미지 등록" :required="true" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" />
+        <Image label="증빙 이미지 등록" :required="true" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
+          useModalStore().setModal({
+            type: 'alert',
+            data: {
+              title: '이미지 업로드 실패',
+              message
+            }
+          })
+        }" />
         <Gap :height="20" />
       </div>
     </div>
