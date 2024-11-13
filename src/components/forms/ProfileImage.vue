@@ -14,11 +14,13 @@ const emit = defineEmits(['change'])
 const input = ref<HTMLInputElement>()
 const image = ref<HTMLImageElement>()
 const selected = ref(false)
+const loading = ref(false)
 
 const onImageChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   const file = target.files?.[0]
   if (file) {
+    loading.value = true
     const reader = new FileReader()
     reader.onload = (e) => {
       if (image.value) {
@@ -26,6 +28,7 @@ const onImageChange = (e: Event) => {
         image.value.src = e.target?.result as string
       }
       emit('change', e.target?.result as string, file)
+      loading.value = false
     }
     reader.readAsDataURL(file)
   }
