@@ -30,4 +30,6 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 
+app.provide('rootDiv', document.getElementById('app'));
+
 app.mount('#app')

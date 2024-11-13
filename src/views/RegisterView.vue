@@ -23,7 +23,7 @@ import http from '@/lib/http'
 import { calculateAge, validateDate } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch } from 'vue'
+import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
 
 const progress = ref(0)
 const processing = ref(false)
@@ -43,6 +43,7 @@ const photoRequired: Ref<any> = ref(false);
 const jobRequired: Ref<any> = ref(false);
 const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
+const root = inject('rootDiv');
 
 // 질문
 const question1 = '미팅에 함께 나가는 나와 내 친구들은 어떤 사람인가요?';
@@ -222,6 +223,7 @@ const ProfileUpdateAction = (stage: string) => {
       await accountDataUpdate()
       await progressUpdate()
       window.scrollTo(0, 0);
+      root.scrollTo(0, 0);
     })
     .catch((error: any) => {
       console.log(error)
