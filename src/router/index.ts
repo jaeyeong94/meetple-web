@@ -12,6 +12,7 @@ import ProfileEditView from '@/views/ProfileEditView.vue'
 import PointView from '@/views/PointView.vue'
 import NotificationView from '@/views/NotificationView.vue'
 import StartView from '@/views/StartView.vue'
+import ProfilePreviewView from '@/views/ProfilePreviewView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -75,6 +76,11 @@ const router = createRouter({
       path: '/profile-edit',
       name: 'profile-edit',
       component: ProfileEditView
+    },
+    {
+      path: '/profile-preview',
+      name: 'profile-preview',
+      component: ProfilePreviewView
     },
     {
       path: '/point',

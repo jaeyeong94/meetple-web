@@ -34,7 +34,9 @@ const error = ref(false)
 
 const textAreaUpdate = (e: any) => {
   const val = e.target.value
-  emit('input', props.maxLength ? val.slice(0, props.maxLength) : val)
+  const value = props.maxLength ? val.slice(0, props.maxLength) : val;
+  e.target.value = value
+  emit('input', value)
   if (!props.maxLength) return
   error.value = val.length >= props.maxLength
 }

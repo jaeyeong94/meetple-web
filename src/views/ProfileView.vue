@@ -6,7 +6,6 @@ import Divider from '@/components/Divider.vue'
 import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
-import { TEST_USER } from '@/consts/testData'
 import http from '@/lib/http'
 import router from '@/router'
 import { onMounted, reactive, ref, type Ref } from 'vue'
@@ -76,7 +75,7 @@ onMounted(async () => {
     <div style="cursor: pointer;" @click.capture="() => {
       router.push('/profile-edit')
     }">
-      <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[photos.length - 1]?.image_path" @change="() => {}" />
+      <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[photos.length - 1]?.image_path" @click="() => router.push('/profile-edit')" />
     </div>
 <!--    <Gap :height="20" />-->
 <!--    <AlertBanner title="카카오톡 오픈 프로필을 등록해주세요." description="링크된 상대방과 대화할 수 있습니다." />-->
