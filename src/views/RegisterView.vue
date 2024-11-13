@@ -221,6 +221,7 @@ const ProfileUpdateAction = (stage: string) => {
     .then(async (data: any) => {
       await accountDataUpdate()
       await progressUpdate()
+      window.scrollTo(0, 0);
     })
     .catch((error: any) => {
       console.log(error)
