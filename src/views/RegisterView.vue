@@ -25,6 +25,7 @@ import router from '@/router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
 
+const currentStage = ref('')
 const progress = ref(0)
 const processing = ref(false)
 const profileData: Reactive<{
@@ -43,7 +44,7 @@ const photoRequired: Ref<any> = ref(false);
 const jobRequired: Ref<any> = ref(false);
 const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
-const root = inject('rootDiv');
+const root = inject<HTMLElement>('rootDiv');
 
 // 질문
 const question1 = '미팅에 함께 나가는 나와 내 친구들은 어떤 사람인가요?';
@@ -87,6 +88,8 @@ const accountDataUpdate = async () => {
     await router.push('/match')
   }
 
+  currentStage.value = account.data.accountMeta.stage
+
   profileData.termsRequired = account.data.terms_required
   profileData.termsOptional = account.data.terms_optional
   profileData.name = account.data.name
@@ -120,6 +123,9 @@ const accountDataUpdate = async () => {
 
   profileData.termsRequired = true;
   profileData.termsOptional = true;
+
+  // 생년월일
+  defaultData.birthDate = account.data.birth_date.replaceAll('-', '');
 }
 
 const progressUpdate = async () => {
@@ -154,8 +160,6 @@ const termsAccept = () => {
   termsRequired.value = true;
 }
 
-console.log();
-
 function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
   const byteCharacters = atob(base64);
   const byteNumbers = new Array(byteCharacters.length);
@@ -166,6 +170,7 @@ function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
   return new Blob([byteArray], { type: mimeType });
 }
 
+const ProfileUploaderLoading = ref(false);
 const ProfileUploader = (base64: string, file: any) => {
   const base64Data = base64.split(',')[1];
   const mimeType = 'text/plain';
@@ -173,6 +178,8 @@ const ProfileUploader = (base64: string, file: any) => {
   const formData = new FormData();
   formData.append('file', blob, file.name);
   formData.append('type', 'photo');
+
+  ProfileUploaderLoading.value = true;
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
       photoRequired.value = true;
@@ -188,8 +195,12 @@ const ProfileUploader = (base64: string, file: any) => {
       })
       console.log(error, 'error')
     })
+    .finally(() => {
+      ProfileUploaderLoading.value = false;
+    })
 }
 
+const JobUploaderLoading = ref(false);
 const JobUploader = (base64: string, file: any) => {
   const base64Data = base64.split(',')[1];
   const mimeType = 'text/plain';
@@ -197,6 +208,8 @@ const JobUploader = (base64: string, file: any) => {
   const formData = new FormData();
   formData.append('file', blob, file.name);
   formData.append('type', 'job');
+
+  JobUploaderLoading.value = true;
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
       jobRequired.value = true;
@@ -212,6 +225,9 @@ const JobUploader = (base64: string, file: any) => {
       })
       console.log(error, 'error')
     })
+    .finally(() => {
+      JobUploaderLoading.value = false;
+    })
 }
 
 const ProfileUpdateAction = (stage: string) => {
@@ -223,7 +239,7 @@ const ProfileUpdateAction = (stage: string) => {
       await accountDataUpdate()
       await progressUpdate()
       window.scrollTo(0, 0);
-      root.scrollTo(0, 0);
+      root!.scrollTo(0, 0);
     })
     .catch((error: any) => {
       console.log(error)
@@ -238,6 +254,10 @@ const ProfileUpdateAction = (stage: string) => {
     })
 }
 
+window.addEventListener('popstate', function (event) {
+
+});
+
 </script>
 
 <template>
@@ -245,9 +265,7 @@ const ProfileUpdateAction = (stage: string) => {
     <div v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader :show-close-button="true" @close="() => {
-          router.push('/')
-        }" />
+        <SubHeader />
       </StickyArea>
       <div class="content-container">
         <PageTitleAndDescription title="<img src='/meetple-mini-logo.png' style='width:110px; vertical-align: bottom;' /> 의 서비스<br>이용약관에 동의해주세요." description="" />
@@ -284,9 +302,7 @@ const ProfileUpdateAction = (stage: string) => {
     <div v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader :show-back-button="true" @back="() => {
-          termsRequired = false
-        }" />
+        <SubHeader />
       </StickyArea>
       <div class="content-container">
         <PageTitleAndDescription title="가입에 필요한 기본정보를<br>입력해주세요." description="이름은 프로필에 공개되지 않으며, 인증을 위한 정보입니다." />
@@ -309,7 +325,7 @@ const ProfileUpdateAction = (stage: string) => {
           } else {
             profileData.name = '';
           }
-        }" :value="defaultData.name" />
+        }" :value="profileData.name" />
         <Gap :height="20" />
 
         <TextInput label="생년월일" placeholder="20000130" :required="true" :validate="(val: string) => {
@@ -329,7 +345,7 @@ const ProfileUpdateAction = (stage: string) => {
         <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {
           defaultData.gender = val;
           profileData.gender = val;
-        }" :value="defaultData.gender" :options="TEST_RADIO_OPTIONS" />
+        }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />
         </div>
     </div>
 
@@ -346,7 +362,7 @@ const ProfileUpdateAction = (stage: string) => {
         <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
         <Gap :height="40" />
 
-        <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" @error="(message: string) => {
+        <ProfileImage label="프로필 이미지" :required="true" :loading="ProfileUploaderLoading" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {
@@ -417,7 +433,7 @@ const ProfileUpdateAction = (stage: string) => {
         }" :value="profileData.job" />
         <Gap :height="20" />
 
-        <Image label="증빙 이미지 등록" :required="true" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
+        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {

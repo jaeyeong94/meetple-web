@@ -13,9 +13,14 @@ import { ref } from 'vue'
 const phoneNumber = localStorage.getItem('authPhoneNumber')
 const authCode = ref('')
 const btnState = ref(false)
+const token = localStorage.getItem('token')
 
 if(!phoneNumber) {
   router.push('/login')
+}
+
+if(token) {
+  router.push('/register')
 }
 
 const retryAction = () => {

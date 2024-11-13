@@ -24,6 +24,7 @@ const inputRef = ref<HTMLInputElement | null>(null)
     <input
       ref="inputRef"
       type="number"
+      inputmode="numeric" pattern="[0-9]*"
       :value="props.value"
       @input="(e) => {
           const target = e.target as HTMLInputElement

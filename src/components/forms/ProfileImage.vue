@@ -7,6 +7,7 @@ const props = defineProps({
   label: String,
   required: Boolean,
   imageUrl: String,
+  loading: Boolean,
 })
 
 const emit = defineEmits<{
@@ -17,7 +18,6 @@ const emit = defineEmits<{
 const input = ref<HTMLInputElement>()
 const image = ref<HTMLImageElement>()
 const selected = ref(false)
-const loading = ref(false)
 
 // 허용할 이미지 확장자 목록
 const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
@@ -44,7 +44,6 @@ const onImageChange = (e: Event) => {
       return
     }
 
-    loading.value = true
     const reader = new FileReader()
     reader.onload = (e) => {
       if (image.value) {
@@ -52,7 +51,6 @@ const onImageChange = (e: Event) => {
         image.value.src = e.target?.result as string
       }
       emit('change', e.target?.result as string, file)
-      loading.value = false
     }
     reader.readAsDataURL(file)
   }

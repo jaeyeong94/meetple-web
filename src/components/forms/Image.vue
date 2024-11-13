@@ -20,6 +20,7 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  loading: Boolean,
 })
 
 // `defineEmits`를 타입스크립트로 정의하여 'change'와 'error' 이벤트를 명시
@@ -31,7 +32,6 @@ const emit = defineEmits<{
 const input = ref<HTMLInputElement | null>(null)
 const image = ref<HTMLImageElement | null>(null)
 const selected = ref(false)
-const loading = ref(false)
 
 // 허용할 이미지 확장자 목록
 const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
@@ -66,7 +66,6 @@ const onImageChange = (e: Event) => {
       return
     }
 
-    loading.value = true
     const reader = new FileReader()
     reader.onload = (e) => {
       if (image.value) {
@@ -74,7 +73,6 @@ const onImageChange = (e: Event) => {
         image.value.src = e.target?.result as string
       }
       emit('change', e.target?.result as string, file)
-      loading.value = false
     }
     reader.readAsDataURL(file)
   }
