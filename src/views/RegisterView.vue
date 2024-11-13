@@ -306,27 +306,27 @@ const ProfileUpdateAction = (stage: string) => {
           } else {
             profileData.name = '';
           }
-        }" :value="profileData.name" />
+        }" :value="defaultData.name" />
         <Gap :height="20" />
 
-        <TextInput label="생년월일" placeholder="2000-01-30" :required="true" :validate="(val: string) => {
+        <TextInput label="생년월일" placeholder="20000130" :required="true" :validate="(val: string) => {
           if (!val) return null;
-          if (val.length < 11 && validateDate(val)) return null;
+          if (val.length < 9 && validateDate(val)) return null;
           return '생년월일이 올바르지 않습니다';
         }" @input="(val: string, validateValue: any) => {
           defaultData.birthDate = val;
-          if (validateValue && val.length > 0) {
-            profileData.birthDate = val;
+          if (validateValue && val.length == 8) {
+            profileData.birthDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
           } else {
             profileData.birthDate = '';
           }
-        }" :value="profileData.birthDate" />
+        }" :value="defaultData.birthDate" />
         <Gap :height="20" />
 
         <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {
           defaultData.gender = val;
           profileData.gender = val;
-        }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />
+        }" :value="defaultData.gender" :options="TEST_RADIO_OPTIONS" />
         </div>
     </div>
 
