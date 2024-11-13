@@ -73,7 +73,7 @@ const onImageChange = (e: Event) => {
     <input
       ref="input"
       class="input"
-      accept="images/*"
+      accept="image/*"
       type="file"
       @change="onImageChange"
     />
