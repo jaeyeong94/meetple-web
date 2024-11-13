@@ -40,7 +40,7 @@ onUnmounted(() => {
 <template>
   <div class="app-container">
     <div class="banner-container">
-      <span class="subtitle">내 친구들과 함께 만나는 미팅 매칭</span>
+      <span class="subtitle">친구와 함께 직장인 미팅</span>
       <IcMainLogo width="383" height="100" />
     </div>
     <img src="@/assets/images/main-background.png" class="background" alt="" />

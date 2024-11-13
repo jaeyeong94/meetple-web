@@ -32,7 +32,7 @@ onUnmounted(() => {
 <template>
   <div class="banner">
     <div class="container">
-      <span class="subtitle">내 친구들과 함께 만나는 미팅 매칭</span>
+      <span class="subtitle">친구와 함께 직장인 미팅</span>
       <IcMainLogo />
     </div>
     <router-link to="/login" style="width: 100%; z-index: 1000;"><SubmitButton>서비스 시작하기</SubmitButton></router-link>
