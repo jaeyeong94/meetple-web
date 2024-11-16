@@ -20,7 +20,7 @@ if(!phoneNumber) {
 }
 
 if(token) {
-  router.push('/register')
+  router.push('/register/auto')
 }
 
 const retryAction = () => {

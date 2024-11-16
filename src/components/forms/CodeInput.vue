@@ -26,6 +26,12 @@ const inputRef = ref<HTMLInputElement | null>(null)
       type="number"
       inputmode="numeric" pattern="[0-9]*"
       :value="props.value"
+      @focus="(e) => {
+        const target = e.target as HTMLInputElement
+        const val = target.value.replace(/[^\d]/g, '').slice(0, LENGTH)
+        target.value = ''
+        emit('input', '')
+      }"
       @input="(e) => {
           const target = e.target as HTMLInputElement
           const val = target.value.replace(/[^\d]/g, '').slice(0, LENGTH)

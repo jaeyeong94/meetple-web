@@ -22,8 +22,18 @@ import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS } fro
 import http from '@/lib/http'
 import { calculateAge, validateDate } from '@/lib/utils'
 import router from '@/router'
+import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
+
+// 라우터 제한
+const route = useRoute();
+const routerLimit = ['auto', 'default', 'normal', 'job', 'school', 'answer', 'request', 'reject'];
+const routeFlow = ['default', 'normal', 'job', 'school', 'answer'];
+
+if(!routerLimit.includes(route.params.stage as string)) {
+  router.push('/');
+}
 
 const currentStage = ref('')
 const progress = ref(0)
@@ -38,6 +48,15 @@ const defaultData = reactive({
   birthDate: '',
   gender: '',
 })
+
+// 텍스트 에어리어
+const textArea: Reactive<{
+  [key: string]: any
+}> = reactive({
+  selfIntroduction: '',
+  description1Answer: '',
+  description2Answer: ''
+});
 
 const termsRequired = ref( false);
 const photoRequired: Ref<any> = ref(false);
@@ -81,11 +100,21 @@ const accountDataUpdate = async () => {
 
   if(!account.data) {
     localStorage.removeItem('token')
-    await router.push('/login')
+    return router.push('/login')
   }
 
   if(account.data.accountMeta.stage === 'approve') {
-    await router.push('/match')
+    return router.push('/match')
+  }
+
+  if(route.params.stage === 'auto') {
+    return router.push(`/register/${account.data.accountMeta.stage}`)
+  }
+
+  if(account.data.accountMeta.stage !== 'request' && account.data.accountMeta.stage !== 'reject') {
+    if(['default', 'normal', 'job', 'school', 'answer', 'request', 'reject'].includes(route.params.stage as string)) {
+      account.data.accountMeta.stage = route.params.stage as string;
+    }
   }
 
   currentStage.value = account.data.accountMeta.stage
@@ -126,6 +155,11 @@ const accountDataUpdate = async () => {
 
   // 생년월일
   defaultData.birthDate = account.data.birth_date.replaceAll('-', '');
+
+  // 텍스트 에어리어
+  textArea.selfIntroduction = account.data.accountMeta.self_introduction;
+  textArea.description1Answer = profileData.descriptions[0].answer;
+  textArea.description2Answer = profileData.descriptions[1].answer;
 }
 
 const progressUpdate = async () => {
@@ -146,6 +180,11 @@ const progressUpdate = async () => {
 }
 
 onMounted(async () => {
+  await accountDataUpdate();
+  await progressUpdate();
+})
+
+watch(() => router.currentRoute.value.params.stage, async (val) => {
   await accountDataUpdate();
   await progressUpdate();
 })
@@ -230,12 +269,23 @@ const JobUploader = (base64: string, file: any) => {
     })
 }
 
-const ProfileUpdateAction = (stage: string) => {
+const ProfileUpdateAction = (stage: string, next: boolean = true) => {
+  let nextFlow;
+  if(next) {
+    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
+  } else {
+    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) - 1];
+  }
+
   http.post('/account/profile/update', {
     stage,
     data: toRaw(profileData)
   })
     .then(async (data: any) => {
+      if(nextFlow) {
+        await router.push(`/register/${nextFlow}`)
+      }
+
       await accountDataUpdate()
       await progressUpdate()
       window.scrollTo(0, 0);
@@ -253,11 +303,6 @@ const ProfileUpdateAction = (stage: string) => {
       console.log(error, 'error')
     })
 }
-
-window.addEventListener('popstate', function (event) {
-
-});
-
 </script>
 
 <template>
@@ -355,7 +400,6 @@ window.addEventListener('popstate', function (event) {
         <SubHeader :show-back-button="true" @back="() => {
           account.data.accountMeta.stage = 'default';
           progressUpdate();
-
         }" />
       </StickyArea>
       <div class="content-container">
@@ -400,9 +444,14 @@ window.addEventListener('popstate', function (event) {
         }" :value="profileData.occupiedAreaLow" :view-value="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
         <Gap :height="20" />
 
-        <TextArea label="자기소개" :max-length="120" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
-          profileData.selfIntroduction = val
-        }" :value="profileData.selfIntroduction || ''" />
+        <TextArea label="자기소개" :min-length="20" :max-length="500" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
+          textArea.selfIntroduction = val
+          if(val.length >= 20) {
+            profileData.selfIntroduction = val
+          } else {
+            profileData.selfIntroduction = ''
+          }
+        }" :value="textArea.selfIntroduction || ''" />
       </div>
     </div>
 
@@ -410,7 +459,7 @@ window.addEventListener('popstate', function (event) {
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('default')
+          ProfileUpdateAction('default', false)
         }" />
       </StickyArea>
       <div class="content-container">
@@ -450,7 +499,7 @@ window.addEventListener('popstate', function (event) {
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('normal')
+          ProfileUpdateAction('normal', false)
         }" />
       </StickyArea>
       <div class="content-container">
@@ -478,7 +527,7 @@ window.addEventListener('popstate', function (event) {
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('job')
+          ProfileUpdateAction('job', false)
         }" />
       </StickyArea>
       <div class="content-container">
@@ -487,14 +536,26 @@ window.addEventListener('popstate', function (event) {
 
         <TextArea :question="question1" @input="(val: string) => {
           profileData.descriptions[0].title = question1;
-          profileData.descriptions[0].answer = val;
-        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[0].answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
+          textArea.description1Answer = val;
+
+          if(val.length >= 20) {
+            profileData.descriptions[0].answer = val;
+          } else {
+            profileData.descriptions[0].answer = '';
+          }
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description1Answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
         <Gap :height="20" />
 
         <TextArea :question="question2" @input="(val: string) => {
           profileData.descriptions[1].title = question2;
-          profileData.descriptions[1].answer = val;
-        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[1].answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
+          textArea.description2Answer = val;
+
+          if(val.length >= 20) {
+            profileData.descriptions[1].answer = val;
+          } else {
+            profileData.descriptions[1].answer = '';
+          }
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description2Answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
         <Gap :height="20" />
       </div>
     </div>

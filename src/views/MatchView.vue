@@ -46,7 +46,7 @@ onMounted(async () => {
   }
 
   if(account.data.accountMeta.stage !== 'approve') {
-    await router.push('/register')
+    await router.push('/register/auto')
   }
 
   account.data.accountProfiles.forEach((profile: any) => {

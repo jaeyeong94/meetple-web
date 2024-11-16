@@ -53,7 +53,7 @@ const router = createRouter({
       component: PhoneNumberCodeAuth
     },
     {
-      path: '/register',
+      path: '/register/:stage',
       name: 'register',
       component: RegisterView
     },
