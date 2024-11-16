@@ -30,6 +30,7 @@ const retryAction = () => {
       onClickSubmit: () => {
         http.post('/account/verification', { phoneNumber: phoneNumber })
           .then((data: any) => {
+            authCode.value = '';
             useModalStore().setModal({ type: null })
           })
           .catch((error: any) => {
@@ -46,7 +47,7 @@ const submitAction = () => {
     .then((data: any) => {
       const response = data.data;
       localStorage.setItem('token', response.data.accessToken)
-      router.push('/register')
+      router.push('/register/auto')
     })
     .catch((error: any) => {
       useModalStore().setModal({
