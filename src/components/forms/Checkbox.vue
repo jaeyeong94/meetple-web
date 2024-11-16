@@ -17,7 +17,8 @@ const props = defineProps({
     required: true,
   },
   showDetailButton: Boolean,
-  link: String
+  link: String,
+  underlined: Boolean
 })
 
 const emit = defineEmits(['change', 'detail'])
@@ -31,7 +32,7 @@ const emit = defineEmits(['change', 'detail'])
       :checked="props.value"
       @change="() => emit('change', !props.value)"
     />
-    <label :for="props.name" :class="{main: props.main}">
+    <label :for="props.name" :class="{main: props.main, underline: underlined}">
       <IcCheckActive v-if="props.value" />
       <IcCheck v-else />
       <span v-if="props.link"><a :href="props.link" target="_blank">{{props.title}}</a></span>
@@ -50,12 +51,14 @@ const emit = defineEmits(['change', 'detail'])
   align-items: center;
   gap: 12px;
 }
+
 input {
   position: absolute;
   top: 0;
   left: 0;
   opacity: 0;
 }
+
 label {
   display: flex;
   flex-direction: row;
@@ -66,8 +69,13 @@ label {
   color: #777777;
   cursor: pointer;
 }
+
 label.main {
   font-weight: 700;
   color: #000;
+}
+
+.underline {
+  text-decoration: underline;
 }
 </style>

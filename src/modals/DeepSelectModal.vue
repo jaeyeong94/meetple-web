@@ -76,7 +76,7 @@ const category = computed(() => {
   border: 1px solid #E2E2E2;
   border-radius: 10px;
   overflow: hidden;
-  height: 200px;
+  height: 60vh;
 }
 .category-list {
   display: flex;
