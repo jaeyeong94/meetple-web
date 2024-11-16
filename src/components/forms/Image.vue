@@ -92,7 +92,10 @@ const onImageChange = (e: Event) => {
       type="file"
       @change="onImageChange"
     />
-    <img ref="image" class="thumbnail" :src="imageUrl" alt="Thumbnail" />
+    <div>
+      <img ref="image" class="thumbnail" v-if="imageUrl" :src="imageUrl" alt="Thumbnail" />
+      <img ref="image" class="thumbnail" src="" alt="Thumbnail" v-else />
+    </div>
     <div class="empty" v-if="!imageUrl">
       <button class="new-button" @click="() => input?.click()">
         <div class="icon">

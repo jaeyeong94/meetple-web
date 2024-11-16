@@ -24,6 +24,9 @@ const profileData: Reactive<{
 const account: any = reactive({});
 const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
+const jobRequired: Ref<any> = ref(false);
+const jobName: Ref<any> = ref('asdasd');
+const jobFile: FormData = new FormData();
 
 const state: Reactive<{
   stage: 'profile' | 'job'
@@ -82,15 +85,27 @@ function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
   return new Blob([byteArray], { type: mimeType });
 }
 
-const ProfileUploader = (base64: string, file: any) => {
+const JobUploaderLoading = ref(false);
+const JobUploader = (base64: string, file: any) => {
   const base64Data = base64.split(',')[1];
   const mimeType = 'text/plain';
   const blob = base64ToBlob(base64Data, mimeType);
-  const formData = new FormData();
-  formData.append('file', blob, file.name);
-  formData.append('type', 'photo');
-  http.upload('/account/profile/upload', formData)
+  // JobUploaderLoading.value = true;
+  jobFile.append('file', blob, file.name);
+  jobFile.append('type', 'job');
+  jobRequired.value = true;
+}
+
+const UpdateProfileData = () => {
+  http.post('/account/profile/edit', toRaw(profileData))
     .then((data: any) => {
+      useModalStore().setModal({
+        type: 'alert',
+        data: {
+          title: '프로필 수정 완료',
+          message: '프로필 수정이 완료되었습니다.'
+        }
+      })
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -104,20 +119,33 @@ const ProfileUploader = (base64: string, file: any) => {
     })
 }
 
-const UpdateAndPreview = () => {
-  http.post('/account/profile/update', {
-    stage: 'answer',
-    data: toRaw(profileData)
-  })
-    .then(async (data: any) => {
-      if (state.stage === 'job') {
-        state.stage = 'profile';
-        return;
-      }
-      await router.push('/profile-preview')
+const RequestProfile = () => {
+  http.upload('/account/profile/upload', jobFile)
+    .then((data: any) => {
+      accountUpdate();
+
+      profileData.job = jobName.value;
+
+      http.post('/account/profile/update', {
+        stage: 'request',
+        data: toRaw(profileData)
+      })
+        .then(async (data: any) => {
+          return router.push('/register/auto')
+        })
+        .catch((error: any) => {
+          console.log(error)
+          useModalStore().setModal({
+            type: 'alert',
+            data: {
+              title: error.response.data.title,
+              message: error.response.data.message
+            }
+          })
+          console.log(error, 'error')
+        })
     })
     .catch((error: any) => {
-      console.log(error)
       useModalStore().setModal({
         type: 'alert',
         data: {
@@ -126,6 +154,9 @@ const UpdateAndPreview = () => {
         }
       })
       console.log(error, 'error')
+    })
+    .finally(() => {
+      JobUploaderLoading.value = false;
     })
 }
 
@@ -138,16 +169,18 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
     <SubHeader title="프로필 수정" :action-button-data="{
       title: '미리보기',
-      onClick: () => UpdateAndPreview()
+      onClick: () => {
+        router.push('/profile-preview')
+      }
     }" :show-back-button="true" @back="() => {
       router.back();
     }"
-    v-if="state.stage === 'profile'"
+               v-if="state.stage === 'profile'"
     />
     <SubHeader :show-back-button="true" @back="() => {
       state.stage = 'profile'
     }"
-    v-else
+               v-else
     />
   </StickyArea>
 
@@ -164,7 +197,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="20" />
     <TextInput label="닉네임" placeholder="이름을 입력하세요" :required="true" @input="(val: string) => { profileData.nickName = val}" :value="profileData.nickName" />
     <Gap :height="20" />
-    <LinkButton :title="profileData.job" label="직장 및 직무" :required="true" @click="() => { state.stage = 'job' }" />
+    <LinkButton :title="profileData.job" label="직장 및 직무" :required="true" warning-message="별도 승인이 필요하며, 승인 시 자동 반영됩니다." @click="() => { state.stage = 'job' }" />
     <Gap :height="20" />
     <Select label="MBTI" :required="true" @change="(val: string) => profileData.mbti = val" :value="profileData.mbti" :options="TEST_SELECT_OPTIONS" :modal-option-cols="4" />
     <Gap :height="20" />
@@ -202,16 +235,11 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
 
           return null;
         }" @input="(val: string, validateValue: any) => {
-          profileData.job = val;
-          if (validateValue === null && val.length > 0) {
-            profileData.job = val;
-          } else {
-            profileData.job = '';
-          }
-        }" :value="profileData.job" />
+          jobName = val;
+        }" :value="jobName" />
     <Gap :height="20" />
 
-    <Image label="증빙 이미지 등록" :required="true" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
+    <Image label="증빙 이미지 등록" :required="true" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {
@@ -223,10 +251,16 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="40" />
   </div>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'job'">
-    <SubmitButton @click="() => UpdateAndPreview()" :disabled="!profileData.job" :style="{
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'profile'">
+    <SubmitButton @click="UpdateProfileData" :style="{
           backgroundColor: '#6726FE',
-        }">인증 신청하기</SubmitButton>
+        }">수정 완료하기</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'job'">
+    <SubmitButton @click="RequestProfile" :disabled="!jobName || !jobRequired" :style="{
+          backgroundColor: '#6726FE',
+        }">심사하기</SubmitButton>
   </StickyArea>
 </template>
 

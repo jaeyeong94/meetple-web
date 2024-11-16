@@ -7,7 +7,11 @@ const props = defineProps({
   title: {
     type: String,
     required: true,
-  }
+  },
+  warningMessage: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['click'])
@@ -15,7 +19,7 @@ const emit = defineEmits(['click'])
 
 <template>
   <label v-if="props.label">{{props.label}}
-    <span class="required" v-if="props.required">*</span>
+    <span class="required" v-if="props.required">* <span style="color: #6726FE; font-size: 11px;">{{warningMessage}}</span></span>
     <span v-else>(선택사항)</span>
   </label>
   <div class="container">

@@ -65,7 +65,7 @@ onMounted(async () => {
   </StickyArea>
   <div class="page" v-if="Object.keys(profileData).length > 0">
     <UserProfileInfo
-      :name="profileData.name"
+      :name="profileData.nickName"
       :message="profileData.selfIntroduction"
       :age="calculateAge(profileData.birthDate)"
       :job="profileData.job"
