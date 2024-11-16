@@ -72,11 +72,7 @@ onMounted(async () => {
 <!--    <Tabs :tabs="TEST_TABS" :current-index="1" />-->
   </StickyArea>
   <div class="page">
-    <div style="cursor: pointer;" @click.capture="() => {
-      router.push('/profile-edit')
-    }">
       <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[photos.length - 1]?.image_path" @click="() => router.push('/profile-edit')" />
-    </div>
 <!--    <Gap :height="20" />-->
 <!--    <AlertBanner title="카카오톡 오픈 프로필을 등록해주세요." description="링크된 상대방과 대화할 수 있습니다." />-->
     <Gap :height="20" />
@@ -85,9 +81,13 @@ onMounted(async () => {
     }" />
     <Gap :height="20" />
     <Settings :options="settings" />
-    <Gap :height="20" />
-    <Divider :height="5" />
-    <Gap :height="20" />
+    <Gap :height="80" />
+    <div class="info">
+      <p>(주) 다이버즈 Divers Inc.</p>
+      <p>사업자등록번호 : 685-86-02346 l 대표 : 김도건</p>
+      <p>주소 : 서울특별시 강남구 봉은사로22길 45-9, 1층 14호</p>
+      <p>전화번호 : 010-2483-3511</p>
+    </div>
   </div>
 </template>
 
@@ -95,5 +95,14 @@ onMounted(async () => {
 .page {
   padding: 16px;
   min-height: 100dvh;
+}
+
+.info {
+  border-top: 1px solid #91A3BD;
+  padding-top: 8px;
+  font-size: 12px;
+  color: #91A3BD;
+  text-align: left;
+  line-height: 1.5;
 }
 </style>

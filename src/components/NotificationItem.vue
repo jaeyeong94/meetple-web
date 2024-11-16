@@ -39,6 +39,8 @@ const getType = () => {
       return '미팅 성사'
     case 'match-reject':
       return '상대방 매칭 거절'
+    case 'approve':
+      return 'Meetple'
     default:
       return '알림'
   }
@@ -46,6 +48,7 @@ const getType = () => {
 
 const matchSuccess = props.type === 'recommended-meeting';
 const matchFailure = props.type === 'match-reject';
+const info = props.type === 'approve';
 
 const emits = defineEmits(['click'])
 </script>
@@ -55,7 +58,7 @@ const emits = defineEmits(['click'])
     <IcNotificationType :type="props.type" />
     <div class="container">
       <p class="top">
-        <span class="type" :class="{ 'match-success': matchSuccess, 'match-failure': matchFailure }">{{getType()}}</span>·<span class="date">{{props.date}}</span>
+        <span class="type" :class="{ 'match-success': matchSuccess, 'match-failure': matchFailure, 'info': info }">{{getType()}}</span>·<span class="date">{{props.date}}</span>
       </p>
       <p class="content">{{props.content}}</p>
       <div v-if="props.type === 'recommended-meeting'"><button class="behavior-btn" @click="() => emits('click')">확인하기</button></div>
@@ -94,6 +97,9 @@ const emits = defineEmits(['click'])
   color: #F742AF;
 }
 .type.match-failure {
+  color: #878787;
+}
+.type.info {
   color: #878787;
 }
 .content {

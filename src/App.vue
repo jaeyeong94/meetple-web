@@ -35,6 +35,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', onResize);
 })
+
+window.addEventListener('popstate', function(event) {
+  modalStore.setModal({ type: null });
+}, false);
 </script>
 
 <template>

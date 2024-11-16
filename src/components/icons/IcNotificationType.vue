@@ -14,6 +14,8 @@ const category =
     ? 'match-success' :
   props.type === 'match-reject'
     ? 'match-failure' :
+  props.type === 'approve'
+    ? 'info' :
     'normal'
 </script>
 
@@ -41,6 +43,16 @@ const category =
       <rect x="26.5381" y="17.8486" width="5.91554" height="2.47091" transform="rotate(45 26.5381 17.8486)" fill="#DFDFDF"/>
     </svg>
   </div>
+
+  <svg v-else-if="category === 'info'" xmlns="http://www.w3.org/2000/svg" width="54" height="55" viewBox="0 0 54 55" fill="none">
+    <circle cx="27" cy="27.832" r="27" fill="#DFDFDF"/>
+    <g opacity="0.01">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 41.832H41V12.832H12V41.832Z" fill="white"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4166 39.4147H38.5833V15.248H14.4166V39.4147Z" fill="white"/>
+    </g>
+    <path d="M26.5 38.6978L18.0776 30.6413L16.393 29.03C14.0672 26.8052 14.0672 23.1981 16.393 20.9734C18.7188 18.7487 22.4897 18.7487 24.8155 20.9734L26.5 22.5846L28.1846 20.9733C30.5103 18.7484 34.2812 18.7486 36.607 20.9733C38.9328 23.198 38.9328 26.8051 36.6069 29.0298L34.9225 30.6412L31.2885 34.1173L30.9998 34.3934L25.6364 29.03" stroke="white" stroke-width="1.85" stroke-linecap="square"/>
+    <rect x="26.5381" y="17.8477" width="5.91554" height="2.47091" transform="rotate(45 26.5381 17.8477)" fill="#DFDFDF"/>
+  </svg>
 
   <div v-else>
     <svg width="54" height="55" viewBox="0 0 54 55" fill="none" xmlns="http://www.w3.org/2000/svg">
