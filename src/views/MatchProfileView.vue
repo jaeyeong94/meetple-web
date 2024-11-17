@@ -81,9 +81,10 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
       matchId,
       attitude: true
     })
-      .then((data: any) => {
+      .then(async (data: any) => {
         const response = data.data;
-        accountUpdate()
+        await accountUpdate();
+        return router.push('/match');
       })
       .catch((error: any) => {
         useModalStore().setModal({
@@ -153,9 +154,10 @@ const answerRejectAction = (matchId: number, nickname: string) => {
       matchId,
       attitude: false
     })
-      .then((data: any) => {
+      .then(async (data: any) => {
         const response = data.data;
-        accountUpdate()
+        await accountUpdate();
+        return router.push('/match');
       })
       .catch((error: any) => {
         useModalStore().setModal({
