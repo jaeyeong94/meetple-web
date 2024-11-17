@@ -73,7 +73,12 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
           type: 'alert',
           data: {
             title: error.response.data.title,
-            message: error.response.data.message
+            message: error.response.data.message,
+            onClickClose: () => {
+              if(error.response.data.title === '캔디가 부족해요!') {
+                router.push('/point')
+              }
+            }
           }
         })
         console.log(error, 'error')
@@ -103,7 +108,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
             data: {
               name: nickname,
               partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
-              myProfileImageUrl: photos.value[photos.value.length - 1]?.image_path,
+              myProfileImageUrl: photos.value[0]?.image_path,
               onClickSubmit: () => {
                 useModalStore().setModal({ type: null })
                 router.push(`/history/profile/${match.data.hit[0].id}`);

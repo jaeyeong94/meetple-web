@@ -91,10 +91,14 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
           type: 'alert',
           data: {
             title: error.response.data.title,
-            message: error.response.data.message
-          }
+            message: error.response.data.message,
+            onClickClose: () => {
+              if(error.response.data.title === '캔디가 부족해요!') {
+                router.push('/point')
+              }
+            }
+          },
         })
-        console.log(error, 'error')
       })
   }
 
@@ -124,7 +128,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
               myProfileImageUrl: photos.value[0]?.image_path,
               onClickClose: () => {
                 useModalStore().setModal({ type: null })
-                // router.push('/chat')
+                router.push(`/history/profile/${match.data.hit[0].id}`);
               }
             }
           })
@@ -207,7 +211,7 @@ const answerRejectAction = (matchId: number, nickname: string) => {
         :age="calculateAge(matchProfile.hit_account?.birth_date)"
         :job="matchProfile.hit_account?.accountMeta.job"
         :mbti="matchProfile.hit_account?.accountMeta.mbti"
-        :location="`${matchProfile.hit_account?.accountMeta.occupied_area_high}, ${matchProfile.hit_account?.accountMeta.occupied_area_low}`"
+        :location="`${matchProfile.hit_account?.accountMeta.occupied_area_high} ${matchProfile.hit_account?.accountMeta.occupied_area_low}`"
         :school="matchProfile.hit_account?.accountMeta.school"
         :image-url="matchProfile.hit_account?.accountProfiles[0]?.image_path"
       />

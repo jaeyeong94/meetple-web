@@ -15,6 +15,10 @@ const emit = defineEmits(['close'])
     <p class="description">{{props.data?.message}}</p>
     <CancelButton :style="{marginTop: '20px'}" @click="() => {
           emit('close')
+          if(props.data?.onClickClose) {
+            props.data?.onClickClose()
+          }
+
         }">확인</CancelButton>
   </Modal>
 </template>
