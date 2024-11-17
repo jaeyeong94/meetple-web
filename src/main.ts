@@ -3,13 +3,13 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
-import mixpanel from 'mixpanel-browser'
+import MixpanelService from '@/lib/mixpanel'
 
 const pageView = (page: string) => {
-  mixpanel.track(`page_view:${page}`, { page });
+  mixpanel.trackPageView(page);
 };
 
-mixpanel.init("3c1930afca4f02bcace4f1a9a83588e8", {
+const mixpanel = new MixpanelService("3c1930afca4f02bcace4f1a9a83588e8", {
   debug: false,
   track_pageview: true,
   persistence: "localStorage",
@@ -31,5 +31,6 @@ app.use(createPinia())
 app.use(router)
 
 app.provide('rootDiv', document.getElementById('app'));
+app.provide('mp', mixpanel);
 
 app.mount('#app')
