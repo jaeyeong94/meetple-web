@@ -87,13 +87,15 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
         onClickCancel: () => {
           useModalStore().setModal({ type: null })
         },
-        onClickSubmit: () => {
+        onClickSubmit: async () => {
+          await accountUpdate();
+
           if(account.data.currency < 30) {
             useModalStore().setModal({ type: null })
             return router.push('/point')
           }
 
-          action()
+          await action()
 
           useModalStore().setModal({
             type: 'matched',

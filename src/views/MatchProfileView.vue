@@ -76,9 +76,6 @@ onMounted(async () => {
 })
 
 const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boolean, hit_account: any) => {
-  // 프로필, 상점, 히스토리
-  // 캔디부족
-
   const action = async () => {
     http.post('/match/answer', {
       matchId,
@@ -108,8 +105,16 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
         onClickCancel: () => {
           useModalStore().setModal({ type: null })
         },
-        onClickSubmit: () => {
-          action()
+        onClickSubmit: async () => {
+          await accountUpdate();
+
+          if(account.data.currency < 30) {
+            useModalStore().setModal({ type: null })
+            return router.push('/point')
+          }
+
+          await action()
+
           useModalStore().setModal({
             type: 'matched',
             data: {
