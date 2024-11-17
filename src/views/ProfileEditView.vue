@@ -253,7 +253,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="20" />
     <TextInput label="학교명" @input="(val: string) => { profileData.school = val}" :value="profileData.school" />
     <Gap :height="20" />
-    <TextArea label="자개소개" :max-length="500" :required="true" @input="(val: string) => profileData.selfIntroduction = val" :value="profileData.selfIntroduction" />
+    <TextArea label="자기소개" :max-length="500" :required="true" @input="(val: string) => profileData.selfIntroduction = val" :value="profileData.selfIntroduction" />
     <Gap :height="20" />
 
     <TextArea :question="question1" @input="(val: string) => {
