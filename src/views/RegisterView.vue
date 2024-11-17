@@ -615,7 +615,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           :age="calculateAge(profileData.birthDate)"
           :job="profileData.job"
           :mbti="profileData.mbti"
-          :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
+          :location="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`"
           :school="profileData.school"
           :image-url="photos[0].image_path"
         />
