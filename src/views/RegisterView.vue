@@ -227,9 +227,9 @@ const ProfileUploader = (base64: string, file: any) => {
 
   ProfileUploaderLoading.value = true;
   http.upload('/account/profile/upload', formData)
-    .then((data: any) => {
+    .then(async (data: any) => {
       photoRequired.value = true;
-      accountUpdateDefault();
+      await accountUpdateDefault();
     })
     .catch((error: any) => {
       useModalStore().setModal({
