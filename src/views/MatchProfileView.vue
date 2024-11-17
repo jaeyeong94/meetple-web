@@ -126,7 +126,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
               name: nickname,
               partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
               myProfileImageUrl: photos.value[0]?.image_path,
-              onClickClose: () => {
+              onClickSubmit: () => {
                 useModalStore().setModal({ type: null })
                 router.push(`/history/profile/${match.data.hit[0].id}`);
               }
