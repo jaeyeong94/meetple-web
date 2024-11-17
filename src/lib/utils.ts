@@ -48,3 +48,8 @@ export const formatPhoneNumber = (phoneNumber: string) => {
   const cleaned = phoneNumber.replace(/\D/g, '');
   return cleaned.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
 }
+
+// ... 처리
+export const ellipsis = (str: string, len: number) => {
+  return str.length > len ? str.slice(0, len) + '...' : str;
+}

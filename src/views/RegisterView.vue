@@ -469,7 +469,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           if (validateValue === null && val.length > 0) {
             profileData.nickName = val;
           } else {
-            profileData.nickName = '';
+            profileData.nickName = val.slice(0, 10);
           }
         }" :value="profileData.nickName || ''" />
         <Gap :height="20" />

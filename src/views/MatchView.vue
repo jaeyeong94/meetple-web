@@ -11,7 +11,7 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
-import { calculateAge } from '@/lib/utils'
+import { calculateAge, ellipsis } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
@@ -199,7 +199,7 @@ const multipleProfileMove = (id: string) => {
           :age="calculateAge(matchProfile.hit_account.birth_date)"
           :job="matchProfile.hit_account.accountMeta.job"
           :mbti="matchProfile.hit_account.accountMeta.mbti"
-          :location="`${matchProfile.hit_account.accountMeta.occupied_area_high}, ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
+          :location="`${matchProfile.hit_account.accountMeta.occupied_area_high} ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
           :school="matchProfile.hit_account.school"
           :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path"
         />
@@ -229,7 +229,7 @@ const multipleProfileMove = (id: string) => {
       <div v-for="matchProfile in match.data.recommended">
         <PartnerProfileInfo @click="multipleProfileMove(matchProfile.id)"
                             :name="matchProfile.hit_account.accountMeta.nick_name"
-                            :message="matchProfile.hit_account.accountMeta.self_introduction"
+                            :message="ellipsis(matchProfile.hit_account.accountMeta.self_introduction, 50)"
                             :age="calculateAge(matchProfile.hit_account.birth_date)"
                             :job="matchProfile.hit_account.accountMeta.job"
                             :mbti="matchProfile.hit_account.accountMeta.mbti"

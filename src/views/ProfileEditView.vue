@@ -227,7 +227,20 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
       })
     }" />
     <Gap :height="20" />
-    <TextInput label="닉네임" placeholder="이름을 입력하세요" :required="true" @input="(val: string) => { profileData.nickName = val}" :value="profileData.nickName" />
+    <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
+          if (val && val.length >= 10) {
+            return '닉네임은 10자 이내로 입력해주세요.';
+          }
+
+          return null;
+        }" @input="(val: string, validateValue: any) => {
+          profileData.nickName = val;
+          if (validateValue === null && val.length > 0) {
+            profileData.nickName = val;
+          } else {
+            profileData.nickName = val.slice(0, 10);
+          }
+        }" :value="profileData.nickName || ''" />
     <Gap :height="20" />
     <LinkButton :title="profileData.job" label="직장 및 직무" :required="true" warning-message="별도 승인이 필요하며, 승인 시 자동 반영됩니다." @click="() => { state.stage = 'job' }" />
     <Gap :height="20" />
