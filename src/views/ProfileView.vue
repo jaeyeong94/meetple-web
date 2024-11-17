@@ -67,7 +67,8 @@ onMounted(async () => {
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
     <SubHeader :show-back-button="true" @back="() => {
-      router.back()
+      // router.back()
+      router.push('/match')
     }" />
 <!--    <Tabs :tabs="TEST_TABS" :current-index="1" />-->
   </StickyArea>

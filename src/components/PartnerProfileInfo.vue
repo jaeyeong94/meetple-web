@@ -25,7 +25,7 @@ const props = defineProps({
           <li class="info-item" v-if="props.school">{{props.school}}</li>
           <li class="info-item">{{props.mbti}}</li>
           <li class="info-item">{{props.location}}</li>
-          <li class="info-item">{{props.age}}</li>
+          <li class="info-item">{{props.age}}세</li>
         </ul>
       </div>
     </div>
