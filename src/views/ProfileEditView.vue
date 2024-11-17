@@ -11,7 +11,7 @@ import LinkButton from '@/components/forms/LinkButton.vue'
 import Image from '@/components/forms/Image.vue'
 import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
-import { TEST_SELECT_OPTIONS, TEST_DEEP_SELECT_OPTIONS } from '@/consts/testData'
+import { TEST_SELECT_OPTIONS, TEST_DEEP_SELECT_OPTIONS, QUESTION1, QUESTION2 } from '@/consts/testData'
 import http from '@/lib/http'
 import router from '@/router'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw } from 'vue'
@@ -28,6 +28,15 @@ const jobRequired: Ref<any> = ref(false);
 const jobName: Ref<any> = ref('');
 const jobFile: FormData = new FormData();
 const jobFileBase64: Ref<any> = ref('');
+const submitRequired: Ref<any> = ref(true);
+
+const textArea: Reactive<{
+  [key: string]: any
+}> = reactive({
+  selfIntroduction: '',
+  description1Answer: '',
+  description2Answer: ''
+});
 
 const state: Reactive<{
   stage: 'profile' | 'job'
@@ -66,6 +75,11 @@ onMounted(async () => {
   profileData.school = account.data.accountMeta.school
   profileData.job = account.data.accountMeta.job
   profileData.descriptions = account.data.accountMeta.descriptions ?? []
+
+  // 텍스트 에어리어
+  textArea.selfIntroduction = account.data?.accountMeta.self_introduction;
+  textArea.description1Answer = profileData.descriptions[0].answer;
+  textArea.description2Answer = profileData.descriptions[1].answer;
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -192,8 +206,8 @@ const RequestProfile = () => {
     })
 }
 
-const question1 = '미팅에 함께 나가는 나와 내 친구들은 어떤 사람인가요?';
-const question2 = '어떤 미팅을 하고 싶으신가요?';
+const question1 = QUESTION1;
+const question2 = QUESTION2;
 
 </script>
 
@@ -229,6 +243,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="20" />
     <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
           if (val && val.length >= 10) {
+            submitRequired = false;
             return '닉네임은 10자 이내로 입력해주세요.';
           }
 
@@ -236,8 +251,10 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
         }" @input="(val: string, validateValue: any) => {
           profileData.nickName = val;
           if (validateValue === null && val.length > 0) {
+            submitRequired = true;
             profileData.nickName = val;
           } else {
+            submitRequired = true;
             profileData.nickName = val.slice(0, 10);
           }
         }" :value="profileData.nickName || ''" />
@@ -253,19 +270,45 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="20" />
     <TextInput label="학교명" @input="(val: string) => { profileData.school = val}" :value="profileData.school" />
     <Gap :height="20" />
-    <TextArea label="자기소개" :max-length="500" :required="true" @input="(val: string) => profileData.selfIntroduction = val" :value="profileData.selfIntroduction" />
+    <TextArea label="자기소개" :min-length="20" :max-length="500" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
+          textArea.selfIntroduction = val
+          if(val.length >= 20) {
+            submitRequired = true;
+            profileData.selfIntroduction = val
+          } else {
+            submitRequired = false;
+            profileData.selfIntroduction = ''
+          }
+        }" :value="textArea.selfIntroduction || ''" />
     <Gap :height="20" />
 
     <TextArea :question="question1" @input="(val: string) => {
           profileData.descriptions[0].title = question1;
-          profileData.descriptions[0].answer = val;
-        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[0].answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
+          textArea.description1Answer = val;
+
+          if(val.length >= 20) {
+            submitRequired = true;
+            profileData.descriptions[0].answer = val;
+          } else {
+            submitRequired = false;
+            profileData.descriptions[0].answer = '';
+          }
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description1Answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
     <Gap :height="20" />
 
     <TextArea :question="question2" @input="(val: string) => {
           profileData.descriptions[1].title = question2;
-          profileData.descriptions[1].answer = val;
-        }" :num-lines="6" :max-length="500" :value="profileData.descriptions[1].answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
+          textArea.description2Answer = val;
+
+          if(val.length >= 20) {
+            submitRequired = true;
+            profileData.descriptions[1].answer = val;
+          } else {
+            submitRequired = false;
+            profileData.descriptions[1].answer = '';
+          }
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description2Answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
+    <Gap :height="20" />
     <Gap :height="40" />
   </div>
 
@@ -297,7 +340,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
   </div>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'profile'">
-    <SubmitButton @click="UpdateProfileData" :style="{
+    <SubmitButton :disabled="!submitRequired" @click="UpdateProfileData" :style="{
           backgroundColor: '#6726FE',
         }">수정 완료하기</SubmitButton>
   </StickyArea>

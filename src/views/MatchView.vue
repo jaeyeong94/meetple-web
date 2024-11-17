@@ -202,7 +202,7 @@ const multipleProfileMove = (id: string) => {
           :job="matchProfile.hit_account.accountMeta.job"
           :mbti="matchProfile.hit_account.accountMeta.mbti"
           :location="`${matchProfile.hit_account.accountMeta.occupied_area_high} ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
-          :school="matchProfile.hit_account.school"
+          :school="matchProfile.hit_account.accountMeta.school"
           :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path"
         />
         <Gap :height="20" />
@@ -235,8 +235,8 @@ const multipleProfileMove = (id: string) => {
                             :age="calculateAge(matchProfile.hit_account.birth_date)"
                             :job="matchProfile.hit_account.accountMeta.job"
                             :mbti="matchProfile.hit_account.accountMeta.mbti"
-                            :location="`${matchProfile.hit_account.accountMeta.occupied_area_high}, ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
-                            :school="matchProfile.hit_account.school"
+                            :location="`${matchProfile.hit_account.accountMeta.occupied_area_high} ${matchProfile.hit_account.accountMeta.occupied_area_low}`"
+                            :school="matchProfile.hit_account.accountMeta.school"
                             :image-url="matchProfile.hit_account.accountProfiles[0]?.image_path" />
         <Gap :height="20" />
       </div>

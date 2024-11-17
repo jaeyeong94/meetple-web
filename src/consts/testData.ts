@@ -322,3 +322,6 @@ export const TEST_NOTIFICATIONS = [
     date: '2024.11.12',
   }
 ]
+
+export const QUESTION1 = '어떤 사람들과 미팅에 함께 나가시나요?';
+export const QUESTION2 = '어떤 미팅을 하고 싶으신가요?';

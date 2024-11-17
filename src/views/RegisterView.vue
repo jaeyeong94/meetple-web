@@ -18,7 +18,7 @@ import Divider from '@/components/Divider.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
 import ProfileImage from '@/components/forms/ProfileImage.vue'
-import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS } from '@/consts/testData'
+import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS, QUESTION1, QUESTION2 } from '@/consts/testData'
 import http from '@/lib/http'
 import { calculateAge, validateDate } from '@/lib/utils'
 import router from '@/router'
@@ -66,8 +66,8 @@ const jobs: Ref<any> = ref([]);
 const root = inject<HTMLElement>('rootDiv');
 
 // 질문
-const question1 = '어떤 사람들과 미팅에 함께 나가시나요?';
-const question2 = '어떤 미팅을 하고 싶으신가요?';
+const question1 = QUESTION1;
+const question2 = QUESTION2;
 
 // 서버정보
 const account: any = reactive({})

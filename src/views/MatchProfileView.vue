@@ -206,7 +206,7 @@ const answerRejectAction = (matchId: number, nickname: string) => {
         :job="matchProfile.hit_account?.accountMeta.job"
         :mbti="matchProfile.hit_account?.accountMeta.mbti"
         :location="`${matchProfile.hit_account?.accountMeta.occupied_area_high}, ${matchProfile.hit_account?.accountMeta.occupied_area_low}`"
-        :school="matchProfile.hit_account?.school"
+        :school="matchProfile.hit_account?.accountMeta.school"
         :image-url="matchProfile.hit_account?.accountProfiles[0]?.image_path"
       />
       <Gap :height="20" />
