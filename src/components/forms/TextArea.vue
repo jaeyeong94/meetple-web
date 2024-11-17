@@ -35,6 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits(['input'])
 const error = ref(false)
+const errorMessage = ref('')
 
 const textAreaUpdate = (e: any) => {
   const val = e.target.value
@@ -42,8 +43,13 @@ const textAreaUpdate = (e: any) => {
   e.target.value = value
   emit('input', value)
   if (!props.maxLength || !props.minLength) return
-  error.value = val.length >= props.maxLength || val.length < props.minLength
+  if(val.length < props.minLength) {
+    error.value = true
+    errorMessage.value = '20자 이상 작성해주세요.';
+    return
+  }
 
+  error.value = false
 }
 </script>
 
@@ -67,7 +73,7 @@ const textAreaUpdate = (e: any) => {
     @input="textAreaUpdate"
   />
   <div class="max-length" v-if="props.maxLength">
-    <p class="message">{{error ? '20자 이상 작성해주세요.' : ''}}</p>
+    <p class="message">{{error ? errorMessage : ''}}</p>
     <p class="length" >
       <span :class="{ error: error }" >{{props.value.length}}</span>/{{props.maxLength}}
     </p>

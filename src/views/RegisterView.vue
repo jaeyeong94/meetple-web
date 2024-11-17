@@ -146,6 +146,10 @@ const accountDataUpdate = async () => {
   })
 
   // 이용약관 상태 저장
+  if(localStorage.getItem('terms')) {
+    termsRequired.value = true;
+  }
+
   if(profileData.termsRequired) {
     termsRequired.value = true;
   }
@@ -199,6 +203,7 @@ watch(agreement, (val) => {
 })
 const termsAccept = () => {
   termsRequired.value = true;
+  localStorage.setItem('terms', 'true');
 }
 
 function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
@@ -367,10 +372,19 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
           return null;
         }" @input="(val: string, validateValue: any) => {
           defaultData.name = val;
-          if (validateValue === null && val.length > 1) {
-            profileData.name = val;
-          } else {
+
+          if (val && !(/^[ㄱ-힣]+$/.test(val))) {
             profileData.name = '';
+          }
+
+          if (val && val.length >= 10) {
+            profileData.name = '';
+          }
+
+          if(val.length < 1) {
+            profileData.name = '';
+          } else {
+            profileData.name = val;
           }
         }" :value="defaultData.name" />
         <Gap :height="20" />
@@ -397,7 +411,16 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
           return null;
         }" @input="(val: string, validateValue: any) => {
           defaultData.birthDate = val;
-          if (validateDate(val) && val.length == 8) {
+
+          if (!val) {
+            profileData.birthDate = '';
+          }
+
+          if (!validateDate(val)) {
+            profileData.birthDate = '';
+          }
+
+          if (val.length == 8) {
             const formattedDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
             const age = calculateAge(formattedDate);
             if (age >= 20) {
@@ -614,7 +637,6 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
     </div>
   </div>
 
-
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
     <SubmitButton @click="termsAccept" :disabled="!agreement[0] || !agreement[1]" :style="{
           backgroundColor: '#6726FE',
@@ -622,19 +644,21 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
-    <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!profileData.name || !profileData.birthDate || !profileData.gender" :style="{
+    <SubmitButton @click="() => {
+        ProfileUpdateAction('default');
+    }" :disabled="!(profileData.name && profileData.birthDate && profileData.gender)" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
-    <SubmitButton @click="ProfileUpdateAction('job')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
+    <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
-    <SubmitButton @click="ProfileUpdateAction('school')" :disabled="!profileData.job || !jobRequired" :style="{
+    <SubmitButton @click="ProfileUpdateAction('job')" :disabled="!profileData.job || !jobRequired" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
@@ -659,25 +683,10 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
-    <Button @click="() => {
-        profileData.descriptions[0].title = question1;
-        profileData.descriptions[0].answer = '';
-        profileData.descriptions[1].title = question2
-        profileData.descriptions[1].answer = '';
-        ProfileUpdateAction('request')
-      }" :style="{
-        width: 'auto',
-        padding: '0 32px',
-        height: '52px',
-        borderRadius: '26px',
-        fontSize: '17px'
-      }">건너뛰기</Button>
-    <div :style="{flex: 1}" />
     <SubmitButton @click="ProfileUpdateAction('request')" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
-        width: 'auto',
-        padding: '0 32px',
         backgroundColor: '#6726FE',
-      }">등록하고 다음</SubmitButton>
+      }">다음</SubmitButton>
+
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
