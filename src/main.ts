@@ -15,6 +15,8 @@ const mixpanel = new MixpanelService("3c1930afca4f02bcace4f1a9a83588e8", {
   persistence: "localStorage",
 });
 
+mixpanel.resetUser();
+
 router.afterEach((to) => {
   if(to.name === null) {
     return;
@@ -31,6 +33,6 @@ app.use(createPinia())
 app.use(router)
 
 app.provide('rootDiv', document.getElementById('app'));
-app.provide('mp', mixpanel);
+app.provide('mixpanel', mixpanel);
 
 app.mount('#app')

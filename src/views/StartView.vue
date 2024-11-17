@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import IcMainLogo from '@/components/icons/IcMainLogo.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
-import { onMounted, onUnmounted } from 'vue'
+import type MixpanelService from '@/lib/mixpanel'
+import { inject, onMounted, onUnmounted } from 'vue'
 
 let timeout = 0
+
+const mp = inject<MixpanelService>('mixpanel')
 
 const resizeBackground = () => {
   clearTimeout(timeout)
@@ -35,7 +38,9 @@ onUnmounted(() => {
       <span class="subtitle">친구와 함께 직장인 미팅</span>
       <IcMainLogo />
     </div>
-    <router-link to="/login" style="width: 100%; z-index: 1000;"><SubmitButton>서비스 시작하기</SubmitButton></router-link>
+    <router-link to="/login" style="width: 100%; z-index: 1000;" @click="() => {
+      mp?.trackEvent('start')
+    }"><SubmitButton>서비스 시작하기</SubmitButton></router-link>
     <img src="@/assets/images/background.png" class="background" alt="" />
   </div>
 </template>

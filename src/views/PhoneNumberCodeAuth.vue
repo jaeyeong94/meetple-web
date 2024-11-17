@@ -6,14 +6,16 @@ import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import Gap from '@/components/Gap.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 
 const phoneNumber = localStorage.getItem('authPhoneNumber')
 const authCode = ref('')
 const btnState = ref(false)
 const token = localStorage.getItem('token')
+const mp = inject<MixpanelService>('mixpanel')
 
 if(!phoneNumber) {
   router.push('/login')
@@ -31,6 +33,9 @@ const retryAction = () => {
         http.post('/account/verification', { phoneNumber: phoneNumber })
           .then((data: any) => {
             authCode.value = '';
+
+            mp?.trackEvent('login_code_retry', { phoneNumber: phoneNumber })
+
             useModalStore().setModal({ type: null })
           })
           .catch((error: any) => {
@@ -48,6 +53,9 @@ const submitAction = () => {
       const response = data.data;
       localStorage.setItem('token', response.data.accessToken)
       localStorage.removeItem('terms');
+
+      mp?.trackEvent('login_code_submit', { phoneNumber: phoneNumber })
+
       router.push('/register/auto')
     })
     .catch((error: any) => {

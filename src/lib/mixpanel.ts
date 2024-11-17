@@ -34,7 +34,7 @@ class MixpanelService {
     mixpanel.identify(userInfo.id);
     mixpanel.people.set({
       $name: userInfo.name || null,
-      $email: userInfo.email || null,
+      $phone_number: userInfo.phone_number || null,
       ...userInfo
     });
   }

@@ -20,11 +20,14 @@ import UserProfileInfo from '@/components/UserProfileInfo.vue'
 import ProfileImage from '@/components/forms/ProfileImage.vue'
 import { TEST_DEEP_SELECT_OPTIONS, TEST_RADIO_OPTIONS, TEST_SELECT_OPTIONS, QUESTION1, QUESTION2 } from '@/consts/testData'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge, validateDate } from '@/lib/utils'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
+
+const mp = inject<MixpanelService>('mixpanel')
 
 // 라우터 제한
 const route = useRoute();
@@ -441,6 +444,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('default', false)
+          mp?.trackEvent('click_profile_normal_back');
         }" />
       </StickyArea>
       <div class="content-container">
@@ -501,6 +505,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('normal', false)
+          mp?.trackEvent('click_profile_job_back');
         }" />
       </StickyArea>
       <div class="content-container">
@@ -541,6 +546,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('job', false)
+          mp?.trackEvent('click_profile_school_back');
         }" />
       </StickyArea>
       <div class="content-container">
@@ -569,6 +575,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
           ProfileUpdateAction('school', false)
+          mp?.trackEvent('click_profile_answer_back');
         }" />
       </StickyArea>
       <div class="content-container">
@@ -635,7 +642,10 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   </div>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
-    <SubmitButton @click="termsAccept" :disabled="!agreement[0] || !agreement[1]" :style="{
+    <SubmitButton @click="() => {
+      termsAccept();
+      mp?.trackEvent('click_terms_agree');
+    }" :disabled="!agreement[0] || !agreement[1]" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
@@ -643,19 +653,26 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
     <SubmitButton @click="() => {
         ProfileUpdateAction('default');
+        mp?.trackEvent('click_profile_default_update');
     }" :disabled="!(profileData.name && profileData.birthDate && profileData.gender)" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
-    <SubmitButton @click="ProfileUpdateAction('normal')" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
+    <SubmitButton @click="() => {
+      ProfileUpdateAction('normal')
+      mp?.trackEvent('click_profile_normal_update');
+    }" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
-    <SubmitButton @click="ProfileUpdateAction('job')" :disabled="!profileData.job || !jobRequired" :style="{
+    <SubmitButton @click="() => {
+      ProfileUpdateAction('job')
+      mp?.trackEvent('click_profile_job_update');
+    }" :disabled="!profileData.job || !jobRequired" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>
@@ -664,6 +681,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
     <Button @click="() => {
           profileData.school = '';
           ProfileUpdateAction('school')
+          mp?.trackEvent('click_profile_school_skip');
         }" :style="{
           width: 'auto',
           padding: '0 32px',
@@ -672,7 +690,10 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           fontSize: '17px'
         }">건너뛰기</Button>
     <div :style="{flex: 1}" />
-    <SubmitButton @click="ProfileUpdateAction('answer')" :disabled="!profileData.school" :style="{
+    <SubmitButton @click="() => {
+      ProfileUpdateAction('school')
+      mp?.trackEvent('click_profile_school_update');
+    }" :disabled="!profileData.school" :style="{
           width: 'auto',
           padding: '0 32px',
           backgroundColor: '#6726FE',
@@ -680,14 +701,20 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
-    <SubmitButton @click="ProfileUpdateAction('request')" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
+    <SubmitButton @click="() => {
+      ProfileUpdateAction('request')
+      mp?.trackEvent('click_profile_request');
+    }" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
         backgroundColor: '#6726FE',
       }">다음</SubmitButton>
 
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
-    <SubmitButton @click="ProfileUpdateAction('job', false, true)" :style="{
+    <SubmitButton @click="() => {
+      ProfileUpdateAction('job', false, true)
+      mp?.trackEvent('click_profile_reject_update');
+    }" :style="{
         backgroundColor: '#6726FE',
       }">인증 다시 진행하기</SubmitButton>
   </StickyArea>

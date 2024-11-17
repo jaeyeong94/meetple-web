@@ -5,14 +5,16 @@ import PhoneNumberInput from '@/components/forms/PhoneNumberInput.vue'
 import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import Gap from '@/components/Gap.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
+import type MixpanelService from '@/lib/mixpanel'
 import router from '@/router'
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
 import http from '@/lib/http'
 
 const phoneNumber = ref('')
 const authPhoneNumber = ref('')
 const btnState = ref(false)
 const token = localStorage.getItem('token')
+const mp = inject<MixpanelService>('mixpanel')
 
 if(token) {
   router.push('/match')
@@ -22,6 +24,9 @@ const action = () => {
   http.post('/account/verification', { phoneNumber: authPhoneNumber.value })
     .then((data: any) => {
       localStorage.setItem('authPhoneNumber', authPhoneNumber.value)
+
+      mp?.trackEvent('login_code_request', { phoneNumber: authPhoneNumber.value })
+
       router.push('/login/code')
     })
     .catch((error: any) => {
