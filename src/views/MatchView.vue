@@ -112,7 +112,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
     })
   } else {
     useModalStore().setModal({
-      type: 'request-match',
+      type: 'request-accept-match',
       data: {
         name: nickname,
         onClickCancel: () => {
