@@ -14,14 +14,16 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_ACTION_DATA, TEST_MORE_DATA, TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge, formatPhoneNumber } from '@/lib/utils'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
 const route = useRoute();
 
+const mp = inject<MixpanelService>('mixpanel')
 const account: any = reactive({});
 const match: any = reactive({});
 const hitProfile: any = reactive({});
@@ -170,7 +172,9 @@ const actionBlock = async (nickname: string) => {
           width: 'calc(100%)',
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
-        <PhoneNumberCopy :phone-number="hitProfile.account?.phone_number" />
+        <PhoneNumberCopy :phone-number="hitProfile.account?.phone_number" @copy="() => {
+          mp?.trackEvent('click_copy_phone_number', { type: 'history', data: hitProfile })
+        }" />
       </div>
     </div>
   </div>

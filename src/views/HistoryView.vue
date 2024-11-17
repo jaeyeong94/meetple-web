@@ -11,11 +11,13 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
+const mp = inject<MixpanelService>('mixpanel')
 const account: any = reactive({});
 const match: any = reactive({});
 const notification: any = reactive([]);
@@ -76,7 +78,10 @@ const multipleProfileMove = (id: string) => {
   <div class="page">
     <div v-if="match.data?.hit.length >= 1">
       <div v-for="hitProfile in match.data.hit">
-        <PartnerProfileInfo @click="multipleProfileMove(hitProfile.id)"
+        <PartnerProfileInfo @click="() => {
+          multipleProfileMove(hitProfile.id)
+          mp?.trackEvent('click_profile', { type: 'history', data: hitProfile })
+        }"
                             :name="hitProfile.account?.accountMeta.nick_name"
                             :message="hitProfile.account?.accountMeta.self_introduction"
                             :age="calculateAge(hitProfile.account?.birth_date)"

@@ -122,6 +122,8 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
 
           await action()
 
+          mp?.trackEvent('matched', { data: hit_account })
+
           useModalStore().setModal({
             type: 'matched',
             data: {
