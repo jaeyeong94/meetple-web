@@ -25,6 +25,7 @@ const formatPhoneNumber = (value: string): string => {
   <input
     type="tel"
     :placeholder="PLACEHOLDER"
+    inputmode="numeric" pattern="[0-9]*"
     :value="props.value"
     @input="(e) => {
       const target = e.target as HTMLInputElement;

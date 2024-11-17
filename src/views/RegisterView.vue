@@ -153,8 +153,10 @@ const accountDataUpdate = async () => {
   profileData.termsRequired = true;
   profileData.termsOptional = true;
 
-  // 생년월일
+  // 기본정보
+  defaultData.name = account.data.name;
   defaultData.birthDate = account.data.birth_date.replaceAll('-', '');
+  defaultData.gender = account.data.gender;
 
   // 텍스트 에어리어
   textArea.selfIntroduction = account.data.accountMeta.self_introduction;
@@ -370,7 +372,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
           } else {
             profileData.name = '';
           }
-        }" :value="profileData.name" />
+        }" :value="defaultData.name" />
         <Gap :height="20" />
 
         <TextInput label="생년월일" placeholder="20000130" :required="true" :validate="(val: string) => {

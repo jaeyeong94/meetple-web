@@ -97,6 +97,8 @@ const JobUploader = (base64: string, file: any) => {
 }
 
 const UpdateProfileData = () => {
+  profileData.job = account.data.accountMeta.job;
+
   http.post('/account/profile/edit', toRaw(profileData))
     .then((data: any) => {
       useModalStore().setModal({
@@ -126,10 +128,7 @@ const RequestProfile = () => {
 
       profileData.job = jobName.value;
 
-      http.post('/account/profile/update', {
-        stage: 'request',
-        data: toRaw(profileData)
-      })
+      http.post('/account/profile/edit', toRaw(profileData))
         .then(async (data: any) => {
           return router.push('/register/auto')
         })
