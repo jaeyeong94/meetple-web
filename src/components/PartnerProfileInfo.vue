@@ -22,7 +22,7 @@ const props = defineProps({
         <p class="message">{{props.message}}</p>
         <ul class="info">
           <li class="info-item">{{props.job}}</li>
-          <li class="info-item">{{props.school}}</li>
+          <li class="info-item" v-if="props.school">{{props.school}}</li>
           <li class="info-item">{{props.mbti}}</li>
           <li class="info-item">{{props.location}}</li>
           <li class="info-item">{{props.age}}</li>

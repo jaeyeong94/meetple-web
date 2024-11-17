@@ -23,7 +23,7 @@ const props = defineProps({
         <span class="title">직장 및 직무</span>
         <p class="value">{{props.job}}</p>
       </li>
-      <li class="info-item">
+      <li class="info-item" v-if="props.school">
         <span class="title">학교</span>
         <p class="value">{{props.school}}</p>
       </li>

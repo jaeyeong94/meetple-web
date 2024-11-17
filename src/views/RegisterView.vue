@@ -616,7 +616,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           :job="profileData.job"
           :mbti="profileData.mbti"
           :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
-          :school="profileData.school || '미입력'"
+          :school="profileData.school"
           :image-url="photos[0].image_path"
         />
         <Gap :height="20" />

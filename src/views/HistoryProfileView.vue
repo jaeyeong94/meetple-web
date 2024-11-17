@@ -151,7 +151,7 @@ const actionBlock = async (nickname: string) => {
         :job="hitProfile.account?.accountMeta.job"
         :mbti="hitProfile.account?.accountMeta.mbti"
         :location="`${hitProfile.account?.accountMeta.occupied_area_high}, ${hitProfile.hit_account?.accountMeta.occupied_area_low}`"
-        :school="hitProfile.account?.school || '미입력'"
+        :school="hitProfile.account?.school"
         :image-url="hitProfile.account?.accountProfiles[0]?.image_path"
       />
       <Gap :height="20" />
