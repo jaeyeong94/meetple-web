@@ -11,7 +11,7 @@ const props = defineProps({
 
 <template>
   <div class="my-point">
-    <span class="title">나의 포인트</span>
+    <span class="title">나의 캔디</span>
     <div class="line" />
     <span class="point">{{formatNumber(props.point)}}</span>
   </div>

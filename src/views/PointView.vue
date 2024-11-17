@@ -94,7 +94,7 @@ const pointCharge = async (id: number) => {
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <SubHeader title="포인트 충전" :show-back-button="true" @back="() => {
+    <SubHeader title="캔디 상점" :show-back-button="true" @back="() => {
       router.back()
     }" />
   </StickyArea>
