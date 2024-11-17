@@ -137,11 +137,11 @@ const accountDataUpdate = async () => {
   })
 
   // 이용약관 상태 저장
-  if(localStorage.getItem('terms')) {
+  if(profileData.termsRequired) {
     termsRequired.value = true;
   }
 
-  if(profileData.termsRequired) {
+  if(localStorage.getItem('terms')) {
     termsRequired.value = true;
   }
 
@@ -150,11 +150,11 @@ const accountDataUpdate = async () => {
 
   // 기본정보
   defaultData.name = account.data.name;
-  defaultData.birthDate = account.data.birth_date.replaceAll('-', '');
+  defaultData.birthDate = account.data.birth_date?.replaceAll('-', '');
   defaultData.gender = account.data.gender;
 
   // 텍스트 에어리어
-  textArea.selfIntroduction = account.data.accountMeta.self_introduction;
+  textArea.selfIntroduction = account.data?.accountMeta.self_introduction;
   textArea.description1Answer = profileData.descriptions[0].answer;
   textArea.description2Answer = profileData.descriptions[1].answer;
 }

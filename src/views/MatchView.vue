@@ -178,7 +178,7 @@ const multipleProfileMove = (id: string) => {
 
 <template>
   <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-    <MainHeader :image-url="photos[photos.length - 1]?.image_path" @notification="() => {
+    <MainHeader :image-url="photos[0]?.image_path" @notification="() => {
       router.push('/notification')
     }" @profile="() => {
       router.push('/profile')

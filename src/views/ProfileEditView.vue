@@ -161,8 +161,6 @@ const RequestProfile = () => {
 
       profileData.job = jobName.value;
 
-      console.log(profileData);
-
       http.post('/account/profile/edit', toRaw(profileData))
         .then(async (data: any) => {
           return router.push('/register/auto')

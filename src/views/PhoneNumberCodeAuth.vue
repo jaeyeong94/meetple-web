@@ -47,6 +47,7 @@ const submitAction = () => {
     .then((data: any) => {
       const response = data.data;
       localStorage.setItem('token', response.data.accessToken)
+      localStorage.removeItem('terms');
       router.push('/register/auto')
     })
     .catch((error: any) => {

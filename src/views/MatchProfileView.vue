@@ -115,7 +115,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
             data: {
               name: nickname,
               partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
-              myProfileImageUrl: photos.value[photos.value.length - 1]?.image_path,
+              myProfileImageUrl: photos.value[0]?.image_path,
               onClickClose: () => {
                 useModalStore().setModal({ type: null })
                 // router.push('/chat')
