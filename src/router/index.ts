@@ -103,7 +103,7 @@ router.beforeEach((to, from, next) => {
   next();
 });
 
-const mixpanel = new MixpanelService("3c1930afca4f02bcace4f1a9a83588e8", {
+const mixpanel = new MixpanelService("c0dc3a05e48fb2aef3b05900be49db45", {
   debug: false,
   track_pageview: true,
   persistence: "localStorage",
