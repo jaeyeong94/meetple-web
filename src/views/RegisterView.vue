@@ -220,9 +220,7 @@ const ProfileUploader = (base64: string, file: any) => {
   http.upload('/account/profile/upload', formData)
     .then(async (data: any) => {
       photoRequired.value = true;
-      setTimeout(async () => {
-        await accountUpdateDefault();
-      }, 1000)
+      ProfileUpdateAction('normal', false, true);
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -250,11 +248,9 @@ const JobUploader = (base64: string, file: any) => {
 
   JobUploaderLoading.value = true;
   http.upload('/account/profile/upload', formData)
-    .then((data: any) => {
+    .then(async (data: any) => {
       jobRequired.value = true;
-      setTimeout(async () => {
-        await accountUpdateDefault();
-      }, 1000)
+      ProfileUpdateAction('job', false, true);
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -271,12 +267,16 @@ const JobUploader = (base64: string, file: any) => {
     })
 }
 
-const ProfileUpdateAction = (stage: string, next: boolean = true) => {
+const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean = false) => {
   let nextFlow;
-  if(next) {
-    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
+  if(hold) {
+    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value)];
   } else {
-    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) - 1];
+    if(next) {
+      nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
+    } else {
+      nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) - 1];
+    }
   }
 
   http.post('/account/profile/update', {
@@ -286,6 +286,8 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
     .then(async (data: any) => {
       if(nextFlow) {
         await router.push(`/register/${nextFlow}`)
+      } else {
+        await router.push('/register/auto');
       }
 
       await accountDataUpdate()
@@ -431,7 +433,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
           defaultData.gender = val;
           profileData.gender = val;
         }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />
-        </div>
+      </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'normal'">
@@ -445,7 +447,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
         <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
         <Gap :height="40" />
 
-        <ProfileImage label="프로필 이미지" :required="true" :loading="ProfileUploaderLoading" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" @error="(message: string) => {
+        <ProfileImage label="프로필 이미지" :required="true" :loading="ProfileUploaderLoading" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {
@@ -521,7 +523,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
         }" :value="profileData.job" />
         <Gap :height="20" />
 
-        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[jobs.length - 1]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
+        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {
@@ -542,10 +544,10 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
         }" />
       </StickyArea>
       <div class="content-container">
-          <PageTitleAndDescription title="프로필에 등록될 재학 및<br>졸업 대학을 입력해주세요." description="나와 더 잘 맞는 상대와 매칭될 수 있어요." />
-          <Gap :height="40" />
+        <PageTitleAndDescription title="프로필에 등록될 재학 및<br>졸업 대학을 입력해주세요." description="나와 더 잘 맞는 상대와 매칭될 수 있어요." />
+        <Gap :height="40" />
 
-          <TextInput label="학교명" placeholder="학교명을 입력해주세요." :required="false" :validate="(val: string) => {
+        <TextInput label="학교명" placeholder="학교명을 입력해주세요." :required="false" :validate="(val: string) => {
             if (val && val.length >= 20) {
               return '학교명은 20자 이내로 입력해주세요.';
             }
@@ -559,8 +561,8 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
               profileData.school = '';
             }
           }" :value="profileData.school" />
-        </div>
       </div>
+    </div>
 
     <div v-if="account.data?.accountMeta.stage === 'answer'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
@@ -615,7 +617,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
           :mbti="profileData.mbti"
           :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
           :school="profileData.school || '미입력'"
-          :image-url="photos[photos.length - 1].image_path"
+          :image-url="photos[0].image_path"
         />
         <Gap :height="20" />
         <Questions :data="profileData.descriptions.map((line: any) => {
@@ -685,7 +687,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true) => {
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
-    <SubmitButton @click="ProfileUpdateAction('job')" :style="{
+    <SubmitButton @click="ProfileUpdateAction('job', false, true)" :style="{
         backgroundColor: '#6726FE',
       }">인증 다시 진행하기</SubmitButton>
   </StickyArea>

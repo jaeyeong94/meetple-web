@@ -72,7 +72,7 @@ onMounted(async () => {
       :mbti="profileData.mbti"
       :location="`${profileData.occupiedAreaHigh}, ${profileData.occupiedAreaLow}`"
       :school="profileData.school || '미입력'"
-      :image-url="photos[photos.length - 1].image_path"
+      :image-url="photos[0].image_path"
     />
     <Gap :height="20" />
     <Questions :data="profileData.descriptions.map((line: any) => {

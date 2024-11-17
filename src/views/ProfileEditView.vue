@@ -25,8 +25,9 @@ const account: any = reactive({});
 const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
 const jobRequired: Ref<any> = ref(false);
-const jobName: Ref<any> = ref('asdasd');
+const jobName: Ref<any> = ref('');
 const jobFile: FormData = new FormData();
+const jobFileBase64: Ref<any> = ref('');
 
 const state: Reactive<{
   stage: 'profile' | 'job'
@@ -85,6 +86,37 @@ function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
   return new Blob([byteArray], { type: mimeType });
 }
 
+const ProfileUploaderLoading = ref(false);
+const ProfileUploader = (base64: string, file: any) => {
+  const base64Data = base64.split(',')[1];
+  const mimeType = 'text/plain';
+  const blob = base64ToBlob(base64Data, mimeType);
+  const formData = new FormData();
+  formData.append('file', blob, file.name);
+  formData.append('type', 'photo');
+
+  ProfileUploaderLoading.value = true;
+  http.upload('/account/profile/upload', formData)
+    .then(async (data: any) => {
+      setTimeout(async () => {
+        await accountUpdate();
+      }, 1000)
+    })
+    .catch((error: any) => {
+      useModalStore().setModal({
+        type: 'alert',
+        data: {
+          title: error.response.data.title,
+          message: error.response.data.message
+        }
+      })
+      console.log(error, 'error')
+    })
+    .finally(() => {
+      ProfileUploaderLoading.value = false;
+    })
+}
+
 const JobUploaderLoading = ref(false);
 const JobUploader = (base64: string, file: any) => {
   const base64Data = base64.split(',')[1];
@@ -94,6 +126,7 @@ const JobUploader = (base64: string, file: any) => {
   jobFile.append('file', blob, file.name);
   jobFile.append('type', 'job');
   jobRequired.value = true;
+  jobFileBase64.value = base64;
 }
 
 const UpdateProfileData = () => {
@@ -127,6 +160,8 @@ const RequestProfile = () => {
       accountUpdate();
 
       profileData.job = jobName.value;
+
+      console.log(profileData);
 
       http.post('/account/profile/edit', toRaw(profileData))
         .then(async (data: any) => {
@@ -184,7 +219,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
   </StickyArea>
 
   <div class="page" v-if="Object.keys(profileData).length > 0 && state.stage === 'profile'">
-    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[photos.length - 1]?.image_path" @change="ProfileUploader" @error="(message: string) => {
+    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {
       useModalStore().setModal({
         type: 'alert',
         data: {
@@ -207,7 +242,7 @@ const question2 = '어떤 미팅을 하고 싶으신가요?';
     <Gap :height="20" />
     <TextInput label="학교명" @input="(val: string) => { profileData.school = val}" :value="profileData.school" />
     <Gap :height="20" />
-    <TextArea label="자개소개" :max-length="120" :required="true" @input="(val: string) => profileData.selfIntroduction = val" :value="profileData.selfIntroduction" />
+    <TextArea label="자개소개" :max-length="500" :required="true" @input="(val: string) => profileData.selfIntroduction = val" :value="profileData.selfIntroduction" />
     <Gap :height="20" />
 
     <TextArea :question="question1" @input="(val: string) => {

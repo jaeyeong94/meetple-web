@@ -21,6 +21,7 @@ const props = defineProps({
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding: 24px 0;
 }
 .question-item {
   display: flex;

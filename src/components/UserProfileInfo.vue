@@ -62,6 +62,7 @@ const props = defineProps({
   font-size: 14px;
   font-weight: 500;
   color: #7F7F7F;
+  word-break: break-all;
 }
 .info {
   margin-top: 26px;

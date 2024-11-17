@@ -94,9 +94,9 @@ const onImageChange = (e: Event) => {
     />
     <div>
       <img ref="image" class="thumbnail" v-if="imageUrl" :src="imageUrl" alt="Thumbnail" />
-      <img ref="image" class="thumbnail" src="" alt="Thumbnail" v-else />
+      <img ref="image" class="thumbnail" v-else src="" alt="Thumbnail" />
     </div>
-    <div class="empty" v-if="!imageUrl">
+    <div class="empty" v-if="!selected && !imageUrl">
       <button class="new-button" @click="() => input?.click()">
         <div class="icon">
           <IcImage width="43" height="43" />

@@ -55,11 +55,13 @@ const emit = defineEmits(['click'])
   font-size: 25px;
   font-weight: 700;
   color: #000;
+  word-break: break-all;
 }
 .message {
   margin-top: 6px;
   font-size: 13px;
   font-weight: 500;
   color: #7F7F7F;
+  word-break: break-all;
 }
 </style>
