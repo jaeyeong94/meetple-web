@@ -90,6 +90,45 @@ const pointCharge = async (id: number) => {
     }
   })
 }
+
+const eventPointCharge = () => {
+  const action = async () => {
+    http.post('/payment/buy', { itemId: 2 })
+      .then(async (data: any) => {
+        const response = data.data;
+        const candyCurrency = items.data.find((item: any) => item.id === 2).charge_currency
+        await accountUpdate();
+        useModalStore().setModal({
+          type: 'alert',
+          data: {
+            title: '캔디 충전 완료!',
+            message: `${candyCurrency} 캔디가 충전되었습니다.`
+          }
+        })
+      })
+      .catch((error: any) => {
+        useModalStore().setModal({
+          type: 'alert',
+          data: {
+            title: error.response.data.title,
+            message: error.response.data.message
+          }
+        })
+        console.log(error, 'error')
+      })
+  }
+
+  useModalStore().setModal({
+    type: 'purchase-point',
+    data: {
+      point: items.data.find((item: any) => item.id === 2).charge_currency,
+      onClickCancel: () => {
+        useModalStore().setModal({ type: null })
+      },
+      onClickSubmit: action
+    }
+  })
+}
 </script>
 
 <template>
@@ -101,7 +140,7 @@ const pointCharge = async (id: number) => {
   <div class="page">
     <MyPoint :point="account.data?.currency || 0" />
     <Gap :height="20" />
-    <PointItems :items="items.data || []" @click="(id: number) => {
+    <PointItems @event="eventPointCharge" :items="items.data || []" @click="(id: number) => {
       pointCharge(id)
     }" />
   </div>

@@ -11,7 +11,7 @@ const props = defineProps({
 <template>
   <Modal>
     <span class="title">캔디 구매하기</span>
-    <p class="description">{{props.data?.point}} 캔디를 구매하겠습니까?</p>
+    <p class="description">{{props.data?.point}} 캔디를 구매하시겠습니까?</p>
     <SubmitButton :style="{backgroundColor: '#6751FF'}" @click="props.data?.onClickSubmit">구매하기</SubmitButton>
     <CancelButton :style="{marginTop: '20px'}" @click="props.data?.onClickCancel">취소하기</CancelButton>
   </Modal>
