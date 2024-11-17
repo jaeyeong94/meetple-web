@@ -126,6 +126,7 @@ function mixPanelUserSet(to: RouteLocationNormalizedGeneric, from: RouteLocation
       mixpanel.setUser({
         id: user.id,
         name: user.name,
+        gender: user.gender,
         phone_number: user.phone_number,
         birth_date: user.birth_date,
         nick_name: user.accountMeta.nick_name,
