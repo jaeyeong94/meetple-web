@@ -150,8 +150,8 @@ const actionBlock = async (nickname: string) => {
         :age="calculateAge(hitProfile.account?.birth_date)"
         :job="hitProfile.account?.accountMeta.job"
         :mbti="hitProfile.account?.accountMeta.mbti"
-        :location="`${hitProfile.account?.accountMeta.occupied_area_high}, ${hitProfile.hit_account?.accountMeta.occupied_area_low}`"
-        :school="hitProfile.account?.school"
+        :location="`${hitProfile.account?.accountMeta.occupied_area_high} ${hitProfile.account?.accountMeta.occupied_area_low}`"
+        :school="hitProfile.account?.accountMeta.school"
         :image-url="hitProfile.account?.accountProfiles[0]?.image_path"
       />
       <Gap :height="20" />

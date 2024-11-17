@@ -8,7 +8,7 @@ import SubmitButton from '@/components/SubmitButton.vue'
 import { formatNumber } from '@/lib/utils'
 import type { PropType } from 'vue'
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click', 'event'])
 
 const props = defineProps({
   items: {
@@ -26,7 +26,7 @@ const props = defineProps({
   </div>
 
   <Gap :height="16" />
-  <div class="event">
+  <div class="event" @click="() => emit('event')">
     <img class="icon" src="@/assets/images/logo.png" alt="Point" />
     <div class="text">
       <p class="event-title">밋플(Meetple) 오픈 Event</p>
