@@ -220,7 +220,9 @@ const ProfileUploader = (base64: string, file: any) => {
   http.upload('/account/profile/upload', formData)
     .then(async (data: any) => {
       photoRequired.value = true;
-      await accountUpdateDefault();
+      setTimeout(async () => {
+        await accountUpdateDefault();
+      }, 1000)
     })
     .catch((error: any) => {
       useModalStore().setModal({
@@ -250,7 +252,9 @@ const JobUploader = (base64: string, file: any) => {
   http.upload('/account/profile/upload', formData)
     .then((data: any) => {
       jobRequired.value = true;
-      accountUpdateDefault();
+      setTimeout(async () => {
+        await accountUpdateDefault();
+      }, 1000)
     })
     .catch((error: any) => {
       useModalStore().setModal({
