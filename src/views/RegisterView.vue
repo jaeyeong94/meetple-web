@@ -66,7 +66,7 @@ const jobs: Ref<any> = ref([]);
 const root = inject<HTMLElement>('rootDiv');
 
 // 질문
-const question1 = '미팅에 함께 나가는 나와 내 친구들은 어떤 사람인가요?';
+const question1 = '어떤 사람들과 미팅에 함께 나가시나요?';
 const question2 = '어떤 미팅을 하고 싶으신가요?';
 
 // 서버정보
