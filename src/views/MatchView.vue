@@ -11,11 +11,13 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge, ellipsis } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
+const mp = inject<MixpanelService>('mixpanel')
 const account: any = reactive({});
 const match: any = reactive({});
 const notification: any = reactive([]);
@@ -229,14 +231,23 @@ const multipleProfileMove = (id: string) => {
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
           <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
-          <ProfileActions v-else @close="answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)" @heart="answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)" />
+          <ProfileActions v-else @close="() => {
+            answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)
+            mp?.trackEvent('click_reject', { type: 'match', data: matchProfile })
+          }" @heart="() => {
+            answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)
+            mp?.trackEvent('click_accept', { type: 'match', data: matchProfile })
+          }" />
         </div>
       </div>
     </div>
 
     <div v-else-if="match.data?.recommended.length >= 2">
       <div v-for="matchProfile in match.data.recommended">
-        <PartnerProfileInfo @click="multipleProfileMove(matchProfile.id)"
+        <PartnerProfileInfo @click="() => {
+          multipleProfileMove(matchProfile.id)
+          mp?.trackEvent('click_profile', { type: 'match', data: matchProfile })
+        }"
                             :name="matchProfile.hit_account.accountMeta.nick_name"
                             :message="ellipsis(matchProfile.hit_account.accountMeta.self_introduction, 50)"
                             :age="calculateAge(matchProfile.hit_account.birth_date)"

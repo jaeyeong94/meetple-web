@@ -6,9 +6,12 @@ import SubHeader from '@/components/SubHeader.vue'
 import PointItems from '@/components/PointItems.vue'
 import { TEST_USER } from '@/consts/testData'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive, ref, type Ref } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref } from 'vue'
+
+const mp = inject<MixpanelService>('mixpanel')
 
 const user = TEST_USER;
 
@@ -59,6 +62,11 @@ const pointCharge = async (id: number) => {
         const response = data.data;
         const candyCurrency = items.data.find((item: any) => item.id === id).charge_currency
         await accountUpdate();
+
+        mp?.trackEvent('point_charge', {
+          point: candyCurrency
+        })
+
         useModalStore().setModal({
           type: 'alert',
           data: {
@@ -98,6 +106,11 @@ const eventPointCharge = () => {
         const response = data.data;
         const candyCurrency = items.data.find((item: any) => item.id === 2).charge_currency
         await accountUpdate();
+
+        mp?.trackEvent('event_point_charge', {
+          point: candyCurrency
+        })
+
         useModalStore().setModal({
           type: 'alert',
           data: {

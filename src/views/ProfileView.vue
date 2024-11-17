@@ -7,9 +7,11 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import router from '@/router'
-import { onMounted, reactive, ref, type Ref } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref } from 'vue'
 
+const mp = inject<MixpanelService>('mixpanel')
 const settings = [
   { title: '문의하기', onClick: () => {
     window.open('https://seen-bison-bae.notion.site/136c10e8cd2c8077ae1cf0d2f78bb31d?pvs=4', '_blank');
@@ -73,12 +75,16 @@ onMounted(async () => {
 <!--    <Tabs :tabs="TEST_TABS" :current-index="1" />-->
   </StickyArea>
   <div class="page">
-      <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[0]?.image_path" @click="() => router.push('/profile-edit')" />
+      <MyProfile :name="account.data?.accountMeta?.nick_name" :message="account.data?.accountMeta.self_introduction" :image-url="photos[0]?.image_path" @click="() => {
+        router.push('/profile-edit')
+        mp?.trackEvent('click_profile_edit')
+      }" />
 <!--    <Gap :height="20" />-->
 <!--    <AlertBanner title="카카오톡 오픈 프로필을 등록해주세요." description="링크된 상대방과 대화할 수 있습니다." />-->
     <Gap :height="20" />
     <MyPointWithButton :point="account.data?.currency || 0" @charge="() => {
       router.push('/point')
+      mp?.trackEvent('click_move_point')
     }" />
     <Gap :height="20" />
     <Settings :options="settings" />

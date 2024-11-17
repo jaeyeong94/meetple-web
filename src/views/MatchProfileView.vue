@@ -12,14 +12,16 @@ import Gap from '@/components/Gap.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
+import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge } from '@/lib/utils'
 import router from '@/router'
 import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive, ref, type Ref, toRaw } from 'vue'
+import { inject, onMounted, reactive, ref, type Ref, toRaw } from 'vue'
 
 const route = useRoute();
 
+const mp = inject<MixpanelService>('mixpanel')
 const account: any = reactive({});
 const match: any = reactive({});
 const matchProfile: any = reactive({});
@@ -232,7 +234,13 @@ const answerRejectAction = (matchId: number, nickname: string) => {
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
         <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
-        <ProfileActions v-else @close="answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)" @heart="answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)" />
+        <ProfileActions v-else @close="() => {
+          answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)
+          mp?.trackEvent('click_reject', { type: 'match', data: matchProfile })
+        }" @heart="() => {
+          answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)
+          mp?.trackEvent('click_accept', { type: 'match', data: matchProfile })
+        }" />
       </div>
     </div>
   </div>

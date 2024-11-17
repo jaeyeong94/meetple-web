@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import IcGrayArrow from '@/components/icons/IcGrayArrow.vue'
+import type MixpanelService from '@/lib/mixpanel'
+import { inject } from 'vue'
 
+const mp = inject<MixpanelService>('mixpanel')
 const props = defineProps({
   options: Array<{title: string, onClick: () => void}>,
 })
@@ -10,7 +13,10 @@ const props = defineProps({
   <span class="title">설정</span>
   <ul class="settings">
     <li class="setting-item" :key="index" v-for="(item, index) in props.options">
-      <button @click="item.onClick()">
+      <button @click="() => {
+        item.onClick()
+        mp?.trackEvent('click_setting', { title: item.title })
+      }">
         <span class="label">{{item.title}}</span>
         <IcGrayArrow />
       </button>

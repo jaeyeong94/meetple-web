@@ -13,10 +13,12 @@ import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import { TEST_SELECT_OPTIONS, TEST_DEEP_SELECT_OPTIONS, QUESTION1, QUESTION2 } from '@/consts/testData'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import router from '@/router'
-import { onMounted, type Reactive, reactive, type Ref, ref, toRaw } from 'vue'
+import { inject, onMounted, type Reactive, reactive, type Ref, ref, toRaw } from 'vue'
 import { useModalStore } from '@/stores/modal'
 
+const mp = inject<MixpanelService>('mixpanel')
 const profileData: Reactive<{
   [key: string]: any
 }> = reactive({});
@@ -217,6 +219,7 @@ const question2 = QUESTION2;
       title: '미리보기',
       onClick: () => {
         router.push('/profile-preview')
+        mp?.trackEvent('click_profile_preview')
       }
     }" :show-back-button="true" @back="() => {
       router.back();
@@ -340,13 +343,19 @@ const question2 = QUESTION2;
   </div>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'profile'">
-    <SubmitButton :disabled="!submitRequired" @click="UpdateProfileData" :style="{
+    <SubmitButton :disabled="!submitRequired" @click="() => {
+      UpdateProfileData()
+      mp?.trackEvent('click_profile_edit')
+    }" :style="{
           backgroundColor: '#6726FE',
         }">수정 완료하기</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'job'">
-    <SubmitButton @click="RequestProfile" :disabled="!jobName || !jobRequired" :style="{
+    <SubmitButton @click="() => {
+      RequestProfile()
+      mp?.trackEvent('click_profile_job_edit')
+    }" :disabled="!jobName || !jobRequired" :style="{
           backgroundColor: '#6726FE',
         }">심사하기</SubmitButton>
   </StickyArea>
