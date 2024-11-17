@@ -76,15 +76,6 @@ const accountUpdateDefault = async () => {
   const response = await http.get('/account')
   Object.assign(account, response.data)
 
-  if (!account.data) {
-    localStorage.removeItem('token')
-    await router.push('/login')
-  }
-
-  if (account.data.accountMeta.stage === 'approve') {
-    await router.push('/match')
-  }
-
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
       photos.value.push(profile)
