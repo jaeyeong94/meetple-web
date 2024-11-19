@@ -7,11 +7,13 @@ import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import { TEST_MORE_DATA, TEST_TABS, TEST_USER } from '@/consts/testData'
 import http from '@/lib/http'
+import type MixpanelService from '@/lib/mixpanel'
 import { formatPhoneNumber } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
-import { onMounted, reactive } from 'vue'
+import { inject, onMounted, reactive } from 'vue'
 
+const mp = inject<MixpanelService>('mixpanel')
 const settings = [
   { title: '문의하기', onClick: () => {} },
   { title: '공지사항', onClick: () => {} },
@@ -86,6 +88,7 @@ const user = TEST_USER;
     <Divider :height="5" />
     <Gap :height="20" />
     <ButtonWithDetail @click="() => {
+        mp?.trackEvent('click_delete_account')
         useModalStore().setModal({
           type: 'delete-account',
           data: {
@@ -93,6 +96,7 @@ const user = TEST_USER;
               useModalStore().setModal({ type: null })
             },
             onClickSubmit: () => {
+              mp?.trackEvent('click_delete_account_submit')
               useModalStore().setModal({ type: null })
               leave();
             }
