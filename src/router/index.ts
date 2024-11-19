@@ -120,7 +120,8 @@ function mixPanelUserSet(to: RouteLocationNormalizedGeneric, from: RouteLocation
   }
 
   // User tracking
-  if(mixpanel.userInfo === null && token) {
+  // if(mixpanel.userInfo === null && token) {
+  if(token) {
     http.get('/account').then((response) => {
       const user = response.data.data;
       mixpanel.setUser({
