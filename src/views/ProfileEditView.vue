@@ -345,7 +345,7 @@ const question2 = QUESTION2;
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'profile'">
     <SubmitButton :disabled="!submitRequired" @click="() => {
       UpdateProfileData()
-      mp?.trackEvent('click_profile_edit')
+      mp?.trackEvent('click_profile_edit_done')
     }" :style="{
           backgroundColor: '#6726FE',
         }">수정 완료하기</SubmitButton>
