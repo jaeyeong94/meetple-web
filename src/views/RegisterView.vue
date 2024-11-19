@@ -617,7 +617,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <PageTitleAndDescription title="가입 승인을 위해<br>인증 심사중이에요." description="신뢰도 기반의 미팅을 위해 인증 절차를 진행하고 있어요.<br>인증이 승인되면 문자를 통해 안내해드릴게요!" />
         <Gap :height="40" />
         <UserProfileInfo
-          :name="profileData.name"
+          :name="account.data.accountMeta.nick_name"
           :message="profileData.selfIntroduction"
           :age="calculateAge(profileData.birthDate)"
           :job="profileData.job"
