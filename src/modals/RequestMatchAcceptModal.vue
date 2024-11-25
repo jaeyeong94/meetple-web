@@ -12,7 +12,7 @@ const props = defineProps({
 <template>
   <Modal>
     <span class="title">{{props.data?.name}}님과의<br> 매칭을 수락하시겠습니까?</span>
-    <p class="description">매칭이 최종 성사되는 경우 캔디 30개가 사용됩니다.</p>
+    <p class="description">캔디 30개가 사용되며, 성사되지 않는 경우 환불됩니다.</p>
     <SubmitButton :style="{backgroundColor: '#6751FF'}" @click="props.data?.onClickSubmit">매칭 수락하기</SubmitButton>
     <CancelButton :style="{marginTop: '20px'}" @click="props.data?.onClickCancel">취소하기</CancelButton>
   </Modal>
