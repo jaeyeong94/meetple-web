@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ActionButton from '@/components/buttons/ActionButton.vue'
 import MoreButton from '@/components/buttons/MoreButton.vue'
+import Divider from '@/components/Divider.vue'
 import Gap from '@/components/Gap.vue'
 import IcLogo from '@/components/icons/IcLogo.vue'
 import IcPointLogo from '@/components/icons/IcPointLogo.vue'
@@ -26,17 +27,17 @@ const props = defineProps({
   </div>
 
   <Gap :height="16" />
-  <div class="event" @click="() => emit('event')">
-    <img class="icon" src="@/assets/images/logo.png" alt="Point" />
-    <div class="text">
-      <p class="event-title">밋플(Meetple) 오픈 Event</p>
-      <p class="event-description">캔디 30개를 무료로 드려요! (최대 30개 보유 가능)</p>
-    </div>
-    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
-      <path d="M6.25146 14.5234L12.387 8.38788L6.25146 2.25232" stroke="#A4A4A4" stroke-width="2.1"/>
-    </svg>
-  </div>
-  <Gap :height="30" />
+<!--  <div class="event" @click="() => emit('event')">-->
+<!--    <img class="icon" src="@/assets/images/logo.png" alt="Point" />-->
+<!--    <div class="text">-->
+<!--      <p class="event-title">밋플(Meetple) 오픈 Event</p>-->
+<!--      <p class="event-description">캔디 30개를 무료로 드려요! (최대 30개 보유 가능)</p>-->
+<!--    </div>-->
+<!--    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">-->
+<!--      <path d="M6.25146 14.5234L12.387 8.38788L6.25146 2.25232" stroke="#A4A4A4" stroke-width="2.1"/>-->
+<!--    </svg>-->
+<!--  </div>-->
+<!--  <Gap :height="30" />-->
 
   <ul class="point-items">
     <li v-for="(item) in props.items" :key="item.id">
@@ -62,8 +63,7 @@ const props = defineProps({
 .point-items {
   display: flex;
   flex-direction: column;
-  padding: 16px 0;
-  gap: 24px;
+  padding: 0 16px;
   background-color: #F4F4F4;
   border-radius: 16px;
 }
@@ -73,7 +73,12 @@ const props = defineProps({
   align-items: center;
   justify-content: space-between;
   gap: 9px;
-  padding: 0 16px;
+  padding: 20px 16px;
+  border-bottom: 1px solid #DFDFDF;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 .icon {
   width: 40px;

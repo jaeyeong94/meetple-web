@@ -94,7 +94,11 @@ const pointCharge = async (id: number) => {
       onClickCancel: () => {
         useModalStore().setModal({ type: null })
       },
-      onClickSubmit: action
+      onClickSubmit: () => {
+        // action()
+        window.open('https://seen-bison-bae.notion.site/147c10e8cd2c80579c96c1a6a4103d3c?pvs=4')
+        useModalStore().setModal({ type: null })
+      }
     }
   })
 }
@@ -138,7 +142,9 @@ const eventPointCharge = () => {
       onClickCancel: () => {
         useModalStore().setModal({ type: null })
       },
-      onClickSubmit: action
+      onClickSubmit: () => {
+        // action()
+      }
     }
   })
 }
