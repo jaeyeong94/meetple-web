@@ -5,11 +5,23 @@ import type MixpanelService from '@/lib/mixpanel'
 import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 let timeout = 0
-
 const mp = inject<MixpanelService>('mixpanel')
-
 const onboarding = localStorage.getItem('onboarding')
-const onboardingState = ref(1);
+const onboardingState = ref(1)
+
+// 이미지 프리로딩 함수
+const preloadImages = async (imagePaths: string[]) => {
+  await Promise.all(
+    imagePaths.map((path) => {
+      return new Promise((resolve) => {
+        const img = new Image()
+        img.src = path
+        img.onload = resolve
+        img.onerror = resolve // 에러 발생해도 로드 완료로 처리
+      })
+    })
+  )
+}
 
 const resizeBackground = () => {
   clearTimeout(timeout)
@@ -25,7 +37,14 @@ const resizeBackground = () => {
   }, 1)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // 백그라운드 이미지 프리로딩
+  await preloadImages([
+    '@/assets/images/onboarding-01.png',
+    '@/assets/images/onboarding-02.png',
+    '@/assets/images/onboarding-03.png',
+  ])
+
   resizeBackground()
   window.addEventListener('resize', resizeBackground)
 })
@@ -37,7 +56,7 @@ onUnmounted(() => {
 const next = () => {
   mp?.trackEvent(`onboarding_btn_${onboardingState.value}`)
 
-  if(onboardingState.value === 3) {
+  if (onboardingState.value === 3) {
     localStorage.setItem('onboarding', 'true')
     location.href = '/login'
   } else {
