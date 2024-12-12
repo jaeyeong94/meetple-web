@@ -67,16 +67,16 @@ const next = () => {
 
 <template>
   <div class="onboarding" v-if="!onboarding">
-    <div class="step-01" v-if="onboardingState === 1">
+    <div class="step-01" :style="{ zIndex: onboardingState === 1 ? 3 : 1, opacity: onboardingState === 1 ? 1 : 0 }">
       <h2>퇴근 후<br>친구와 함께</h2>
     </div>
-    <div class="step-02" v-else-if="onboardingState === 2">
+    <div class="step-02" :style="{ zIndex: onboardingState === 2 ? 3 : 1, opacity: onboardingState === 2 ? 1 : 0 }">
       <h2>신뢰할 수 있는<br>직장인들과</h2>
     </div>
-    <div class="step-03" v-else-if="onboardingState === 3">
+    <div class="step-03" :style="{ zIndex: onboardingState === 3 ? 3 : 1, opacity: onboardingState === 3 ? 1 : 0 }">
       <h2>매주 새로운 연결</h2>
     </div>
-    <SubmitButton style="background-color: #6726FE" @click="next">다음</SubmitButton>
+    <SubmitButton style="background-color: #6726FE; z-index: 4; margin-bottom: 24px;" @click="next">다음</SubmitButton>
   </div>
 
   <div class="banner" v-else>
@@ -96,108 +96,60 @@ const next = () => {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: end;
   align-items: center;
   height: 100dvh;
   background-color: #000;
-  box-sizing: border-box;
   overflow: hidden;
-  padding: 25px 16px;
+  padding: 0 16px;
 
-  .step-01 {
+  > div[class^="step"] {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-      text-align: center;
-      line-height: 1.5;
-      position:relative;
-      z-index:1000;
-    }
-
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('@/assets/images/onboarding-01.png');
-      background-size: cover;
-      background-position: bottom;
-      opacity: 0.7;
-    }
+    transition: opacity 0.5s ease, z-index 0s 0.5s;
   }
 
-  .step-02 {
+  .step-01::before,
+  .step-02::before,
+  .step-03::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-      text-align: center;
-      line-height: 1.5;
-      position:relative;
-      z-index:1000;
-    }
-
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('@/assets/images/onboarding-02.png');
-      background-size: cover;
-      background-position: bottom;
-      opacity: 0.7;
-    }
+    background-size: cover;
+    background-position: bottom;
+    opacity: 0.7;
   }
 
-  .step-03 {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  .step-01::before {
+    background-image: url('@/assets/images/onboarding-01.png');
+  }
 
-    h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #fff;
-      text-align: center;
-      line-height: 1.5;
-      position:relative;
-      z-index:1000;
-    }
+  .step-02::before {
+    background-image: url('@/assets/images/onboarding-02.png');
+  }
 
-    &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('@/assets/images/onboarding-03.png');
-      background-size: cover;
-      background-position: bottom;
-      opacity: 0.7;
-    }
+  .step-03::before {
+    background-image: url('@/assets/images/onboarding-03.png');
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
   }
 }
 
