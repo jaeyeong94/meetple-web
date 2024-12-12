@@ -9,6 +9,13 @@ const mp = inject<MixpanelService>('mixpanel')
 const onboarding = localStorage.getItem('onboarding')
 const onboardingState = ref(1)
 
+// 레퍼럴 코드 확인
+const referralCode = new URLSearchParams(location.search).get('referralCode')
+if(referralCode) {
+  window.localStorage.setItem('referralCode', referralCode);
+  mp?.trackEvent('referral_start');
+}
+
 // 이미지 프리로딩 함수
 const preloadImages = async (imagePaths: string[]) => {
   await Promise.all(

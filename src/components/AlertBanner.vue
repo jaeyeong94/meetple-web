@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import IcAlert from '@/components/icons/IcAlert.vue'
+import IcGrayArrow from '@/components/icons/IcGrayArrow.vue'
 
 const props = defineProps({
   title: String,

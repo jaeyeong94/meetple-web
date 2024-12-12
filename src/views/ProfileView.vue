@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ReferralBanner from '@/components/ReferralBanner.vue'
+import Banner from '@/components/ReferralBanner.vue'
 import MyProfile from '@/components/MyProfile.vue'
 import MyPointWithButton from '@/components/MyPointWithButton.vue'
 import Settings from '@/components/Settings.vue'
@@ -83,7 +85,6 @@ onMounted(async () => {
         mp?.trackEvent('click_profile_edit')
       }" />
 <!--    <Gap :height="20" />-->
-<!--    <AlertBanner title="카카오톡 오픈 프로필을 등록해주세요." description="링크된 상대방과 대화할 수 있습니다." />-->
     <Gap :height="20" />
     <MyPointWithButton :point="account.data?.currency || 0" @charge="() => {
       router.push('/point')
@@ -98,13 +99,13 @@ onMounted(async () => {
       <p>주소 : 서울특별시 강남구 봉은사로22길 45-9, 1층 14호</p>
       <p>전화번호 : 010-2483-3511</p>
     </div>
+    <ReferralBanner />
   </div>
 </template>
 
 <style scoped>
 .page {
-  padding: 16px;
-  min-height: 100dvh;
+  padding: 16px 16px 128px 16px;
 }
 
 .info {

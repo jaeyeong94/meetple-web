@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ReferralBanner from '@/components/ReferralBanner.vue'
 import http from '@/lib/http'
 import Tabs from '@/components/Tabs.vue'
 import UserProfileInfo from '@/components/UserProfileInfo.vue'
@@ -92,15 +93,17 @@ const multipleProfileMove = (id: string) => {
                             :image-url="hitProfile.account?.accountProfiles[0]?.image_path" />
         <Gap :height="20" />
       </div>
+      <ReferralBanner />
     </div>
     <div v-else>
       <Empty v-if="match.data" title="매칭 이력이 없어요" description="추천 매칭을 통해<br>새로운 분들을 만나보세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
+      <ReferralBanner />
     </div>
   </div>
 </template>
 
 <style scoped>
 .page {
-  padding: 16px;
+  padding: 16px 16px 128px 16px;
 }
 </style>

@@ -48,7 +48,9 @@ const retryAction = () => {
 }
 
 const submitAction = () => {
-  http.post('/account/login', { phoneNumber, code: authCode.value })
+  const referralCode = localStorage.getItem('referralCode');
+
+  http.post('/account/login', { phoneNumber, code: authCode.value, referralCode })
     .then((data: any) => {
       const response = data.data;
       localStorage.setItem('token', response.data.accessToken)
