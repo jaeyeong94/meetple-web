@@ -28,7 +28,7 @@ const props = defineProps({
         <p class="value">{{props.school}}</p>
       </li>
       <li class="info-item">
-        <span class="title">거주 지역</span>
+        <span class="title">지역</span>
         <p class="value">{{props.location}}</p>
       </li>
       <li class="info-item">

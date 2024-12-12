@@ -65,10 +65,6 @@ const action = () => {
       bottom: '16px',
       width: 'calc(100% - 32px)',
     }">인증번호 받기</SubmitButton>
-<!--    <DeepSelect label="거주지역" :required="true" modal-title="거주지역을 선택해주세요."-->
-<!--                @change="(val1: string, val2: string) => location = val2"-->
-<!--                :value="location"-->
-<!--                :options="TEST_DEEP_SELECT_OPTIONS"/>-->
   </div>
 </template>
 

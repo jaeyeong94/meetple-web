@@ -483,7 +483,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         }" :value="profileData.mbti" :options="TEST_SELECT_OPTIONS" :modal-option-cols="4" />
         <Gap :height="20" />
 
-        <DeepSelect label="거주지역" placeholder="거주지역을 선택해주세요." modalTitle="거주지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
+        <DeepSelect label="지역" placeholder="지역을 선택해주세요." modalTitle="지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
           profileData.occupiedAreaHigh = val
           profileData.occupiedAreaLow = val2
         }" :value="profileData.occupiedAreaLow" :view-value="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />

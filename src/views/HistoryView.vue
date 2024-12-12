@@ -12,7 +12,7 @@ import StickyArea from '@/components/StickyArea.vue'
 import MainHeader from '@/components/MainHeader.vue'
 import { TEST_PROFILE_URL, TEST_TABS } from '@/consts/testData'
 import type MixpanelService from '@/lib/mixpanel'
-import { calculateAge } from '@/lib/utils'
+import { calculateAge, ellipsis } from '@/lib/utils'
 import router from '@/router'
 import { useModalStore } from '@/stores/modal'
 import { inject, onMounted, reactive, ref, type Ref, toRaw } from 'vue'
@@ -83,7 +83,7 @@ const multipleProfileMove = (id: string) => {
           mp?.trackEvent('click_profile', { type: 'history', data: hitProfile })
         }"
                             :name="hitProfile.account?.accountMeta.nick_name"
-                            :message="hitProfile.account?.accountMeta.self_introduction"
+                            :message="ellipsis(hitProfile.account?.accountMeta.self_introduction, 50)"
                             :age="calculateAge(hitProfile.account?.birth_date)"
                             :job="hitProfile.account?.accountMeta.job"
                             :mbti="hitProfile.account?.accountMeta.mbti"

@@ -2,11 +2,14 @@
 import IcMainLogo from '@/components/icons/IcMainLogo.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import type MixpanelService from '@/lib/mixpanel'
-import { inject, onMounted, onUnmounted } from 'vue'
+import { inject, onMounted, onUnmounted, ref } from 'vue'
 
 let timeout = 0
 
 const mp = inject<MixpanelService>('mixpanel')
+
+const onboarding = localStorage.getItem('onboarding')
+const onboardingState = ref(1);
 
 const resizeBackground = () => {
   clearTimeout(timeout)
@@ -30,10 +33,32 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', resizeBackground)
 })
+
+const next = () => {
+  if(onboardingState.value === 3) {
+    localStorage.setItem('onboarding', 'true')
+    location.href = '/login'
+  } else {
+    onboardingState.value += 1
+  }
+}
 </script>
 
 <template>
-  <div class="banner">
+  <div class="onboarding" v-if="!onboarding">
+    <div class="step-01" v-if="onboardingState === 1">
+      <h2>퇴근 후<br>친구와 함께</h2>
+    </div>
+    <div class="step-02" v-else-if="onboardingState === 2">
+      <h2>신뢰할 수 있는<br>직장인들과</h2>
+    </div>
+    <div class="step-03" v-else-if="onboardingState === 3">
+      <h2>매주 새로운 연결</h2>
+    </div>
+    <SubmitButton style="background-color: #6726FE" @click="next">다음</SubmitButton>
+  </div>
+
+  <div class="banner" v-else>
     <div class="container">
       <span class="subtitle">친구와 함께 직장인 미팅</span>
       <IcMainLogo />
@@ -46,6 +71,115 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.onboarding {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100dvh;
+  background-color: #000;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 25px 16px;
+
+  .step-01 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.5;
+      position:relative;
+      z-index:1000;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('@/assets/images/onboarding-01.png');
+      background-size: cover;
+      background-position: bottom;
+      opacity: 0.7;
+    }
+  }
+
+  .step-02 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.5;
+      position:relative;
+      z-index:1000;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('@/assets/images/onboarding-01.png');
+      background-size: cover;
+      background-position: bottom;
+      opacity: 0.7;
+    }
+  }
+
+  .step-03 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      line-height: 1.5;
+      position:relative;
+      z-index:1000;
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('@/assets/images/onboarding-01.png');
+      background-size: cover;
+      background-position: bottom;
+      opacity: 0.7;
+    }
+  }
+}
+
 .banner {
   position: relative;
   display: flex;

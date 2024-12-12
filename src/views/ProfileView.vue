@@ -13,6 +13,9 @@ import { inject, onMounted, reactive, ref, type Ref } from 'vue'
 
 const mp = inject<MixpanelService>('mixpanel')
 const settings = [
+  { title: '이용 가이드', onClick: () => {
+      window.open('https://seen-bison-bae.notion.site/Meetple-135c10e8cd2c80e48768c5e702705b41', '_blank');
+    } },
   { title: '문의하기', onClick: () => {
     window.open('https://seen-bison-bae.notion.site/136c10e8cd2c8077ae1cf0d2f78bb31d?pvs=4', '_blank');
     } },
