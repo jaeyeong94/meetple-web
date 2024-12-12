@@ -48,13 +48,13 @@ const next = () => {
 
 <template>
   <div class="onboarding" v-if="!onboarding">
-    <div class="step-01" v-if="onboardingState === 1">
+    <div class="step-01" v-show="onboardingState === 1">
       <h2>퇴근 후<br>친구와 함께</h2>
     </div>
-    <div class="step-02" v-else-if="onboardingState === 2">
+    <div class="step-02" v-show="onboardingState === 2">
       <h2>신뢰할 수 있는<br>직장인들과</h2>
     </div>
-    <div class="step-03" v-else-if="onboardingState === 3">
+    <div class="step-03" v-show="onboardingState === 3">
       <h2>매주 새로운 연결</h2>
     </div>
     <SubmitButton style="background-color: #6726FE" @click="next">다음</SubmitButton>
