@@ -142,7 +142,7 @@ const next = () => {
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('@/assets/images/onboarding-01.png');
+      background-image: url('@/assets/images/onboarding-02.png');
       background-size: cover;
       background-position: bottom;
       opacity: 0.7;
@@ -174,7 +174,7 @@ const next = () => {
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: url('@/assets/images/onboarding-01.png');
+      background-image: url('@/assets/images/onboarding-03.png');
       background-size: cover;
       background-position: bottom;
       opacity: 0.7;
