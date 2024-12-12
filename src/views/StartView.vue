@@ -35,6 +35,8 @@ onUnmounted(() => {
 })
 
 const next = () => {
+  mp?.trackEvent(`onboarding_btn_${onboardingState.value}`)
+
   if(onboardingState.value === 3) {
     localStorage.setItem('onboarding', 'true')
     location.href = '/login'

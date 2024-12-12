@@ -20,10 +20,6 @@ class MixpanelService {
     mixpanel.init(this.token, options);
   }
 
-  /**
-   * Set user information for tracking.
-   * @param {Object} userInfo - User information (e.g., { id: '12345', name: 'John Doe', email: 'john@example.com' }).
-   */
   setUser(userInfo: any) {
     if (!userInfo || typeof userInfo.id === 'undefined') {
       throw new Error('User information must include an id');
@@ -39,11 +35,6 @@ class MixpanelService {
     });
   }
 
-  /**
-   * Track an event in Mixpanel.
-   * @param {string} eventName - Event name.
-   * @param {Object} [properties={}] - Event properties.
-   */
   trackEvent(eventName: string, properties = {}) {
     if (!eventName) {
       throw new Error('Event name is required');
@@ -61,6 +52,26 @@ class MixpanelService {
     mixpanel.track_pageview({
       page: pageName,
     });
+  }
+
+  trackEventForUser(userId: string, eventName: string, properties = {}) {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+    if (!eventName) {
+      throw new Error('Event name is required');
+    }
+
+    // Temporarily identify the user, track the event, and reset to current user
+    mixpanel.identify(userId);
+    mixpanel.track(eventName, properties);
+
+    // Reset back to the current user if one is set
+    if (this.userInfo) {
+      mixpanel.identify(this.userInfo.id);
+    } else {
+      mixpanel.reset();
+    }
   }
 
   /**

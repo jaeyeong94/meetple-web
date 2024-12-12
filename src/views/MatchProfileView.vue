@@ -84,7 +84,6 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
       attitude: true
     })
       .then(async (data: any) => {
-        const response = data.data;
         await accountUpdate();
         return router.push('/match');
       })
@@ -99,7 +98,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
                 router.push('/point')
               }
             }
-          },
+          }
         })
       })
   }
@@ -122,7 +121,10 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
 
           await action()
 
+          mp?.trackEvent('click_accept')
           mp?.trackEvent('matched', { data: hit_account })
+          mp?.trackEvent('success')
+          mp?.trackEventForUser(hit_account.id, 'success');
 
           useModalStore().setModal({
             type: 'matched',
@@ -147,8 +149,16 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
         onClickCancel: () => {
           useModalStore().setModal({ type: null })
         },
-        onClickSubmit: () => {
-          action()
+        onClickSubmit: async () => {
+          if(account.data.currency < 30) {
+            useModalStore().setModal({ type: null })
+            return router.push('/point')
+          }
+
+          await action()
+
+          mp?.trackEvent('click_accept')
+
           useModalStore().setModal({ type: null })
         }
       }
@@ -164,7 +174,7 @@ const answerRejectAction = (matchId: number, nickname: string) => {
     })
       .then(async (data: any) => {
         const response = data.data;
-        await accountUpdate();
+        await accountUpdate()
         return router.push('/match');
       })
       .catch((error: any) => {
@@ -175,7 +185,6 @@ const answerRejectAction = (matchId: number, nickname: string) => {
             message: error.response.data.message
           }
         })
-        console.log(error, 'error')
       })
   }
 
@@ -186,8 +195,9 @@ const answerRejectAction = (matchId: number, nickname: string) => {
       onClickCancel: () => {
         useModalStore().setModal({ type: null })
       },
-      onClickSubmit: () => {
-        action()
+      onClickSubmit: async () => {
+        await action()
+        mp?.trackEvent('click_reject')
         useModalStore().setModal({ type: null })
       }
     }
@@ -238,10 +248,8 @@ const answerRejectAction = (matchId: number, nickname: string) => {
         <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
         <ProfileActions v-else @close="() => {
           answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)
-          mp?.trackEvent('click_reject', { type: 'match', data: matchProfile })
         }" @heart="() => {
           answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)
-          mp?.trackEvent('click_accept', { type: 'match', data: matchProfile })
         }" />
       </div>
     </div>
