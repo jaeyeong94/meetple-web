@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MyPoint from '@/components/MyPoint.vue'
 import Gap from '@/components/Gap.vue'
+import ReferralBanner from '@/components/ReferralBanner.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import PointItems from '@/components/PointItems.vue'
@@ -162,6 +163,7 @@ const eventPointCharge = () => {
     <PointItems @event="eventPointCharge" :items="items.data || []" @click="(id: number) => {
       pointCharge(id)
     }" />
+    <ReferralBanner />
   </div>
 </template>
 
