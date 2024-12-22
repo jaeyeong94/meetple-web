@@ -104,10 +104,10 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
 
           await action()
 
-          mp?.trackEvent('click_accept')
-          mp?.trackEvent('matched', { data: hit_account })
-          mp?.trackEvent('success')
-          mp?.trackEventForUser(hit_account.id, 'success');
+          mp?.trackEvent('click_accept', { data: hit_account })
+          mp?.trackEvent('matched', { data: match })
+          mp?.trackEvent('success', { data: hit_account })
+          mp?.trackEventForUser(hit_account.id, 'success', { data: account.data });
 
           useModalStore().setModal({ type: null })
 
@@ -142,7 +142,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
 
           await action()
 
-          mp?.trackEvent('click_accept')
+          mp?.trackEvent('click_accept', { data: hit_account })
 
           useModalStore().setModal({ type: null })
         }
@@ -151,7 +151,7 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
   }
 }
 
-const answerRejectAction = (matchId: number, nickname: string) => {
+const answerRejectAction = (matchId: number, nickname: string, hit_account: any) => {
   const action = async () => {
     http.post('/match/answer', {
       matchId,
@@ -182,7 +182,7 @@ const answerRejectAction = (matchId: number, nickname: string) => {
       },
       onClickSubmit: async () => {
         await action()
-        mp?.trackEvent('click_reject')
+        mp?.trackEvent('click_reject', { data: hit_account })
         useModalStore().setModal({ type: null })
       }
     }
@@ -241,7 +241,7 @@ const multipleProfileMove = (id: string) => {
           <MatchingStatus v-if="matchProfile.my_answer == true" status="waiting" style="padding: 10px 20px 10px 10px;" />
           <MatchingStatus v-else-if="matchProfile.my_answer == false" status="rejected" style="padding: 10px 20px 10px 10px;" />
           <ProfileActions v-else @close="() => {
-            answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)
+            answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_account)
           }" @heart="() => {
             answerAcceptAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name, matchProfile.hit_answer, matchProfile.hit_account)
           }" />
