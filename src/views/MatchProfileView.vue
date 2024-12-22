@@ -126,18 +126,20 @@ const answerAcceptAction = (matchId: number, nickname: string, hit_answer: boole
           mp?.trackEvent('success')
           mp?.trackEventForUser(hit_account.id, 'success');
 
-          useModalStore().setModal({
-            type: 'matched',
-            data: {
-              name: nickname,
-              partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
-              myProfileImageUrl: photos.value[0]?.image_path,
-              onClickSubmit: () => {
-                useModalStore().setModal({ type: null })
-                router.push(`/history/profile/${match.data.hit[0].id}`);
-              }
-            }
-          })
+          useModalStore().setModal({ type: null })
+
+          // useModalStore().setModal({
+          //   type: 'matched',
+          //   data: {
+          //     name: nickname,
+          //     partnerProfileImageUrl: hit_account.accountProfiles[0]?.image_path,
+          //     myProfileImageUrl: photos.value[0]?.image_path,
+          //     onClickSubmit: () => {
+          //       useModalStore().setModal({ type: null })
+          //       router.push(`/history/profile/${match.data.hit[0].id}`);
+          //     }
+          //   }
+          // })
         }
       }
     })
@@ -215,8 +217,8 @@ const answerRejectAction = (matchId: number, nickname: string) => {
   <div class="page">
     <div v-if="match.data?.recommended.length > 0">
       <div v-if="matchProfile.hit_answer">
-        <MatchingStatus status="matched" />
-        <Gap :height="20" />
+<!--        <MatchingStatus status="matched" />-->
+<!--        <Gap :height="20" />-->
       </div>
 
       <UserProfileInfo
@@ -245,7 +247,8 @@ const answerRejectAction = (matchId: number, nickname: string) => {
           width: 'calc(100%)',
           display: 'flex', justifyContent: 'center', paddingBottom: '16px'
         }">
-        <MatchingStatus v-if="matchProfile.my_answer" status="waiting" style="padding: 6px 20px;" />
+        <MatchingStatus v-if="matchProfile.my_answer == true" status="waiting" style="padding: 10px 20px 10px 10px;" />
+        <MatchingStatus v-else-if="matchProfile.my_answer == false" status="rejected" style="padding: 10px 20px 10px 10px;" />
         <ProfileActions v-else @close="() => {
           answerRejectAction(matchProfile.id, matchProfile.hit_account.accountMeta.nick_name)
         }" @heart="() => {

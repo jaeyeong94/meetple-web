@@ -1,15 +1,28 @@
 <script setup lang="ts">
 import type { PropType } from 'vue'
 import IcHeart from '@/components/icons/IcHeart.vue'
-type StatusType = 'waiting' | 'matched'
+type StatusType = 'waiting' | 'matched' | 'rejected'
 
 const props = defineProps({
   status: String as PropType<StatusType>,
 })
+let color = '';
+let title = '';
+let description = '';
 
-const color = props.status === 'matched' ? '#F742AF' : '#7542FD'
-const title = props.status === 'matched' ? '상대가 매칭을 수락했어요.' : '내가 수락한 매칭'
-const description = props.status === 'matched' ? '내가 수락하면 매칭이 성사됩니다.' : '문자로 결과를 알려드릴게요!'
+if(props.status === 'matched') {
+  color = '#F742AF'
+  title = '상대가 매칭을 수락했어요.'
+  description = '내가 수락하면 매칭이 성사됩니다.'
+} else if(props.status === 'rejected') {
+  color = '#000'
+  title = '내가 거절한 매칭.'
+  description = '다음 추천 미팅으로 찾아뵐게요!'
+} else {
+  color = '#7542FD'
+  title = '내가 수락한 매칭'
+  description = '문자로 결과를 알려드릴게요!'
+}
 </script>
 
 <template>
@@ -32,13 +45,16 @@ const description = props.status === 'matched' ? '내가 수락하면 매칭이 
   padding: 6px;
   gap: 12px;
   border: 1px solid #F4F4F4;
-  border-radius: 31px;
+  border-radius: 40px;
 }
 .matching-status.waiting {
   background-color: #7542FD;
 }
 .matching-status.matched {
   background-color: #F742AF;
+}
+.matching-status.rejected {
+  background-color: #000;
 }
 .icon {
   display: flex;
