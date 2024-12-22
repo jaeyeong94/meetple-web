@@ -105,6 +105,7 @@ label > span.required {
   font-size: 16px;
   border: 1px solid #EAEAEA;
   border-radius: 8px;
+  height: 150px;
 }
 .text-area:focus {
   border-color: #6726FE;

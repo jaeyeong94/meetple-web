@@ -489,7 +489,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         }" :value="profileData.occupiedAreaLow" :view-value="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
         <Gap :height="20" />
 
-        <TextArea label="자기소개" :min-length="20" :max-length="500" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
+        <TextArea label="자기소개" :min-length="20" :max-length="500" :required="true" placeholder="나에 대해 소개해주세요!&#13;&#10;상세하게 작성할수록 매칭 확률이 올라갑니다.&#13;&#10;&#13;&#10;하는 일, 성격, 취미, 관심사 등은 물론,&#13;&#10;‘어필 요소’를 작성해보시는 것도 좋아요!" @input="(val: string) => {
           textArea.selfIntroduction = val
           if(val.length >= 20) {
             profileData.selfIntroduction = val
@@ -591,7 +591,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           } else {
             profileData.descriptions[0].answer = '';
           }
-        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description1Answer" :requiredMessageVisible="false" placeholder="답변을 입력해주세요." />
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description1Answer" :requiredMessageVisible="false" placeholder="회사 동료, 대학 동기 등 주로 어떤 사람들과&#13;&#10;함께 나가게 될 것 같은지 적어주세요!&#13;&#10;&#13;&#10;(어떻게 아는지, 나이대, 어떤 사람들인지 등)" />
         <Gap :height="20" />
 
         <TextArea :question="question2" @input="(val: string) => {
@@ -603,7 +603,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           } else {
             profileData.descriptions[1].answer = '';
           }
-        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description2Answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="답변을 입력해주세요." />
+        }" :num-lines="6" :min-length="20" :max-length="500" :value="textArea.description2Answer" requiredMessage="(분위기, 인원수 등)" :requiredMessageVisible="true" placeholder="상대방이 많이 참고하는 정보입니다!&#13;&#10;자세히 작성할수록 매칭 확률이 올라가요!&#13;&#10;&#13;&#10;미팅 분위기, 인원수, 선호하는 장소, 위치 등&#13;&#10;자유롭게 기재해주세요. 이모지도 활용해보세요." />
         <Gap :height="20" />
       </div>
     </div>
