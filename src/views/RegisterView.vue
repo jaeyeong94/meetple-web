@@ -452,7 +452,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
       <div class="content-container" style="padding: 0;">
         <div class="iframe-container">
           <p v-if="!certData.certUp">인증 정보를 불러오는 중...</p>
-          <iframe id="certIframe" name="certIframe" class="cert-iframe" v-show="certData.certUp" style="width: 100%; height: calc(100vh - 53px)"></iframe>
+          <iframe id="certIframe" name="certIframe" class="cert-iframe" v-show="certData.certUp" style="width: 100%; height: calc(100vh)"></iframe>
         </div>
       </div>
 <!--      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">-->
