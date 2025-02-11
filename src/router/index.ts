@@ -1,5 +1,6 @@
 import http from '@/lib/http'
 import MixpanelService from '@/lib/mixpanel'
+import CertView from '@/views/CertView.vue'
 import ProfileSettingView from '@/views/ProfileSettingView.vue'
 import { createRouter, createWebHistory, type RouteLocationNormalizedGeneric } from 'vue-router'
 import HistoryProfileView from '@/views/HistoryProfileView.vue'
@@ -58,6 +59,11 @@ const router = createRouter({
       path: '/register/:stage',
       name: 'register',
       component: RegisterView
+    },
+    {
+      path: '/register/cert',
+      name: 'cert',
+      component: CertView
     },
     {
       path: '/notification',

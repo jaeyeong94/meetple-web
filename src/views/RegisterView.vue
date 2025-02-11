@@ -3,7 +3,6 @@ import Button from '@/components/Button.vue'
 import Empty from '@/components/Empty.vue'
 import DeepSelect from '@/components/forms/DeepSelect.vue'
 import Image from '@/components/forms/Image.vue'
-import RadioButtonTabs from '@/components/forms/RadioButtonTabs.vue'
 import Select from '@/components/forms/Select.vue'
 import TextArea from '@/components/forms/TextArea.vue'
 import TextInput from '@/components/forms/TextInput.vue'
@@ -49,10 +48,8 @@ const certData: {
     url: string;
     request: upHashFrontRequest
   } | null;
-  certDn: any;
 } = reactive({
-  certUp: null,
-  certDn: null,
+  certUp: null
 });
 
 const getCertUpHash = async () => {
@@ -62,7 +59,6 @@ const getCertUpHash = async () => {
       url: response.data.data.url,
       request: response.data.data.request,
     };
-    console.log(certData.certUp);
     await certLoading();
   } catch (error) {
     console.error('Failed to fetch certUpHash:', error);
@@ -93,15 +89,26 @@ const certLoading = async () => {
   form.submit();
 }
 
-const handleCertCompletion = (event: MessageEvent) => {
-  console.log(event);
-  if (event.origin !== 'https://cert.kcp.co.kr') return;
+const handleCertCompletion = async (event: MessageEvent) => {
+  if (!certData.certUp) return;
+  console.log(event.origin.includes('meetple.com'), event.origin);
+  if (event.data.status === "CERT_SUCCESS") {
+    console.log("Certification Success:", event.data);
+    window.dispatchEvent(new CustomEvent("certification-success", { detail: event.data }));
+    await accountDataUpdate();
+    await progressUpdate();
+  } else if (event.data.status === "CERT_FAILED") {
+    console.error("Certification Failed:", event.data);
+    useModalStore().setModal({
+      type: "alert",
+      data: {
+        title: "인증 실패",
+        message: "본인 인증이 실패하였습니다. 다시 시도해주세요.",
+      },
+    });
 
-  if (event.data === 'CERT_SUCCESS') {
-    console.log('Certification Success');
-    termsRequired.value = true;
-  } else if (event.data === 'CERT_FAILED') {
-    console.error('Certification Failed');
+    // 인증 실패 이벤트 발생
+    window.dispatchEvent(new CustomEvent("certification-failed", { detail: event.data }));
   }
 };
 
