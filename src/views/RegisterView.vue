@@ -444,10 +444,10 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
-      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader />
-      </StickyArea>
+<!--      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">-->
+<!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
+<!--        <SubHeader />-->
+<!--      </StickyArea>-->
 
       <div class="content-container" style="padding: 0;">
         <div class="iframe-container">
