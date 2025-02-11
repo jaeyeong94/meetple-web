@@ -1,7 +1,7 @@
 import http from '@/lib/http'
 import MixpanelService from '@/lib/mixpanel'
 import ProfileSettingView from '@/views/ProfileSettingView.vue'
-import { createRouter, createWebHistory, type RouteLocation, type RouteLocationNormalizedGeneric } from 'vue-router'
+import { createRouter, createWebHistory, type RouteLocationNormalizedGeneric } from 'vue-router'
 import HistoryProfileView from '@/views/HistoryProfileView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import LoginView from '@/views/LoginView.vue'

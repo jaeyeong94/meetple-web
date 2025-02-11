@@ -27,6 +27,86 @@ import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
 
+interface upHashFrontRequest {
+  site_cd: string;
+  ordr_idxx: string;
+  req_tx: 'CERT';
+  cert_method: '01';
+  up_hash: string;
+  cert_otp_use: 'N';
+  param_opt_1?: string;
+  param_opt_2?: string;
+  param_opt_3?: string;
+  Ret_URL: string;
+  cert_enc_use_ext: 'Y';
+  kcp_merchant_time: string;
+  kcp_cert_lib_ver: string;
+  kcp_page_submit_yn?: 'Y' | 'N';
+}
+
+const certData: {
+  certUp: {
+    url: string;
+    request: upHashFrontRequest
+  } | null;
+  certDn: any;
+} = reactive({
+  certUp: null,
+  certDn: null,
+});
+
+const getCertUpHash = async () => {
+  try {
+    const response = await http.post('/account/cert/up-hash', {});
+    certData.certUp = {
+      url: response.data.data.url,
+      request: response.data.data.request,
+    };
+    console.log(certData.certUp);
+    await certLoading();
+  } catch (error) {
+    console.error('Failed to fetch certUpHash:', error);
+  }
+};
+
+const certLoading = async () => {
+  const certIframe = document.getElementById('certIframe') as HTMLIFrameElement;
+  if (!certData.certUp || !certIframe) return;
+  const existingForm = document.getElementById("certForm");
+  if (existingForm) existingForm.remove();
+
+  const form = document.createElement("form");
+  form.id = "certForm";
+  form.method = "POST";
+  form.action = certData.certUp.url;
+  form.target = certIframe.name;
+
+  Object.entries(certData.certUp.request).forEach(([key, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = key;
+    input.value = value.toString();
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
+const handleCertCompletion = (event: MessageEvent) => {
+  console.log(event);
+  if (event.origin !== 'https://cert.kcp.co.kr') return;
+
+  if (event.data === 'CERT_SUCCESS') {
+    console.log('Certification Success');
+    termsRequired.value = true;
+  } else if (event.data === 'CERT_FAILED') {
+    console.error('Certification Failed');
+  }
+};
+
+/** ************************************************************************** */
+
 const mp = inject<MixpanelService>('mixpanel')
 
 // 라우터 제한
@@ -182,6 +262,11 @@ const progressUpdate = async () => {
 onMounted(async () => {
   await accountDataUpdate();
   await progressUpdate();
+
+  if (route.params.stage === 'default') {
+    await getCertUpHash();
+    window.addEventListener('message', handleCertCompletion);
+  }
 })
 
 watch(() => router.currentRoute.value.params.stage, async (val) => {
@@ -356,87 +441,98 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader />
       </StickyArea>
-      <div class="content-container">
-        <PageTitleAndDescription title="가입에 필요한 기본정보를<br>입력해주세요." description="이름은 프로필에 공개되지 않으며, 인증을 위한 정보입니다." />
-        <Gap :height="40" />
 
-        <TextInput label="이름" placeholder="이름을 입력하세요" :required="true" :validate="(val: string) => {
-          if (val && !(/^[ㄱ-힣]+$/.test(val))) {
-            return '이름에는 특수문자, 숫자, 알파벳이 포함될 수 없습니다.';
-          }
-
-          if (val && val.length >= 10) {
-            return '이름은 10자 이내로 입력해주세요.';
-          }
-
-          return null;
-        }" @input="(val: string, validateValue: any) => {
-          defaultData.name = val;
-
-          if (val && !(/^[ㄱ-힣]+$/.test(val))) {
-            profileData.name = '';
-          }
-
-          if (val && val.length >= 10) {
-            profileData.name = '';
-          }
-
-          if(val.length < 1) {
-            profileData.name = '';
-          } else {
-            profileData.name = val;
-          }
-        }" :value="defaultData.name" />
-        <Gap :height="20" />
-
-        <TextInput label="생년월일" placeholder="20000130" :required="true" :validate="(val: string) => {
-          // 값이 없다면 null 반환
-          if (!val) return null;
-
-          // 값이 올바른 날짜 형식인지 검증
-          if (!validateDate(val)) {
-            return '생년월일이 올바르지 않습니다';
-          }
-
-          // 나이 계산
-          const formattedDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-          const age = calculateAge(formattedDate);
-
-          // 나이가 만 20세 미만인 경우 에러 메시지 반환
-          if (age < 20) {
-            return '만 20세 이상만 가입 가능합니다.';
-          }
-
-          // 모든 조건을 통과하면 null 반환
-          return null;
-        }" @input="(val: string, validateValue: any) => {
-          defaultData.birthDate = val;
-
-          if (!val) {
-            profileData.birthDate = '';
-          }
-
-          if (!validateDate(val)) {
-            profileData.birthDate = '';
-          }
-
-          if (val.length == 8) {
-            const formattedDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-            const age = calculateAge(formattedDate);
-            if (age >= 20) {
-              profileData.birthDate = formattedDate;
-            }
-          } else {
-            profileData.birthDate = '';
-          }
-        }" :value="defaultData.birthDate" />
-        <Gap :height="20" />
-
-        <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {
-          defaultData.gender = val;
-          profileData.gender = val;
-        }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />
+      <div class="content-container" style="padding: 0;">
+        <div class="iframe-container">
+          <p v-if="!certData.certUp">인증 정보를 불러오는 중...</p>
+          <iframe id="certIframe" name="certIframe" class="cert-iframe" v-show="certData.certUp" style="width: 100%; height: calc(100vh - 53px)"></iframe>
+        </div>
       </div>
+<!--      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">-->
+<!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
+<!--        <SubHeader />-->
+<!--      </StickyArea>-->
+<!--      <div class="content-container">-->
+<!--        <PageTitleAndDescription title="가입에 필요한 기본정보를<br>입력해주세요." description="이름은 프로필에 공개되지 않으며, 인증을 위한 정보입니다." />-->
+<!--        <Gap :height="40" />-->
+
+<!--        <TextInput label="이름" placeholder="이름을 입력하세요" :required="true" :validate="(val: string) => {-->
+<!--          if (val && !(/^[ㄱ-힣]+$/.test(val))) {-->
+<!--            return '이름에는 특수문자, 숫자, 알파벳이 포함될 수 없습니다.';-->
+<!--          }-->
+
+<!--          if (val && val.length >= 10) {-->
+<!--            return '이름은 10자 이내로 입력해주세요.';-->
+<!--          }-->
+
+<!--          return null;-->
+<!--        }" @input="(val: string, validateValue: any) => {-->
+<!--          defaultData.name = val;-->
+
+<!--          if (val && !(/^[ㄱ-힣]+$/.test(val))) {-->
+<!--            profileData.name = '';-->
+<!--          }-->
+
+<!--          if (val && val.length >= 10) {-->
+<!--            profileData.name = '';-->
+<!--          }-->
+
+<!--          if(val.length < 1) {-->
+<!--            profileData.name = '';-->
+<!--          } else {-->
+<!--            profileData.name = val;-->
+<!--          }-->
+<!--        }" :value="defaultData.name" />-->
+<!--        <Gap :height="20" />-->
+
+<!--        <TextInput label="생년월일" placeholder="20000130" :required="true" :validate="(val: string) => {-->
+<!--          // 값이 없다면 null 반환-->
+<!--          if (!val) return null;-->
+
+<!--          // 값이 올바른 날짜 형식인지 검증-->
+<!--          if (!validateDate(val)) {-->
+<!--            return '생년월일이 올바르지 않습니다';-->
+<!--          }-->
+
+<!--          // 나이 계산-->
+<!--          const formattedDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');-->
+<!--          const age = calculateAge(formattedDate);-->
+
+<!--          // 나이가 만 20세 미만인 경우 에러 메시지 반환-->
+<!--          if (age < 20) {-->
+<!--            return '만 20세 이상만 가입 가능합니다.';-->
+<!--          }-->
+
+<!--          // 모든 조건을 통과하면 null 반환-->
+<!--          return null;-->
+<!--        }" @input="(val: string, validateValue: any) => {-->
+<!--          defaultData.birthDate = val;-->
+
+<!--          if (!val) {-->
+<!--            profileData.birthDate = '';-->
+<!--          }-->
+
+<!--          if (!validateDate(val)) {-->
+<!--            profileData.birthDate = '';-->
+<!--          }-->
+
+<!--          if (val.length == 8) {-->
+<!--            const formattedDate = val.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');-->
+<!--            const age = calculateAge(formattedDate);-->
+<!--            if (age >= 20) {-->
+<!--              profileData.birthDate = formattedDate;-->
+<!--            }-->
+<!--          } else {-->
+<!--            profileData.birthDate = '';-->
+<!--          }-->
+<!--        }" :value="defaultData.birthDate" />-->
+<!--        <Gap :height="20" />-->
+
+<!--        <RadioButtonTabs label="성별" name="gender" :required="true" @change="(val: string) => {-->
+<!--          defaultData.gender = val;-->
+<!--          profileData.gender = val;-->
+<!--        }" :value="profileData.gender" :options="TEST_RADIO_OPTIONS" />-->
+<!--      </div>-->
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'normal'">
@@ -650,14 +746,14 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         }">다음</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired">
-    <SubmitButton @click="() => {
-        ProfileUpdateAction('default');
-        mp?.trackEvent('click_profile_default_update');
-    }" :disabled="!(profileData.name && profileData.birthDate && profileData.gender)" :style="{
-          backgroundColor: '#6726FE',
-        }">다음</SubmitButton>
-  </StickyArea>
+<!--  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired">-->
+<!--    <SubmitButton @click="() => {-->
+<!--        ProfileUpdateAction('default');-->
+<!--        mp?.trackEvent('click_profile_default_update');-->
+<!--    }" :disabled="!(profileData.name && profileData.birthDate && profileData.gender)" :style="{-->
+<!--          backgroundColor: '#6726FE',-->
+<!--        }">다음</SubmitButton>-->
+<!--  </StickyArea>-->
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
     <SubmitButton @click="() => {
@@ -729,5 +825,21 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
 
 .content-container {
   padding: 16px 16px 120px;
+}
+
+.iframe-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cert-iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
 }
 </style>
