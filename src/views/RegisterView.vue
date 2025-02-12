@@ -97,6 +97,12 @@ const handleCertCompletion = async (event: MessageEvent) => {
     window.dispatchEvent(new CustomEvent("certification-success", { detail: event.data }));
     await accountDataUpdate();
     await progressUpdate();
+    const nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
+    if (nextFlow) {
+      await router.push(`/register/${nextFlow}`);
+    } else {
+      await router.push('/register/auto');
+    }
   } else if (event.data.status === "CERT_FAILED") {
     console.error("Certification Failed:", event.data);
     useModalStore().setModal({
