@@ -90,19 +90,23 @@ const certLoading = async () => {
 }
 
 const handleCertCompletion = async (event: MessageEvent) => {
-  if (!certData.certUp) return;
-  console.log(event.origin.includes('meetple.com'), event.origin);
+  if (!certData.certUp || !event.origin.includes('meetple.co.kr')) return;
   if (event.data.status === "CERT_SUCCESS") {
     console.log("Certification Success:", event.data);
     window.dispatchEvent(new CustomEvent("certification-success", { detail: event.data }));
-    await accountDataUpdate();
-    await progressUpdate();
+    console.log(currentStage.value, routeFlow[routeFlow.indexOf(currentStage.value) + 1]);
     const nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
     if (nextFlow) {
       await router.push(`/register/${nextFlow}`);
     } else {
       await router.push('/register/auto');
     }
+
+    await accountDataUpdate();
+    await progressUpdate();
+
+    window.scrollTo(0, 0);
+    root!.scrollTo(0, 0);
   } else if (event.data.status === "CERT_FAILED") {
     console.error("Certification Failed:", event.data);
     useModalStore().setModal({
