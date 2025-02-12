@@ -568,10 +568,11 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
     <div v-if="account.data?.accountMeta.stage === 'normal'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-<!--        <SubHeader :show-back-button="true" @back="() => {-->
-<!--          ProfileUpdateAction('default', false)-->
-<!--          mp?.trackEvent('click_profile_normal_back');-->
-<!--        }" />-->
+        <SubHeader :show-back-button="true" @back="() => {
+          router.push('/');
+          // ProfileUpdateAction('default', false)
+          mp?.trackEvent('click_profile_normal_back');
+        }" />
       </StickyArea>
       <div class="content-container">
         <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
