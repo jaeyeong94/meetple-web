@@ -118,6 +118,8 @@ const handleCertCompletion = async (event: MessageEvent) => {
 
     // 인증 실패 이벤트 발생
     window.dispatchEvent(new CustomEvent("certification-failed", { detail: event.data }));
+
+    await router.push('/');
   }
 };
 
