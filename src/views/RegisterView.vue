@@ -92,7 +92,6 @@ const certLoading = async () => {
 const handleCertCompletion = async (event: MessageEvent) => {
   if (!certData.certUp || !event.origin.includes('meetple.co.kr')) return;
   if (event.data.status === "CERT_SUCCESS") {
-    console.log("Certification Success:", event.data);
     window.dispatchEvent(new CustomEvent("certification-success", { detail: event.data }));
     console.log(currentStage.value, routeFlow[routeFlow.indexOf(currentStage.value) + 1]);
     const nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
@@ -281,8 +280,12 @@ onMounted(async () => {
   await progressUpdate();
 
   if (route.params.stage === 'default') {
-    await getCertUpHash();
-    window.addEventListener('message', handleCertCompletion);
+    if(profileData.name && profileData.birthDate && profileData.gender) {
+      await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
+    } else {
+      await getCertUpHash();
+      window.addEventListener('message', handleCertCompletion);
+    }
   }
 })
 
