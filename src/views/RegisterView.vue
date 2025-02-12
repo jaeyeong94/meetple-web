@@ -292,6 +292,16 @@ onMounted(async () => {
 watch(() => router.currentRoute.value.params.stage, async (val) => {
   await accountDataUpdate();
   await progressUpdate();
+
+  // 맘에가..
+  if (route.params.stage === 'default') {
+    if(profileData.name && profileData.birthDate && profileData.gender) {
+      await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
+    } else {
+      await getCertUpHash();
+      window.addEventListener('message', handleCertCompletion);
+    }
+  }
 })
 
 // 이용약관
