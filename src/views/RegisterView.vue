@@ -310,9 +310,18 @@ watch(agreement, (val) => {
   profileData.termsRequired = !!(val[0] && val[1]);
   profileData.termsOptional = !!val[2];
 })
-const termsAccept = () => {
+const termsAccept = async () => {
   termsRequired.value = true;
   localStorage.setItem('terms', 'true');
+
+  if (route.params.stage === 'default') {
+    if(profileData.name && profileData.birthDate && profileData.gender) {
+      await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
+    } else {
+      await getCertUpHash();
+      window.addEventListener('message', handleCertCompletion);
+    }
+  }
 }
 
 function base64ToBlob(base64: string, mimeType = 'application/octet-stream') {
