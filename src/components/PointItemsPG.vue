@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import ActionButton from '@/components/buttons/ActionButton.vue'
 import MoreButton from '@/components/buttons/MoreButton.vue'
 import Divider from '@/components/Divider.vue'
@@ -8,6 +9,7 @@ import IcPointLogo from '@/components/icons/IcPointLogo.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import { formatNumber } from '@/lib/utils'
 import type { PropType } from 'vue'
+import { loadTossPayments, type TossPaymentsSDK } from '@tosspayments/tosspayments-sdk'
 
 const emit = defineEmits(['click', 'event'])
 
@@ -26,6 +28,60 @@ const props = defineProps({
   }
 })
 
+// TossPayments 인스턴스를 저장할 ref 생성
+const tossPayments = ref<TossPaymentsSDK | null>(null)
+const widgets = ref<any>(null)
+
+// ------  결제위젯 초기화 ------
+const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+const customerKey = "FMjZgN_-rFwPoHMSAJEFT";
+
+onMounted(async () => {
+  try {
+    tossPayments.value = await loadTossPayments(clientKey);
+    widgets.value = tossPayments.value.widgets({
+      customerKey,
+    });
+    console.log("TossPayments SDK 로드 성공", tossPayments.value);
+  } catch (error) {
+    console.error("TossPayments SDK 로드 실패", error);
+  }
+});
+
+// 결제 요청
+const pgCall = async (price: number, amount: string) => {
+  if (!tossPayments.value) {
+    console.error("TossPayments SDK가 로드되지 않았습니다.");
+    return;
+  }
+
+  const tossWidgets = widgets.value;
+
+  await tossWidgets.setAmount({
+    value: price,
+    currency: "KRW",
+  });
+
+  await Promise.all([
+    // ------  결제 UI 렌더링 ------
+    tossWidgets.renderPaymentMethods({
+      selector: "#payment-method",
+      variantKey: "DEFAULT",
+    }),
+    // ------  이용약관 UI 렌더링 ------
+    tossWidgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
+  ]);
+
+  await tossWidgets.requestPayment({
+    orderId: "IxwE0R9Y5vMJ3unlTMs4V",
+    orderName: `캔디 ${amount}개 충전`,
+    successUrl: window.location.origin + "/success.html",
+    failUrl: window.location.origin + "/fail.html",
+    customerEmail: "customer123@gmail.com",
+    customerName: "홍길동",
+    customerMobilePhone: "01012341234",
+  });
+}
 </script>
 
 <template>
@@ -51,15 +107,20 @@ const props = defineProps({
     <!--  </div>-->
     <!--  <Gap :height="30" />-->
 
+    <div id="payment-method">
+
+    </div>
+
     <ul class="point-items">
       <li v-for="(item) in props.items" :key="item.id">
         <img class="icon" src="@/assets/images/logo.png" alt="Point" />
         <p class="point"><span>{{item.charge_currency}}</span> 캔디</p>
         <SubmitButton class="button" :class="{ disabled: !item.visible }" @click="() => {
-        if(item.visible) {
-          emit('click', item.id);
-        }
-      }">₩ {{formatNumber(item.price)}}</SubmitButton>
+          if(item.visible) {
+            pgCall(item.price, item.charge_currency);
+            emit('click', item.id);
+          }
+        }">₩ {{formatNumber(item.price)}}</SubmitButton>
       </li>
     </ul>
   </div>

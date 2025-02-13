@@ -165,9 +165,7 @@ const eventPointCharge = () => {
       pointCharge(id)
     }" />
     <Gap :height="20" />
-    <PointItemsPG @event="eventPointCharge" :items="items.data || []" sub-header="(카드 결제 준비 중입니다!)" :hidden=true @click="(id: number) => {
-      pointCharge(id)
-    }" />
+    <PointItemsPG @event="eventPointCharge" :items="items.data || []" sub-header="(카드 결제 준비 중입니다!)" :hidden=true />
     <ReferralBanner />
   </div>
 </template>
