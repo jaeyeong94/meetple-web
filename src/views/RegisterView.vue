@@ -277,6 +277,7 @@ const progressUpdate = async () => {
   }
 }
 
+/** ******************************************************* **/
 onMounted(async () => {
   await accountDataUpdate();
   await progressUpdate();
@@ -304,6 +305,7 @@ watch(() => router.currentRoute.value.params.stage, async (val) => {
     }
   }
 })
+/** ******************************************************* **/
 
 // 이용약관
 const agreement = reactive([true, true, true]);

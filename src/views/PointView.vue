@@ -5,6 +5,7 @@ import ReferralBanner from '@/components/ReferralBanner.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import PointItems from '@/components/PointItems.vue'
+import PointItemsPG from '@/components/PointItemsPG.vue'
 import { TEST_USER } from '@/consts/testData'
 import http from '@/lib/http'
 import type MixpanelService from '@/lib/mixpanel'
@@ -160,7 +161,11 @@ const eventPointCharge = () => {
   <div class="page">
     <MyPoint :point="account.data?.currency || 0" />
     <Gap :height="20" />
-    <PointItems @event="eventPointCharge" :items="items.data || []" @click="(id: number) => {
+    <PointItems @event="eventPointCharge" :items="items.data || []" sub-header="(계좌이체)" @click="(id: number) => {
+      pointCharge(id)
+    }" />
+    <Gap :height="20" />
+    <PointItemsPG @event="eventPointCharge" :items="items.data || []" sub-header="(카드 결제 준비 중입니다!)" :hidden=true @click="(id: number) => {
       pointCharge(id)
     }" />
     <ReferralBanner />
