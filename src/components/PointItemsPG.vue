@@ -128,7 +128,7 @@ const pgCall = async (price: number, amount: string) => {
 
 <style scoped>
 .hidden {
-  opacity: 0.7;
+  opacity: 0.4;
 }
 
 .title {
