@@ -486,16 +486,18 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
 
       <div class="content-container" style="padding: 0; height: 100vh; display: flex">
         <div class="iframe-container">
-          <div v-if="!certData.certUp" class="loader">
-            <div class="item-1"><span></span></div>
-            <div class="item-2"><span></span></div>
-            <div class="item-3"><span></span></div>
-            <div class="item-4"><span></span></div>
-            <div class="item-5"><span></span></div>
-            <div class="item-6"><span></span></div>
-            <div class="item-7"><span></span></div>
-            <div class="item-8"><span></span></div>
-          </div>
+          <Transition>
+            <div v-if="!certData.certUp" class="loader">
+              <div class="item-1"><span></span></div>
+              <div class="item-2"><span></span></div>
+              <div class="item-3"><span></span></div>
+              <div class="item-4"><span></span></div>
+              <div class="item-5"><span></span></div>
+              <div class="item-6"><span></span></div>
+              <div class="item-7"><span></span></div>
+              <div class="item-8"><span></span></div>
+            </div>
+          </Transition>
           <iframe id="certIframe" name="certIframe" class="cert-iframe" v-show="certData.certUp" style="width: 100%; height: calc(100vh)"></iframe>
         </div>
       </div>
@@ -875,6 +877,15 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   min-height: 100dvh;
 }
 
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
 
 .loader {
   position: absolute;
