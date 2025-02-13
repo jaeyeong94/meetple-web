@@ -875,25 +875,6 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   min-height: 100dvh;
 }
 
-.content-container {
-  padding: 16px 16px 120px;
-}
-
-.iframe-container {
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.cert-iframe {
-  width: 100%;
-  height: 500px;
-  border: none;
-}
 
 .loader {
   position: absolute;
@@ -981,6 +962,26 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
 }
 .loader .item-8 span {
   transform: rotate(450deg) translateZ(0);
+}
+
+.content-container {
+  padding: 16px 16px 120px;
+}
+
+.iframe-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cert-iframe {
+  width: 100%;
+  height: 500px;
+  border: none;
 }
 
 @keyframes spin_full {

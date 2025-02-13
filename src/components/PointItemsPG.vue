@@ -1,17 +1,18 @@
 <script setup lang="ts">
+import BackButton from '@/components/buttons/BackButton.vue'
+import { useModalStore } from '@/stores/modal'
 import { ref, onMounted } from 'vue'
-import ActionButton from '@/components/buttons/ActionButton.vue'
-import MoreButton from '@/components/buttons/MoreButton.vue'
-import Divider from '@/components/Divider.vue'
 import Gap from '@/components/Gap.vue'
 import IcLogo from '@/components/icons/IcLogo.vue'
 import IcPointLogo from '@/components/icons/IcPointLogo.vue'
 import SubmitButton from '@/components/SubmitButton.vue'
 import { formatNumber } from '@/lib/utils'
 import type { PropType } from 'vue'
-import { loadTossPayments, type TossPaymentsSDK } from '@tosspayments/tosspayments-sdk'
+import { clearTossPayments, loadTossPayments, type TossPaymentsSDK } from '@tosspayments/tosspayments-sdk'
 
 const emit = defineEmits(['click', 'event'])
+const paymentOpen = ref(false)
+const paymentLoading = ref(false)
 
 const props = defineProps({
   subHeader: {
@@ -42,6 +43,22 @@ onMounted(async () => {
     widgets.value = tossPayments.value.widgets({
       customerKey,
     });
+
+    await widgets.value.setAmount({
+      value: 50000,
+      currency: "KRW",
+    });
+
+    await Promise.all([
+      // ------  결제 UI 렌더링 ------
+      widgets.value.renderPaymentMethods({
+        selector: "#payment-method",
+        variantKey: "DEFAULT",
+      }),
+      // ------  이용약관 UI 렌더링 ------
+      widgets.value.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
+    ]);
+
     console.log("TossPayments SDK 로드 성공", tossPayments.value);
   } catch (error) {
     console.error("TossPayments SDK 로드 실패", error);
@@ -55,24 +72,8 @@ const pgCall = async (price: number, amount: string) => {
     return;
   }
 
-  const tossWidgets = widgets.value;
-
-  await tossWidgets.setAmount({
-    value: price,
-    currency: "KRW",
-  });
-
-  await Promise.all([
-    // ------  결제 UI 렌더링 ------
-    tossWidgets.renderPaymentMethods({
-      selector: "#payment-method",
-      variantKey: "DEFAULT",
-    }),
-    // ------  이용약관 UI 렌더링 ------
-    tossWidgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
-  ]);
-
-  await tossWidgets.requestPayment({
+  paymentOpen.value = true;
+  await widgets.value.requestPayment({
     orderId: "IxwE0R9Y5vMJ3unlTMs4V",
     orderName: `캔디 ${amount}개 충전`,
     successUrl: window.location.origin + "/success.html",
@@ -85,6 +86,21 @@ const pgCall = async (price: number, amount: string) => {
 </script>
 
 <template>
+  <div class="payment-wrap" :class="{
+      open: paymentOpen
+    }">
+    <div id="payment">
+      <BackButton @click="() => {
+        paymentOpen = false;
+      }" style="margin-left: 10px; margin-top: 10px;" />
+      <div id="payment-method"></div>
+      <div id="agreement"></div>
+      <button class="button" id="payment-button" @click="() => {
+
+      }">결제하기</button>
+    </div>
+  </div>
+
   <div :class="{
     hidden: props.hidden
   }">
@@ -107,10 +123,6 @@ const pgCall = async (price: number, amount: string) => {
     <!--  </div>-->
     <!--  <Gap :height="30" />-->
 
-    <div id="payment-method">
-
-    </div>
-
     <ul class="point-items">
       <li v-for="(item) in props.items" :key="item.id">
         <img class="icon" src="@/assets/images/logo.png" alt="Point" />
@@ -129,6 +141,75 @@ const pgCall = async (price: number, amount: string) => {
 <style scoped>
 .hidden {
   opacity: 0.4;
+}
+
+.payment-wrap {
+  visibility: hidden;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+
+  &.open {
+    visibility: visible;
+  }
+}
+
+#payment {
+  width: 700px;
+  border-radius: 20px;
+  overflow: hidden;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 1);
+  border: 1px solid #eee;
+
+  #payment-method {
+    width: 100%;
+  }
+
+  #agreement {
+    width: 100%;
+  }
+
+  #payment-button {
+    width: 100%;
+    height: 60px;
+    background-color: #3282f6;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 499px) {
+  .payment-wrap {
+    background-color: #fff;
+    align-items: start;
+    overflow: auto;
+
+    #payment {
+      width: 100%;
+      border-radius: 0;
+      min-height: 800px;
+
+      #payment-button {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 50px;
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 960px) {
+
 }
 
 .title {
