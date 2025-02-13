@@ -1,18 +1,33 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import ModalArea from '@/components/ModalArea.vue'
 import IcMainLogo from '@/components/icons/IcMainLogo.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useModalStore } from '@/stores/modal'
 import { storeToRefs } from 'pinia'
 
-const page = ref(null)
+const route = useRoute()
+const page = ref<HTMLElement | null>(null);
 const modalStore = useModalStore()
 const { modal } = storeToRefs(modalStore)
 const activeModal = computed(() => modal.value)
 const position = ref({ left: 0, width: 0 })
 const modalPosition = computed(() => position.value)
 let timeout = 0;
+
+// ✅ 특정 경로일 때 클래스 추가
+const pageClass = computed(() => {
+  if (route.path.startsWith("/register/default")) {
+    return "cert-page";
+  } else {
+    return "";
+  }
+});
+
+// ✅ route 변경 감지 (필요하면 watch 사용)
+watch(() => route.path, (newPath) => {
+  console.log("Route changed:", newPath);
+});
 
 const onResize = () => {
   clearTimeout(timeout)
@@ -49,7 +64,7 @@ window.addEventListener('popstate', function(event) {
     </div>
     <img src="@/assets/images/main-background.png" class="background" alt="" />
   </div>
-  <div ref="page" class="page-container">
+  <div ref="page" class="page-container" :class="pageClass">
     <RouterView />
     <ModalArea
       :activeModal="activeModal.type"
@@ -99,6 +114,9 @@ window.addEventListener('popstate', function(event) {
   width: 375px;
   margin-left: 565px;
   z-index: 1;
+}
+.page-container.cert-page {
+  width: 400px;
 }
 .background-container {
   position: absolute;

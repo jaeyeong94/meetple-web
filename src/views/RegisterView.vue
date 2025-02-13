@@ -295,7 +295,6 @@ watch(() => router.currentRoute.value.params.stage, async (val) => {
   await accountDataUpdate();
   await progressUpdate();
 
-  // 맘에가..
   if (route.params.stage === 'default') {
     if(profileData.name && profileData.birthDate && profileData.gender) {
       await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
@@ -483,9 +482,18 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
 <!--        <SubHeader />-->
 <!--      </StickyArea>-->
 
-      <div class="content-container" style="padding: 0;">
+      <div class="content-container" style="padding: 0; height: 100vh; display: flex">
         <div class="iframe-container">
-          <p v-if="!certData.certUp">인증 정보를 불러오는 중...</p>
+          <div v-if="!certData.certUp" class="loader">
+            <div class="item-1"><span></span></div>
+            <div class="item-2"><span></span></div>
+            <div class="item-3"><span></span></div>
+            <div class="item-4"><span></span></div>
+            <div class="item-5"><span></span></div>
+            <div class="item-6"><span></span></div>
+            <div class="item-7"><span></span></div>
+            <div class="item-8"><span></span></div>
+          </div>
           <iframe id="certIframe" name="certIframe" class="cert-iframe" v-show="certData.certUp" style="width: 100%; height: calc(100vh)"></iframe>
         </div>
       </div>
@@ -884,4 +892,102 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   height: 500px;
   border: none;
 }
+
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  font-size: 32px;
+}
+.loader div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  will-change: transform;
+}
+.loader div span {
+  display: block;
+  width: 0.5em;
+  height: 0.15em;
+  background: black;
+  -webkit-border-radius: 0.08em;
+  border-radius: 0.08em;
+}
+.loader .item-1 {
+  margin-left: 11.313708496px;
+  margin-top: -11.313708496px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-1 span {
+  transform: rotate(45deg) translateZ(0);
+}
+.loader .item-2 {
+  margin-left: 0px;
+  margin-top: -16px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-2 span {
+  transform: rotate(180deg) translateZ(0);
+}
+.loader .item-3 {
+  margin-left: -11.313708496px;
+  margin-top: -11.313708496px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-3 span {
+  transform: rotate(135deg) translateZ(0);
+}
+.loader .item-4 {
+  margin-left: -16px;
+  margin-top: 0px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-4 span {
+  transform: rotate(270deg) translateZ(0);
+}
+.loader .item-5 {
+  margin-left: -11.313708496px;
+  margin-top: 11.313708496px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-5 span {
+  transform: rotate(225deg) translateZ(0);
+}
+.loader .item-6 {
+  margin-left: 0px;
+  margin-top: 16px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-6 span {
+  transform: rotate(360deg) translateZ(0);
+}
+.loader .item-7 {
+  margin-left: 11.313708496px;
+  margin-top: 11.313708496px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-7 span {
+  transform: rotate(315deg) translateZ(0);
+}
+.loader .item-8 {
+  margin-left: 16px;
+  margin-top: 0px;
+  animation: spin_full 2s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+}
+.loader .item-8 span {
+  transform: rotate(450deg) translateZ(0);
+}
+
+@keyframes spin_full {
+  0% {
+    transform: rotate(0deg) translateZ(0);
+  }
+  100% {
+    transform: rotate(360deg) translateZ(0);
+  }
+}
+
 </style>
