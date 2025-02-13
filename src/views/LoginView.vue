@@ -25,6 +25,13 @@ const action = () => {
     .then((data: any) => {
       localStorage.setItem('authPhoneNumber', authPhoneNumber.value)
 
+      // 심사용
+      if(data.data.data.accessToken) {
+        localStorage.setItem('token', data.data.data.accessToken)
+        router.push('/register/auto')
+        return
+      }
+
       mp?.trackEvent('login_code_request', { phoneNumber: authPhoneNumber.value })
 
       router.push('/login/code')
