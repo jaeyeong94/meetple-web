@@ -158,7 +158,7 @@ const eventPointCharge = () => {
       router.back()
     }" />
   </StickyArea>
-  <div class="page">
+  <div class="page" style="padding-bottom: 120px;">
     <MyPoint :point="account.data?.currency || 0" />
     <Gap :height="20" />
     <PointItems @event="eventPointCharge" :items="items.data || []" sub-header="(계좌이체)" @click="(id: number) => {
