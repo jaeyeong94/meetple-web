@@ -234,15 +234,15 @@ const question2 = QUESTION2;
   </StickyArea>
 
   <div class="page" v-if="Object.keys(profileData).length > 0 && state.stage === 'profile'">
-    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {
-      useModalStore().setModal({
-        type: 'alert',
-        data: {
-          title: '이미지 업로드 실패',
-          message
-        }
-      })
-    }" />
+<!--    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {-->
+<!--      useModalStore().setModal({-->
+<!--        type: 'alert',-->
+<!--        data: {-->
+<!--          title: '이미지 업로드 실패',-->
+<!--          message-->
+<!--        }-->
+<!--      })-->
+<!--    }" />-->
     <Gap :height="20" />
     <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
           if (val && val.length >= 10) {

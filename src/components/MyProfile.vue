@@ -22,7 +22,7 @@ const emit = defineEmits(['click'])
 <template>
   <div class="my-profile">
     <div class="profile-image">
-      <img :src="props.imageUrl" alt="User profile" />
+      <img src="@/assets/images/meetple-my-profile.png" alt="User profile" />
       <EditButton class="btn-upload" @click="() => emit('click')" />
     </div>
     <p class="name">{{props.name}}</p>

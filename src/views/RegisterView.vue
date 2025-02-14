@@ -601,16 +601,16 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         <PageTitleAndDescription title="프로필에 등록될 정보를<br>입력해주세요." description="연결된 상대에게 공개되는 프로필 정보입니다." />
         <Gap :height="40" />
 
-        <ProfileImage label="프로필 이미지" :required="true" :loading="ProfileUploaderLoading" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {
-          useModalStore().setModal({
-            type: 'alert',
-            data: {
-              title: '이미지 업로드 실패',
-              message
-            }
-          })
-        }" />
-        <Gap :height="20" />
+<!--        <ProfileImage label="프로필 이미지" :required="true" :loading="ProfileUploaderLoading" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {-->
+<!--          useModalStore().setModal({-->
+<!--            type: 'alert',-->
+<!--            data: {-->
+<!--              title: '이미지 업로드 실패',-->
+<!--              message-->
+<!--            }-->
+<!--          })-->
+<!--        }" />-->
+<!--        <Gap :height="20" />-->
 
         <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
           if (val && val.length >= 10) {
@@ -774,8 +774,8 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
           :mbti="profileData.mbti"
           :location="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`"
           :school="profileData.school"
-          :image-url="photos[0].image_path"
         />
+<!--        :image-url="photos[0].image_path"-->
         <Gap :height="20" />
         <Questions :data="profileData.descriptions.map((line: any) => {
           return {
@@ -813,7 +813,7 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
     <SubmitButton @click="() => {
       ProfileUpdateAction('normal')
       mp?.trackEvent('click_profile_normal_update');
-    }" :disabled="!photoRequired || !profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
+    }" :disabled="!profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
   </StickyArea>

@@ -72,7 +72,6 @@ onMounted(async () => {
       :mbti="profileData.mbti"
       :location="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`"
       :school="profileData.school"
-      :image-url="photos[0].image_path"
     />
     <Gap :height="20" />
     <Questions :data="profileData.descriptions.map((line: any) => {

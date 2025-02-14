@@ -16,7 +16,6 @@ const props = defineProps({
 <template>
   <ShadowBox :style="{padding: '16px'}">
     <div class="container" style="cursor: pointer;">
-      <div><img :src="props.imageUrl" alt="User profile" class="profile-image" /></div>
       <div>
         <p class="name">{{props.name}}</p>
         <p class="message">{{props.message}}</p>

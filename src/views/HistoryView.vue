@@ -84,13 +84,13 @@ const multipleProfileMove = (id: string) => {
           mp?.trackEvent('click_profile', { type: 'history', data: hitProfile })
         }"
                             :name="hitProfile.account?.accountMeta.nick_name"
-                            :message="ellipsis(hitProfile.account?.accountMeta.self_introduction, 50)"
+                            :message="ellipsis(hitProfile.account?.accountMeta.self_introduction ?? '', 50)"
                             :age="calculateAge(hitProfile.account?.birth_date)"
                             :job="hitProfile.account?.accountMeta.job"
                             :mbti="hitProfile.account?.accountMeta.mbti"
                             :location="`${hitProfile.account?.accountMeta.occupied_area_high} ${hitProfile.account?.accountMeta.occupied_area_low}`"
                             :school="hitProfile.account?.accountMeta.school"
-                            :image-url="hitProfile.account?.accountProfiles[0]?.image_path" />
+        />
         <Gap :height="20" />
       </div>
       <ReferralBanner />

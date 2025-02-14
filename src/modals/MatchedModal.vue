@@ -10,11 +10,11 @@ const props = defineProps({
 
 <template>
   <Modal>
-    <div class="couple">
-      <img :src="props.data?.partnerProfileImageUrl" alt="Partner profile" class="profile-image" />
-      <IcConnection />
-      <img :src="props.data?.myProfileImageUrl" alt="My profile" class="profile-image" />
-    </div>
+<!--    <div class="couple">-->
+<!--      <img :src="props.data?.partnerProfileImageUrl" alt="Partner profile" class="profile-image" />-->
+<!--      <IcConnection />-->
+<!--      <img :src="props.data?.myProfileImageUrl" alt="My profile" class="profile-image" />-->
+<!--    </div>-->
     <div class="container">
       <span class="title">{{props.data?.name}}님과의<br>매칭이 성사되었습니다.</span>
       <p class="description">상대방의 연락처를 확인하고 미팅을 진행하세요</p>

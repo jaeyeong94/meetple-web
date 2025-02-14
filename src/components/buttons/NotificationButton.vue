@@ -6,14 +6,12 @@ const props = defineProps({
 })
 </script>
 
-
 <template>
   <button class="btn-notification">
     <div class="indicator" v-if="props.showIndicator" />
     <IcNotification />
   </button>
 </template>
-
 
 <style scoped>
 .btn-notification {

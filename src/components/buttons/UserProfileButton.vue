@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import IcProfileImage from '@/components/icons/IcProfileImage.vue'
+
 const props = defineProps({
   imageUrl: String,
 })
 </script>
 
-
 <template>
   <button class="btn-profile">
-    <img v-if="props.imageUrl" :src="props.imageUrl" alt="User profile" class="profile-image" />
+    <IcProfileImage class="profile-image" />
   </button>
 </template>
-
 
 <style scoped>
 .btn-profile {

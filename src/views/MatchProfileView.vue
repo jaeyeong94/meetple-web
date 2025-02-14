@@ -229,7 +229,6 @@ const answerRejectAction = (matchId: number, nickname: string, hit_account: any)
         :mbti="matchProfile.hit_account?.accountMeta.mbti"
         :location="`${matchProfile.hit_account?.accountMeta.occupied_area_high} ${matchProfile.hit_account?.accountMeta.occupied_area_low}`"
         :school="matchProfile.hit_account?.accountMeta.school"
-        :image-url="matchProfile.hit_account?.accountProfiles[0]?.image_path"
       />
       <Gap :height="20" />
       <Questions :data="matchProfile.hit_account?.accountMeta.descriptions.map((line: any) => {

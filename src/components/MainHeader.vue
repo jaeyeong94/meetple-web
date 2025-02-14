@@ -6,7 +6,6 @@ import type MixpanelService from '@/lib/mixpanel'
 import { inject } from 'vue'
 
 const props = defineProps({
-  imageUrl: String,
   hasUnreadNotification: Boolean,
 })
 
@@ -23,7 +22,7 @@ const emit = defineEmits(['notification', 'profile'])
       emit('notification')
       mp?.trackEvent('click_notification')
     }" />
-    <UserProfileButton :imageUrl="props.imageUrl" @click="() => {
+    <UserProfileButton @click="() => {
       emit('profile')
       mp?.trackEvent('click_profile')
     }" />

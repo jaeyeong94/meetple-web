@@ -15,7 +15,7 @@ const props = defineProps({
 
 <template>
   <ShadowBox>
-    <img :src="props.imageUrl" alt="User profile" class="profile-image" />
+<!--    <img :src="props.imageUrl" alt="User profile" class="profile-image" />-->
     <p class="name">{{props.name}}</p>
     <p class="message">{{props.message}}</p>
     <ul class="info">
@@ -52,7 +52,6 @@ const props = defineProps({
   object-fit: cover;
 }
 .name {
-  margin-top: 16px;
   font-size: 26px;
   font-weight: 700;
   color: #000;
