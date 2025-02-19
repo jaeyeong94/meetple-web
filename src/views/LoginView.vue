@@ -26,10 +26,14 @@ const action = () => {
       localStorage.setItem('authPhoneNumber', authPhoneNumber.value)
 
       // 심사용
-      if(data.data.data.accessToken) {
-        localStorage.setItem('token', data.data.data.accessToken)
-        router.push('/register/auto')
-        return
+      try {
+        if(data.data && data.data.data && data.data.data.accessToken) {
+          localStorage.setItem('token', data.data.data.accessToken)
+          router.push('/register/auto')
+          return
+        }
+      } catch(e) {
+        console.log(e)
       }
 
       mp?.trackEvent('login_code_request', { phoneNumber: authPhoneNumber.value })
