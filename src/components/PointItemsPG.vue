@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BackButton from '@/components/buttons/BackButton.vue'
 import { useModalStore } from '@/stores/modal'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import Gap from '@/components/Gap.vue'
 import IcLogo from '@/components/icons/IcLogo.vue'
 import IcPointLogo from '@/components/icons/IcPointLogo.vue'
@@ -9,6 +9,8 @@ import SubmitButton from '@/components/SubmitButton.vue'
 import { formatNumber } from '@/lib/utils'
 import type { PropType } from 'vue'
 import { clearTossPayments, loadTossPayments, type TossPaymentsSDK } from '@tosspayments/tosspayments-sdk'
+import { v4 as uuidv4 } from 'uuid'
+import http from '@/lib/http'
 
 const emit = defineEmits(['click', 'event'])
 const paymentOpen = ref(false)
@@ -36,6 +38,13 @@ const widgets = ref<any>(null)
 // ------  결제위젯 초기화 ------
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const customerKey = "FMjZgN_-rFwPoHMSAJEFT";
+
+// 결제 정보
+const payInfo = reactive({
+  orderId: '',
+  price: 0,
+  amount: '',
+});
 
 onMounted(async () => {
   try {
@@ -65,23 +74,64 @@ onMounted(async () => {
   }
 });
 
-// 결제 요청
+// 구매 요청
 const pgCall = async (price: number, amount: string) => {
   if (!tossPayments.value) {
     console.error("TossPayments SDK가 로드되지 않았습니다.");
     return;
   }
 
-  paymentOpen.value = true;
-  await widgets.value.requestPayment({
-    orderId: "IxwE0R9Y5vMJ3unlTMs4V",
-    orderName: `캔디 ${amount}개 충전`,
-    successUrl: window.location.origin + "/success.html",
-    failUrl: window.location.origin + "/fail.html",
-    customerEmail: "customer123@gmail.com",
-    customerName: "홍길동",
-    customerMobilePhone: "01012341234",
+  await widgets.value.setAmount({
+    value: price,
+    currency: "KRW",
   });
+
+  payInfo.price = price;
+  payInfo.amount = amount;
+
+  paymentOpen.value = true;
+}
+
+// 결제 요청
+const pgRequest = async () => {
+  if (!tossPayments.value) {
+    console.error("TossPayments SDK가 로드되지 않았습니다.");
+    return;
+  }
+
+  const orderId = uuidv4();
+  payInfo.orderId = orderId;
+
+  try {
+    paymentLoading.value = true;
+
+    try {
+      await http.post("/account/pay/order", {
+        orderId,
+        price: payInfo.price,
+        amount: payInfo.amount,
+      });
+
+      const response = await widgets.value.requestPayment({
+        orderId,
+        orderName: `캔디 ${payInfo.amount}개 충전`,
+        successUrl: window.location.origin + "/point/success",
+        failUrl: window.location.origin + "/point/fail",
+        customerEmail: "customer123@gmail.com",
+        customerName: "김토스",
+        customerMobilePhone: "01012341234",
+      });
+
+      console.log("결제 요청 성공", response);
+    } catch (error) {
+      console.error("결제 정보 저장 실패", error);
+      return;
+    }
+  } catch (error) {
+    console.error("결제 실패", error);
+  } finally {
+    paymentLoading.value = false;
+  }
 }
 </script>
 
@@ -95,9 +145,7 @@ const pgCall = async (price: number, amount: string) => {
       }" style="margin-left: 10px; margin-top: 10px;" />
       <div id="payment-method"></div>
       <div id="agreement"></div>
-      <button class="button" id="payment-button" @click="() => {
-
-      }">결제하기</button>
+      <button class="button" id="payment-button" @click="pgRequest">결제하기</button>
     </div>
   </div>
 

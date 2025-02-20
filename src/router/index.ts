@@ -1,6 +1,8 @@
 import http from '@/lib/http'
 import MixpanelService from '@/lib/mixpanel'
 import CertView from '@/views/CertView.vue'
+import PointViewFail from '@/views/PointViewFail.vue'
+import PointViewSuccess from '@/views/PointViewSuccess.vue'
 import ProfileSettingView from '@/views/ProfileSettingView.vue'
 import { createRouter, createWebHistory, type RouteLocationNormalizedGeneric } from 'vue-router'
 import HistoryProfileView from '@/views/HistoryProfileView.vue'
@@ -94,6 +96,16 @@ const router = createRouter({
       path: '/point',
       name: 'point',
       component: PointView
+    },
+    {
+      path: '/point/success',
+      name: 'point-success',
+      component: PointViewSuccess
+    },
+    {
+      path: '/point/fail',
+      name: 'point-fail',
+      component: PointViewFail
     },
     {
       path: '/:pathMatch(.*)*',
