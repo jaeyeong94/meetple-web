@@ -179,7 +179,7 @@ const accountUpdateDefault = async () => {
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
-      photos.value.push(profile)
+      // photos.value.push(profile)
     } else if(profile.type === 'job') {
       jobs.value.push(profile)
     }
