@@ -75,10 +75,10 @@ const next = () => {
 <template>
   <div class="onboarding" v-if="!onboarding">
     <div class="step-01" :style="{ zIndex: onboardingState === 1 ? 3 : 1, opacity: onboardingState === 1 ? 1 : 0 }">
-      <h2>퇴근 후<br>친구와 함께</h2>
+      <h2>친구와 함께<br>부담 없이</h2>
     </div>
     <div class="step-02" :style="{ zIndex: onboardingState === 2 ? 3 : 1, opacity: onboardingState === 2 ? 1 : 0 }">
-      <h2>신뢰할 수 있는<br>직장인들과</h2>
+      <h2>신뢰할 수 있는<br>사람들과</h2>
     </div>
     <div class="step-03" :style="{ zIndex: onboardingState === 3 ? 3 : 1, opacity: onboardingState === 3 ? 1 : 0 }">
       <h2>매주 새로운 연결</h2>
