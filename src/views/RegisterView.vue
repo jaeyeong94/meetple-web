@@ -283,14 +283,14 @@ onMounted(async () => {
   await accountDataUpdate();
   await progressUpdate();
 
-  // if (route.params.stage === 'default') {
-  //   if(profileData.name && profileData.birthDate && profileData.gender) {
-  //     await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
-  //   } else {
-  //     await getCertUpHash();
-  //     window.addEventListener('message', handleCertCompletion);
-  //   }
-  // }
+  if (route.params.stage === 'default') {
+    if(profileData.name && profileData.birthDate && profileData.gender) {
+      await router.push(`/register/${routeFlow[routeFlow.indexOf(currentStage.value) + 1]}`)
+    } else {
+      await getCertUpHash();
+      window.addEventListener('message', handleCertCompletion);
+    }
+  }
 })
 
 watch(() => router.currentRoute.value.params.stage, async (val) => {
