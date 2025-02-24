@@ -22,6 +22,7 @@ const props = defineProps({
   font-size: 28px;
   font-weight: 700;
   color: #000;
+  line-height: 38px;
 }
 .description {
   white-space: pre-line;
@@ -29,5 +30,6 @@ const props = defineProps({
   font-size: 14px;
   font-weight: 500;
   color: #7F7F7F;
+  line-height: 20px;
 }
 </style>

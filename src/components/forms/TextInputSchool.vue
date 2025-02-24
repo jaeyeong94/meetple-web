@@ -7,6 +7,7 @@ const props = defineProps({
   placeholder: String,
   required: Boolean,
   optionalText: String,
+  domain: String,
   value: {
     type: String,
     required: true,
@@ -17,7 +18,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['input', 'validate', 'click'])
+const emit = defineEmits(['input', 'validate'])
 
 const input = ref<HTMLInputElement | null>(null);
 
@@ -44,26 +45,32 @@ const onBlur = () => {
 </script>
 
 <template>
-  <div @click="emit('click')" class="container">
-    <label v-if="props.label">{{label}}
-      <span class="required" v-if="props.required">*</span>
-      <span v-else>{{ props.optionalText ?? '(선택사항)' }}</span>
-    </label>
-    <div class="container">
-      <input
-        ref="input"
-        class="text-input"
-        :class="{error: validate}"
-        :placeholder="props.placeholder"
-        :value="props.value"
-        @input="(e) => emit('input', e.target.value, validate)"
-        @focus="onFocus"
-        @blur="onBlur"
-      />
-      <button class="clear" @click="onClear" v-if="focused">
-        <IcClear />
-      </button>
+  <label v-if="props.label">{{label}}
+    <span class="required" v-if="props.required">*</span>
+    <span v-else>{{ props.optionalText ?? '(선택사항)' }}</span>
+  </label>
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; flex-direction: row;">
+      <div style="position: relative; flex: 1">
+        <input
+          ref="input"
+          class="text-input"
+          :class="{error: validate}"
+          :placeholder="props.placeholder"
+          :value="props.value"
+          @input="(e) => emit('input', e.target.value, validate)"
+          @focus="onFocus"
+          @blur="onBlur"
+        />
+        <button class="clear" @click="onClear" v-if="focused">
+          <IcClear />
+        </button>
+      </div>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: start; padding-left: 10px; color: #C2C2C2; font-size: 16px; font-weight: 500; line-break: auto; overflow: auto; max-width: 50%;">
+        @{{ domain }}
+      </div>
     </div>
+
   </div>
   <p class="error-message" v-if="validate">{{validate}}</p>
 </template>
@@ -92,7 +99,7 @@ label > span.required {
 }
 .text-input {
   width: -webkit-fill-available;
-  padding: 16px 40px 16px 16px;
+  padding: 16px 16px 16px 16px;
   font-size: 16px;
   font-weight: 500;
   border: 1px solid #EAEAEA;

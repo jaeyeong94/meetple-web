@@ -6,9 +6,11 @@ import Image from '@/components/forms/Image.vue'
 import Select from '@/components/forms/Select.vue'
 import TextArea from '@/components/forms/TextArea.vue'
 import TextInput from '@/components/forms/TextInput.vue'
+import TextInputSchool from '@/components/forms/TextInputSchool.vue'
 import Gap from '@/components/Gap.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import Questions from '@/components/Questions.vue'
+import SearchUniversity from '@/components/SearchUniversity.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import PageTitleAndDescription from '@/components/PageTitleAndDescription.vue'
@@ -129,8 +131,8 @@ const mp = inject<MixpanelService>('mixpanel')
 
 // 라우터 제한
 const route = useRoute();
-const routerLimit = ['auto', 'default', 'normal', 'job', 'school', 'answer', 'request', 'reject'];
-const routeFlow = ['default', 'normal', 'job', 'school', 'answer'];
+const routerLimit = ['auto', 'default', 'normal', 'answer', 'join', 'job', 'school', 'request', 'reject'];
+const routeFlow = ['default', 'normal', 'answer', 'join', 'job', 'school'];
 
 if(!routerLimit.includes(route.params.stage as string)) {
   router.push('/');
@@ -150,6 +152,13 @@ const defaultData = reactive({
   gender: '',
 })
 
+// 대학교 선택
+const choiceSchool = reactive({
+  name: '',
+  domain: '',
+  list: [] as any[]
+})
+
 // 텍스트 에어리어
 const textArea: Reactive<{
   [key: string]: any
@@ -159,6 +168,7 @@ const textArea: Reactive<{
   description2Answer: ''
 });
 
+const findUniversityView = ref(false);
 const certIsView = ref(false);
 const termsRequired = ref( false);
 const photoRequired: Ref<any> = ref(false);
@@ -205,7 +215,7 @@ const accountDataUpdate = async () => {
   }
 
   if(account.data.accountMeta.stage !== 'request' && account.data.accountMeta.stage !== 'reject') {
-    if(['default', 'normal', 'job', 'school', 'answer', 'request', 'reject'].includes(route.params.stage as string)) {
+    if(['default', 'normal', 'answer', 'join', 'job', 'school', 'request', 'reject'].includes(route.params.stage as string)) {
       account.data.accountMeta.stage = route.params.stage as string;
     }
   }
@@ -227,6 +237,10 @@ const accountDataUpdate = async () => {
   profileData.descriptions = account.data.accountMeta.descriptions ?? []
   profileData.descriptions[0] = profileData.descriptions[0] ?? { title: question1, answer: '' }
   profileData.descriptions[1] = profileData.descriptions[1] ?? { title: question2, answer: '' }
+  profileData.certFlow = account.data.accountMeta.cert_flow
+  profileData.certIsJob = account.data.accountMeta.cert_is_job
+  profileData.certIsSchool = account.data.accountMeta.cert_is_school
+  profileData.certSchoolEmail = account.data.accountMeta.cert_school_email
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -275,6 +289,22 @@ const progressUpdate = async () => {
   } else if(account.data.accountMeta.stage === 'request') {
     progress.value = 0
     processing.value = true
+  }
+}
+
+const findUniversityList = async (q: string) => {
+  if(q) {
+    const response = await http.get('/account/info/university', {
+      params: {
+        q
+      }
+    })
+    choiceSchool.list = response.data.data
+    return response.data.data
+  } {
+    const response = await http.get('/account/info/university')
+    choiceSchool.list = response.data.data
+    return response.data.data
   }
 }
 
@@ -438,6 +468,15 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
       console.log(error, 'error')
     })
 }
+
+const handleUniversitySelect = (university: { schoolName: string; emailDomain: string }) => {
+  if (university) {
+    choiceSchool.name = university.schoolName;
+    choiceSchool.domain = university.emailDomain;
+  }
+
+  findUniversityView.value = false;
+};
 </script>
 
 <template>
@@ -576,76 +615,6 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
       </div>
     </div>
 
-    <div v-if="account.data?.accountMeta.stage === 'job'">
-      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('normal', false)
-          mp?.trackEvent('click_profile_job_back');
-        }" />
-      </StickyArea>
-      <div class="content-container">
-        <PageTitleAndDescription title="프로필에 등록될<br>직장 및 직무를 인증해주세요." description="Meetple은 인증 기반의 서비스입니다.<br>공개 가능한 선에서 구체적으로 직장 및 직무를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요." />
-        <Gap :height="40" />
-
-        <TextInput label="직장 및 직무" placeholder="최대한 구체적으로 작성해주세요." :required="true" :validate="(val: string) => {
-          if (val && val.length >= 50) {
-            return '50자 이내로 입력해주세요.';
-          }
-
-          return null;
-        }" @input="(val: string, validateValue: any) => {
-          profileData.job = val;
-          if (validateValue === null && val.length > 0) {
-            profileData.job = val;
-          } else {
-            profileData.job = '';
-          }
-        }" :value="profileData.job" />
-        <Gap :height="20" />
-
-        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
-          useModalStore().setModal({
-            type: 'alert',
-            data: {
-              title: '이미지 업로드 실패',
-              message
-            }
-          })
-        }" />
-        <Gap :height="20" />
-      </div>
-    </div>
-
-    <div v-if="account.data?.accountMeta.stage === 'school'">
-      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('job', false)
-          mp?.trackEvent('click_profile_school_back');
-        }" />
-      </StickyArea>
-      <div class="content-container">
-        <PageTitleAndDescription title="프로필에 등록될 재학 및<br>졸업 대학을 입력해주세요." description="나와 더 잘 맞는 상대와 매칭될 수 있어요." />
-        <Gap :height="40" />
-
-        <TextInput label="학교명" placeholder="학교명을 입력해주세요." :required="false" :validate="(val: string) => {
-            if (val && val.length >= 20) {
-              return '학교명은 20자 이내로 입력해주세요.';
-            }
-
-            return null;
-          }" @input="(val: string, validateValue: any) => {
-            profileData.school = val;
-            if (validateValue === null && val.length > 0) {
-              profileData.school = val;
-            } else {
-              profileData.school = '';
-            }
-          }" :value="profileData.school" />
-      </div>
-    </div>
-
     <div v-if="account.data?.accountMeta.stage === 'answer'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
@@ -684,6 +653,77 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
       </div>
     </div>
 
+    <div v-if="account.data?.accountMeta.stage === 'join'" style="height: 100vh;" class="join-bg">
+      <div class="content-container" style="padding-top: 108px;">
+        <div class="text-wrap">
+          <h2 class="custom title">회원가입이 완료되었습니다!<br>인증 절차를 진행해주세요</h2>
+          <p class="custom description">Meetple은 인증 기반의 서비스입니다.<br>학교나 커리어 정보를 인증한 회원에 한해,<br>추천 매칭을 해드리고 있어요!<br>지금 바로 인증하고, 새로운 인연을 만나보세요.</p>
+        </div>
+        <Gap :height="40" />
+      </div>
+    </div>
+
+    <div v-if="account.data?.accountMeta.stage === 'job'">
+      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+<!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
+        <SubHeader :show-back-button="true" @back="() => {
+          ProfileUpdateAction('join', false)
+          mp?.trackEvent('click_profile_job_back');
+        }" />
+      </StickyArea>
+      <div class="content-container">
+        <PageTitleAndDescription title="프로필에 등록될<br>커리어를 인증해주세요." description="공개 가능한 선에서 커리어 정보를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요.<br>구체적으로 작성하실수록 좋아요!" />
+        <Gap :height="40" />
+
+        <TextInput label="나의 커리어" placeholder="Ex. 대기업 개발자, 스타트업 PM, 회계사 등" optional-text="(직무, 규모 등)" :required="false" :validate="(val: string) => {
+          if (val && val.length >= 50) {
+            return '50자 이내로 입력해주세요.';
+          }
+
+          return null;
+        }" @input="(val: string, validateValue: any) => {
+          profileData.job = val;
+          if (validateValue === null && val.length > 0) {
+            profileData.job = val;
+          } else {
+            profileData.job = '';
+          }
+        }" :value="profileData.job" />
+        <Gap :height="20" />
+
+        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="명함, 재직 증명서, 면허 및 자격증 등의 이미지를 1장 등록해주세요." @error="(message: string) => {
+          useModalStore().setModal({
+            type: 'alert',
+            data: {
+              title: '이미지 업로드 실패',
+              message
+            }
+          })
+        }" />
+        <Gap :height="20" />
+      </div>
+    </div>
+
+    <div v-if="account.data?.accountMeta.stage === 'school'">
+      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
+<!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
+        <SubHeader :show-back-button="true" @back="() => {
+          ProfileUpdateAction('job', false)
+          mp?.trackEvent('click_profile_school_back');
+        }" />
+      </StickyArea>
+      <div class="content-container">
+        <PageTitleAndDescription title="프로필에 등록될<br>대학교를 인증해주세요." description="" />
+        <Gap :height="40" />
+
+        <TextInput label="학교 검색" placeholder="졸업·재학 대학교 이름을 검색해주세요" optional-text="" :required="false" :value="choiceSchool.name" @click="() => {
+          findUniversityView = true;
+        }" />
+        <Gap :height="40" />
+        <TextInputSchool v-if="profileData?.certFlow == 'school'" label="학교 이메일" placeholder="이메일 @앞자리 입력" optional-text="" :required="false" :value="profileData.certSchoolEmail?.split('@')[0]" domain="korea.co.kr" />
+      </div>
+    </div>
+
     <div v-if="account.data?.accountMeta.stage === 'request'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
@@ -717,6 +757,12 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
     </div>
   </div>
 
+  <div class="find-university" v-if="findUniversityView">
+    <SearchUniversity @select="handleUniversitySelect" @close="() => {
+      findUniversityView = false;
+    }" />
+  </div>
+
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
     <SubmitButton @click="() => {
       termsAccept();
@@ -745,46 +791,98 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
         }">다음</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
-    <SubmitButton @click="() => {
-      ProfileUpdateAction('job')
-      mp?.trackEvent('click_profile_job_update');
-    }" :disabled="!profileData.job || !jobRequired" :style="{
-          backgroundColor: '#6726FE',
-        }">다음</SubmitButton>
-  </StickyArea>
-
-  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
-    <Button @click="() => {
-          profileData.school = '';
-          ProfileUpdateAction('school')
-          mp?.trackEvent('click_profile_school_skip');
-        }" :style="{
-          width: 'auto',
-          padding: '0 32px',
-          height: '52px',
-          borderRadius: '26px',
-          fontSize: '17px'
-        }">건너뛰기</Button>
-    <div :style="{flex: 1}" />
-    <SubmitButton @click="() => {
-      ProfileUpdateAction('school')
-      mp?.trackEvent('click_profile_school_update');
-    }" :disabled="!profileData.school" :style="{
-          width: 'auto',
-          padding: '0 32px',
-          backgroundColor: '#6726FE',
-        }">등록하고 다음</SubmitButton>
-  </StickyArea>
-
   <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
     <SubmitButton @click="() => {
-      ProfileUpdateAction('request')
+      ProfileUpdateAction('join')
       mp?.trackEvent('click_profile_request');
     }" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
         backgroundColor: '#6726FE',
       }">다음</SubmitButton>
+  </StickyArea>
 
+  <StickyArea position="bottom" style="flex-direction: column; gap: 7px; position: absolute;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
+    <SubmitButton @click="() => {
+      profileData.certFlow = 'school'
+      ProfileUpdateAction('school')
+      mp?.trackEvent('click_join_school_choice');
+    }" :style="{
+        backgroundColor: '#6726FE',
+    }">대학교 인증하기</SubmitButton>
+
+    <SubmitButton @click="() => {
+      profileData.certFlow = 'job'
+      ProfileUpdateAction('job')
+      mp?.trackEvent('click_join_job_choice');
+    }" :style="{
+        backgroundColor: '#6726FE',
+    }">커리어 인증하기</SubmitButton>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
+    <div class="job-flow" v-if="profileData.certFlow === 'job'">
+      <SubmitButton @click="() => {
+        ProfileUpdateAction('school')
+        mp?.trackEvent('click_profile_job_update');
+      }" :disabled="!profileData.job || !jobRequired" :style="{
+            backgroundColor: '#6726FE',
+          }">완료</SubmitButton>
+    </div>
+
+    <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
+      <Button @click="() => {
+        ProfileUpdateAction('school')
+      }" :style="{
+        justifyContent: 'center',
+        flex: 1,  /* 50% 영역을 자동으로 차지 */
+        height: '52px',
+        borderRadius: '26px',
+        fontSize: '17px',
+        minWidth: '120px' /* 최소 크기 설정 */
+      }">건너뛰기</Button>
+
+      <SubmitButton @click="() => {
+      ProfileUpdateAction('school')
+    }" :disabled="!profileData.job || !jobRequired" :style="{
+        flex: 1, /* 50% 영역을 자동으로 차지 */
+        backgroundColor: '#6726FE',
+        height: '52px',
+        minWidth: '120px' /* 최소 크기 설정 */
+    }">완료</SubmitButton>
+    </div>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
+    <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
+      <Button @click="() => {
+        ProfileUpdateAction('request')
+      }" :style="{
+        justifyContent: 'center',
+        flex: 1,  /* 50% 영역을 자동으로 차지 */
+        height: '52px',
+        borderRadius: '26px',
+        fontSize: '17px',
+        minWidth: '120px' /* 최소 크기 설정 */
+      }">건너뛰기</Button>
+
+      <SubmitButton @click="() => {
+        profileData.school = choiceSchool.name
+        ProfileUpdateAction('request')
+      }" :disabled="!choiceSchool.name" :style="{
+          flex: 1, /* 50% 영역을 자동으로 차지 */
+          backgroundColor: '#6726FE',
+          height: '52px',
+          minWidth: '120px' /* 최소 크기 설정 */
+      }">완료</SubmitButton>
+    </div>
+
+    <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
+      <SubmitButton @click="() => {
+        ProfileUpdateAction('school')
+        mp?.trackEvent('click_profile_job_update');
+      }" :disabled="!profileData.job || !jobRequired" :style="{
+            backgroundColor: '#6726FE',
+          }">인증하기</SubmitButton>
+    </div>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
@@ -929,6 +1027,36 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
   100% {
     transform: rotate(360deg) translateZ(0);
   }
+}
+
+.custom.title {
+  white-space: pre-line;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 38px;
+}
+.custom.description {
+  white-space: pre-line;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #EAEDF1;
+  line-height: 20px;
+}
+
+.join-bg {
+  background: url('@/assets/images/join-bg.png') repeat-y top;
+}
+
+.find-university {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: #fff;
 }
 
 </style>
