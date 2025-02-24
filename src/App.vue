@@ -26,12 +26,18 @@ const pageClass = computed(() => {
 });
 
 const updateBodyClass = () => {
-  if (route.path.startsWith('/register/join')) {
-    document.body.classList.add('noScroll')
+  const appElement = document.getElementById('app'); // ✅ `#app` 요소 가져오기
+  const noScrollRoutes = ['/register/join'];
+  const shouldAddNoScroll = noScrollRoutes.some(path => route.path.startsWith(path));
+
+  if (shouldAddNoScroll) {
+    document.body.classList.add('noScroll');
+    appElement?.classList.add('noScroll');
   } else {
-    document.body.classList.remove('noScroll')
+    document.body.classList.remove('noScroll');
+    appElement?.classList.remove('noScroll');
   }
-}
+};
 
 // ✅ route 변경 감지 (필요하면 watch 사용)
 watch(() => route.path, (newPath) => {
