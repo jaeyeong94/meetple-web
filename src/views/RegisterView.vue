@@ -1046,7 +1046,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 }
 
 .join-bg {
-  background: url('@/assets/images/join-bg.png') repeat-y top;
+  overflow: hidden;
+  background: url('@/assets/images/join-bg.png') repeat top;
 }
 
 .find-university {
