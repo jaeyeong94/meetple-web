@@ -8,6 +8,7 @@ import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const page = ref<HTMLElement | null>(null);
+const pageContent = ref<HTMLElement | null>(null);
 const modalStore = useModalStore()
 const { modal } = storeToRefs(modalStore)
 const activeModal = computed(() => modal.value)
@@ -28,6 +29,12 @@ const pageClass = computed(() => {
 watch(() => route.path, (newPath) => {
   console.log("Route changed:", newPath);
 });
+
+const updateHeight = () => {
+  if (page.value && pageContent.value) {
+    pageContainer.value.style.height = `${pageContent.value.scrollHeight}px`;
+  }
+};
 
 const onResize = () => {
   clearTimeout(timeout)
@@ -65,7 +72,9 @@ window.addEventListener('popstate', function(event) {
     <img src="@/assets/images/main-background.png" class="background" alt="" />
   </div>
   <div ref="page" class="page-container" :class="pageClass">
-    <RouterView />
+    <div ref="pageContent" class="page-content">
+      <RouterView />
+    </div>
     <ModalArea
       :activeModal="activeModal.type"
       :modal-position="modalPosition"
@@ -114,6 +123,10 @@ window.addEventListener('popstate', function(event) {
   width: 375px;
   margin-left: 565px;
   z-index: 1;
+  min-height: 100vh; /* 최소 높이를 화면 높이로 설정 */
+  height: auto; /* 내부 컨텐츠 크기에 맞게 자동 조절 */
+  display: flex;
+  flex-direction: column;
 }
 .page-container.cert-page {
   width: 400px;

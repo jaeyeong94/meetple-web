@@ -763,7 +763,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     }" />
   </div>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
     <SubmitButton @click="() => {
       termsAccept();
       mp?.trackEvent('click_terms_agree');
@@ -772,7 +772,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }">다음</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired && !certIsView">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired && !certIsView">
     <SubmitButton @click="() => {
         certIsView = true;
         mp?.trackEvent('click_cert_view');
@@ -782,7 +782,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }">본인인증 하기</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'normal'">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
     <SubmitButton @click="() => {
       ProfileUpdateAction('normal')
       mp?.trackEvent('click_profile_normal_update');
@@ -791,7 +791,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }">다음</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'answer'">
+  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
     <SubmitButton @click="() => {
       ProfileUpdateAction('join')
       mp?.trackEvent('click_profile_request');
@@ -800,7 +800,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       }">다음</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" style="flex-direction: column; gap: 7px; position: absolute;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
+  <StickyArea position="bottom" style="flex-direction: column; gap: 7px;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
     <SubmitButton @click="() => {
       profileData.certFlow = 'school'
       ProfileUpdateAction('school')
@@ -818,7 +818,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     }">커리어 인증하기</SubmitButton>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'job'">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
     <div class="job-flow" v-if="profileData.certFlow === 'job'">
       <SubmitButton @click="() => {
         ProfileUpdateAction('school')
@@ -851,7 +851,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     </div>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'school'">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
     <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
       <Button @click="() => {
         ProfileUpdateAction('request')
@@ -885,7 +885,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     </div>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px', position: 'absolute' }" v-if="account.data?.accountMeta.stage === 'reject'">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
     <SubmitButton @click="() => {
       ProfileUpdateAction('job', false, true)
       mp?.trackEvent('click_profile_reject_update');
@@ -899,7 +899,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 <style scoped>
 .page {
   //padding: 16px 16px 120px;
-  min-height: 100dvh;
+  //min-height: 100vh;
 }
 
 .v-enter-active,
