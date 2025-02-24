@@ -20,7 +20,7 @@ const props = defineProps({
 
 <style scoped>
 .top-sticky-area {
-  position: sticky;
+  position: absolute;
   left: 0;
   right: 0;
   z-index: 1000;

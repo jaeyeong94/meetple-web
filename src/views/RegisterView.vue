@@ -45,6 +45,8 @@ interface upHashFrontRequest {
   kcp_page_submit_yn?: 'Y' | 'N';
 }
 
+const page = ref<HTMLElement | null>(null);
+
 const certData: {
   certUp: {
     url: string;
@@ -480,7 +482,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 </script>
 
 <template>
-  <div class="page">
+  <div class="page" ref="page">
     <div v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
@@ -755,53 +757,54 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     <div v-if="account.data?.accountMeta.stage === 'reject'">
       <Empty title="인증이 거절되었습니다." description="인증을 위한 문서나 직장 및 직무 텍스트를<br>수정하신 후 인증을 다시 진행해주세요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
     </div>
-  </div>
 
-  <div class="find-university" v-if="findUniversityView">
-    <SearchUniversity @select="handleUniversitySelect" @close="() => {
+    <!-- --------------------------------------------------------------------------------- -->
+
+    <div class="find-university" v-if="findUniversityView">
+      <SearchUniversity @select="handleUniversitySelect" @close="() => {
       findUniversityView = false;
     }" />
-  </div>
+    </div>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && !termsRequired">
+      <SubmitButton @click="() => {
       termsAccept();
       mp?.trackEvent('click_terms_agree');
     }" :disabled="!agreement[0] || !agreement[1]" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
-  </StickyArea>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired && !certIsView">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'default' && termsRequired && !certIsView">
+      <SubmitButton @click="() => {
         certIsView = true;
         mp?.trackEvent('click_cert_view');
         getCertUpHash();
     }" :style="{
           backgroundColor: '#6726FE',
         }">본인인증 하기</SubmitButton>
-  </StickyArea>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
+      <SubmitButton @click="() => {
       ProfileUpdateAction('normal')
       mp?.trackEvent('click_profile_normal_update');
     }" :disabled="!profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
           backgroundColor: '#6726FE',
         }">다음</SubmitButton>
-  </StickyArea>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
+      <SubmitButton @click="() => {
       ProfileUpdateAction('join')
       mp?.trackEvent('click_profile_request');
     }" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
         backgroundColor: '#6726FE',
       }">다음</SubmitButton>
-  </StickyArea>
+    </StickyArea>
 
-  <StickyArea position="bottom" style="flex-direction: column; gap: 7px;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" style="flex-direction: column; gap: 7px;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
+      <SubmitButton @click="() => {
       profileData.certFlow = 'school'
       ProfileUpdateAction('school')
       mp?.trackEvent('click_join_school_choice');
@@ -809,27 +812,27 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         backgroundColor: '#6726FE',
     }">대학교 인증하기</SubmitButton>
 
-    <SubmitButton @click="() => {
+      <SubmitButton @click="() => {
       profileData.certFlow = 'job'
       ProfileUpdateAction('job')
       mp?.trackEvent('click_join_job_choice');
     }" :style="{
         backgroundColor: '#6726FE',
     }">커리어 인증하기</SubmitButton>
-  </StickyArea>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
-    <div class="job-flow" v-if="profileData.certFlow === 'job'">
-      <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
+      <div class="job-flow" v-if="profileData.certFlow === 'job'">
+        <SubmitButton @click="() => {
         ProfileUpdateAction('school')
         mp?.trackEvent('click_profile_job_update');
       }" :disabled="!profileData.job || !jobRequired" :style="{
             backgroundColor: '#6726FE',
           }">완료</SubmitButton>
-    </div>
+      </div>
 
-    <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
-      <Button @click="() => {
+      <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
+        <Button @click="() => {
         ProfileUpdateAction('school')
       }" :style="{
         justifyContent: 'center',
@@ -840,7 +843,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         minWidth: '120px' /* 최소 크기 설정 */
       }">건너뛰기</Button>
 
-      <SubmitButton @click="() => {
+        <SubmitButton @click="() => {
       ProfileUpdateAction('school')
     }" :disabled="!profileData.job || !jobRequired" :style="{
         flex: 1, /* 50% 영역을 자동으로 차지 */
@@ -848,12 +851,12 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         height: '52px',
         minWidth: '120px' /* 최소 크기 설정 */
     }">완료</SubmitButton>
-    </div>
-  </StickyArea>
+      </div>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
-    <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
-      <Button @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
+      <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
+        <Button @click="() => {
         ProfileUpdateAction('request')
       }" :style="{
         justifyContent: 'center',
@@ -864,7 +867,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         minWidth: '120px' /* 최소 크기 설정 */
       }">건너뛰기</Button>
 
-      <SubmitButton @click="() => {
+        <SubmitButton @click="() => {
         profileData.school = choiceSchool.name
         ProfileUpdateAction('request')
       }" :disabled="!choiceSchool.name" :style="{
@@ -873,33 +876,33 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
           height: '52px',
           minWidth: '120px' /* 최소 크기 설정 */
       }">완료</SubmitButton>
-    </div>
+      </div>
 
-    <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
-      <SubmitButton @click="() => {
+      <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
+        <SubmitButton @click="() => {
         ProfileUpdateAction('school')
         mp?.trackEvent('click_profile_job_update');
       }" :disabled="!profileData.job || !jobRequired" :style="{
             backgroundColor: '#6726FE',
           }">인증하기</SubmitButton>
-    </div>
-  </StickyArea>
+      </div>
+    </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
-    <SubmitButton @click="() => {
+    <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
+      <SubmitButton @click="() => {
       ProfileUpdateAction('job', false, true)
       mp?.trackEvent('click_profile_reject_update');
     }" :style="{
         backgroundColor: '#6726FE',
       }">인증 다시 진행하기</SubmitButton>
-  </StickyArea>
+    </StickyArea>
+  </div>
 
 </template>
 
 <style scoped>
 .page {
-  //padding: 16px 16px 120px;
-  //min-height: 100vh;
+  min-height: 100vh;
 }
 
 .v-enter-active,
