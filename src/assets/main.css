@@ -60,6 +60,10 @@ input, button, textarea, select {
   }
   #app {
     overflow: scroll;
+
+    &.noScroll {
+      overflow: hidden;
+    }
   }
 }
 
