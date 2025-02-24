@@ -30,7 +30,7 @@ const updateBodyClass = () => {
   const noScrollRoutes = ['/register/join'];
   const shouldAddNoScroll = noScrollRoutes.some(path => route.path.startsWith(path));
 
-  if (shouldAddNoScroll) {
+  if (shouldAddNoScroll || route.name === 'start') {
     document.body.classList.add('noScroll');
     appElement?.classList.add('noScroll');
   } else {
