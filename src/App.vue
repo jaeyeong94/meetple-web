@@ -25,16 +25,19 @@ const pageClass = computed(() => {
   }
 });
 
+const updateBodyClass = () => {
+  if (route.path.startsWith('/register/join')) {
+    document.body.classList.add('noScroll')
+  } else {
+    document.body.classList.remove('noScroll')
+  }
+}
+
 // ✅ route 변경 감지 (필요하면 watch 사용)
 watch(() => route.path, (newPath) => {
+  updateBodyClass();
   console.log("Route changed:", newPath);
-});
-
-const updateHeight = () => {
-  if (page.value && pageContent.value) {
-    pageContainer.value.style.height = `${pageContent.value.scrollHeight}px`;
-  }
-};
+})
 
 const onResize = () => {
   clearTimeout(timeout)
@@ -52,6 +55,7 @@ const onResize = () => {
 
 onMounted(() => {
   onResize();
+  updateBodyClass();
   window.addEventListener('resize', onResize);
 })
 onUnmounted(() => {

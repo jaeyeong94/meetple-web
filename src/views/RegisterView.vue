@@ -693,7 +693,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }" :value="profileData.job" />
         <Gap :height="20" />
 
-        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="명함, 재직 증명서, 면허 및 자격증 등의 이미지를 1장 등록해주세요." @error="(message: string) => {
+        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="명함, 재직 증명서, 면허 및 자격증 등의<br>이미지를 1장 등록해주세요." @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {

@@ -103,7 +103,7 @@ const onImageChange = (e: Event) => {
         </div>
         <span>이미지 등록하기</span>
       </button>
-      <p class="description" v-if="props.description">{{props.description}}</p>
+      <p class="description" v-if="props.description" v-html="props.description"></p>
     </div>
     <Button v-else class="change-button" @click="() => input?.click()">
       <IcImage width="24" height="24" />
@@ -202,5 +202,6 @@ label > span.required {
   font-weight: 500;
   color: #A1A1A1;
   margin-top: 3px;
+  text-align: center;
 }
 </style>
