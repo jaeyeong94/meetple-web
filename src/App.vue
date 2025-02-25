@@ -82,9 +82,7 @@ window.addEventListener('popstate', function(event) {
     <img src="@/assets/images/main-background.png" class="background" alt="" />
   </div>
   <div ref="page" class="page-container" :class="pageClass">
-    <div ref="pageContent" class="page-content">
-      <RouterView />
-    </div>
+    <RouterView />
     <ModalArea
       :activeModal="activeModal.type"
       :modal-position="modalPosition"
