@@ -10,6 +10,8 @@ const props = defineProps({
   location: String,
   school: String,
   imageUrl: String,
+  jobBadge: Boolean,
+  schoolBadge: Boolean,
 })
 </script>
 
@@ -21,11 +23,11 @@ const props = defineProps({
     <ul class="info">
       <li class="info-item">
         <span class="title">직장 및 직무</span>
-        <p class="value">{{props.job}}</p>
+        <p class="value" style="display: flex; align-items: center;"><span>{{props.job}}</span><span v-if="props.jobBadge"><img src="@/assets/images/badge.png" alt="Badge" style="width: 16px; height: 16px;" /></span></p>
       </li>
       <li class="info-item" v-if="props.school">
         <span class="title">학교</span>
-        <p class="value">{{props.school}}</p>
+        <p class="value" style="display: flex; align-items: center;"><span>{{props.school}}</span><span v-if="props.schoolBadge"><img src="@/assets/images/badge.png" alt="Badge" style="width: 16px; height: 16px;" /></span></p>
       </li>
       <li class="info-item">
         <span class="title">지역</span>

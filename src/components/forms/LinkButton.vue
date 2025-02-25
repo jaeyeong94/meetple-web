@@ -4,6 +4,11 @@ import IcGrayArrow from '@/components/icons/IcGrayArrow.vue'
 const props = defineProps({
   label: String,
   required: Boolean,
+  placeHolder: String,
+  optionalText: {
+    type: String,
+    default: '',
+  },
   title: {
     type: String,
     required: true,
@@ -20,11 +25,12 @@ const emit = defineEmits(['click'])
 <template>
   <label v-if="props.label">{{props.label}}
     <span class="required" v-if="props.required">* <span style="color: #6726FE; font-size: 11px;">{{warningMessage}}</span></span>
-    <span v-else>(선택사항)</span>
+    <span v-else style="color: #6726FE; font-size: 11px;">{{ props.optionalText }}</span>
   </label>
   <div class="container">
     <button class="select" @click="() => emit('click')">
-      <span>{{props.title}}</span>
+      <span v-if="props.title">{{props.title}}</span>
+      <span v-else style="color: #9B9B9B;">{{placeHolder}}</span>
       <div class="arrow">
         <IcGrayArrow />
       </div>
@@ -40,7 +46,7 @@ label {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 15px;
   font-size: 13px;
   font-weight: 700;
   color: #2A2A2A;

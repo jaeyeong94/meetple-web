@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import DeepSelect from '@/components/forms/DeepSelect.vue'
+import TextInputSchool from '@/components/forms/TextInputSchool.vue'
 import Gap from '@/components/Gap.vue'
 import ProfileImage from '@/components/forms/ProfileImage.vue'
+import SearchUniversity from '@/components/SearchUniversity.vue'
 import StickyArea from '@/components/StickyArea.vue'
 import SubHeader from '@/components/SubHeader.vue'
 import TextInput from '@/components/forms/TextInput.vue'
@@ -31,6 +33,17 @@ const jobName: Ref<any> = ref('');
 const jobFile: FormData = new FormData();
 const jobFileBase64: Ref<any> = ref('');
 const submitRequired: Ref<any> = ref(true);
+const findUniversityView = ref(false);
+const newSchoolName = ref('');
+const newSchoolEmailId = ref('');
+
+
+// 대학교 선택
+const choiceSchool = reactive({
+  name: '',
+  domain: '',
+  list: [] as any[]
+})
 
 const textArea: Reactive<{
   [key: string]: any
@@ -41,7 +54,7 @@ const textArea: Reactive<{
 });
 
 const state: Reactive<{
-  stage: 'profile' | 'job'
+  stage: 'profile' | 'job' | 'school'
 }> = reactive({
   stage: 'profile'
 });
@@ -77,6 +90,18 @@ onMounted(async () => {
   profileData.school = account.data.accountMeta.school
   profileData.job = account.data.accountMeta.job
   profileData.descriptions = account.data.accountMeta.descriptions ?? []
+  profileData.certFlow = account.data.accountMeta.cert_flow
+  profileData.certIsJob = account.data.accountMeta.cert_is_job
+  profileData.certIsSchool = account.data.accountMeta.cert_is_school
+  profileData.certSchoolEmail = account.data.accountMeta.cert_school_email
+
+  // 학교 초이스
+  if(profileData.school) {
+    choiceSchool.name = profileData.school
+  }
+  if(profileData.certSchoolEmail) {
+    choiceSchool.domain = profileData.certSchoolEmail.split('@')[1]
+  }
 
   // 텍스트 에어리어
   textArea.selfIntroduction = account.data?.accountMeta.self_introduction;
@@ -170,6 +195,29 @@ const UpdateProfileData = () => {
     })
 }
 
+const RequestSchool = () => {
+  profileData.school = newSchoolName.value;
+  profileData.certSchoolEmail = `${newSchoolEmailId.value}@${choiceSchool.domain}`;
+  profileData.certIsSchool = true;
+
+  http.post('/account/profile/edit', toRaw(profileData))
+    .then((data: any) => {
+      accountUpdate();
+      state.stage = 'profile'
+    })
+    .catch((error: any) => {
+      console.log(error)
+      useModalStore().setModal({
+        type: 'alert',
+        data: {
+          title: error.response.data.title,
+          message: error.response.data.message
+        }
+      })
+      console.log(error, 'error')
+    })
+}
+
 const RequestProfile = () => {
   http.upload('/account/profile/upload', jobFile)
     .then((data: any) => {
@@ -211,6 +259,16 @@ const RequestProfile = () => {
 const question1 = QUESTION1;
 const question2 = QUESTION2;
 
+const handleUniversitySelect = (university: { schoolName: string; emailDomain: string }) => {
+  if (university) {
+    choiceSchool.name = university.schoolName;
+    choiceSchool.domain = university.emailDomain;
+    newSchoolName.value = university.schoolName;
+  }
+
+  findUniversityView.value = false;
+};
+
 </script>
 
 <template>
@@ -234,15 +292,15 @@ const question2 = QUESTION2;
   </StickyArea>
 
   <div class="page" v-if="Object.keys(profileData).length > 0 && state.stage === 'profile'">
-<!--    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {-->
-<!--      useModalStore().setModal({-->
-<!--        type: 'alert',-->
-<!--        data: {-->
-<!--          title: '이미지 업로드 실패',-->
-<!--          message-->
-<!--        }-->
-<!--      })-->
-<!--    }" />-->
+    <!--    <ProfileImage label="프로필 이미지" :required="true" :image-url="photos[0]?.image_path" @change="ProfileUploader" @error="(message: string) => {-->
+    <!--      useModalStore().setModal({-->
+    <!--        type: 'alert',-->
+    <!--        data: {-->
+    <!--          title: '이미지 업로드 실패',-->
+    <!--          message-->
+    <!--        }-->
+    <!--      })-->
+    <!--    }" />-->
     <Gap :height="20" />
     <TextInput label="닉네임" placeholder="닉네임을 입력해 주세요." :required="true" :validate="(val: string) => {
           if (val && val.length >= 10) {
@@ -261,17 +319,17 @@ const question2 = QUESTION2;
             profileData.nickName = val.slice(0, 10);
           }
         }" :value="profileData.nickName || ''" />
+    <Gap :height="30" />
+    <LinkButton :title="profileData.job" label="커리어" place-holder="커리어를 인증해주세요" optional-text="별도 승인이 필요하며, 승인 시 자동 반영됩니다." @click="() => { state.stage = 'job' }" />
     <Gap :height="20" />
-    <LinkButton :title="profileData.job" label="직장 및 직무" :required="true" warning-message="별도 승인이 필요하며, 승인 시 자동 반영됩니다." @click="() => { state.stage = 'job' }" />
-    <Gap :height="20" />
+    <LinkButton :title="profileData.school" label="대학교" place-holder="대학교를 인증해주세요" optional-text="이메일 인증 시 반영됩니다." @click="() => { state.stage = 'school' }" />
+    <Gap :height="60" />
     <Select label="MBTI" :required="true" @change="(val: string) => profileData.mbti = val" :value="profileData.mbti" :options="TEST_SELECT_OPTIONS" :modal-option-cols="4" />
     <Gap :height="20" />
-    <DeepSelect label="지역" placeholder="지역을 선택해주세요." modalTitle="지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
+    <DeepSelect label="거주지역" placeholder="지역을 선택해주세요." modalTitle="지역을 선택해주세요." :required="true" @change="(val: string, val2: string) => {
         profileData.occupiedAreaHigh = val
         profileData.occupiedAreaLow = val2
       }" :value="profileData.occupiedAreaLow" :view-value="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`" :options="TEST_DEEP_SELECT_OPTIONS" :modal-option-cols="4" />
-    <Gap :height="20" />
-    <TextInput label="학교명" @input="(val: string) => { profileData.school = val}" :value="profileData.school" />
     <Gap :height="20" />
     <TextArea label="자기소개" :min-length="20" :max-length="500" :required="true" placeholder="나에 대해 소개해주세요! 상세하게 작성할수록 매칭 확률이 올라갑니다." @input="(val: string) => {
           textArea.selfIntroduction = val
@@ -316,10 +374,10 @@ const question2 = QUESTION2;
   </div>
 
   <div class="page" v-if="Object.keys(profileData).length > 0 && state.stage === 'job'">
-    <PageTitleAndDescription title="프로필에 등록될<br>직장 및 직무를 인증해주세요." description="Meetple은 인증 기반의 서비스입니다.<br>공개 가능한 선에서 구체적으로 직장 및 직무를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요." />
+    <PageTitleAndDescription title="프로필에 등록될<br>커리어를 인증해주세요." description="공개 가능한 선에서 커리어 정보를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요.<br>구체적으로 작성하실수록 좋아요!" />
     <Gap :height="40" />
 
-    <TextInput label="직장 및 직무" placeholder="최대한 구체적으로 작성해주세요." :required="true" :validate="(val: string) => {
+    <TextInput label="나의 커리어" optional-text="(직무, 규모 등)" placeholder="Ex. 대기업 개발자, 스타트업 PM, 회계사 등" :validate="(val: string) => {
           if (val && val.length >= 50) {
             return '50자 이내로 입력해주세요.';
           }
@@ -328,6 +386,8 @@ const question2 = QUESTION2;
         }" @input="(val: string, validateValue: any) => {
           jobName = val;
         }" :value="jobName" />
+
+    <span style="color: #7F7F7F; font-size: 11px; font-weight: 500; line-height: 20px;">* 상대방의 입장에서 파악이 어렵다고 판단되는 경우 승인이 거절됩니다.</span>
     <Gap :height="20" />
 
     <Image label="증빙 이미지 등록" :required="true" @change="JobUploader" description="증빙 이미지를 업로드해요" @error="(message: string) => {
@@ -340,6 +400,25 @@ const question2 = QUESTION2;
           })
         }" />
     <Gap :height="40" />
+  </div>
+
+  <div class="page" v-if="Object.keys(profileData).length > 0 && state.stage === 'school'" style="padding-bottom: 60px;">
+    <PageTitleAndDescription title="프로필에 등록될<br>대학교를 인증해주세요." description="" />
+    <Gap :height="40" />
+
+    <TextInput label="학교 검색" placeholder="졸업·재학 대학교 이름을 검색해주세요" optional-text="" :required="false" :value="newSchoolName" @click="() => {
+        findUniversityView = true;
+      }" />
+    <Gap :height="40" />
+    <TextInputSchool label="학교 이메일" placeholder="이메일 @앞자리 입력" optional-text="" :required="false" :value="newSchoolEmailId" :domain="choiceSchool.domain" @input="(v) => {
+        newSchoolEmailId = v;
+      }" />
+  </div>
+
+  <div class="find-university" v-if="findUniversityView">
+    <SearchUniversity @select="handleUniversitySelect" @close="() => {
+      findUniversityView = false;
+    }" />
   </div>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'profile'">
@@ -359,10 +438,29 @@ const question2 = QUESTION2;
           backgroundColor: '#6726FE',
         }">심사하기</SubmitButton>
   </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="state.stage === 'school'">
+    <SubmitButton @click="() => {
+        RequestSchool()
+        mp?.trackEvent('click_profile_job_update');
+      }" :disabled="!newSchoolName || !newSchoolEmailId" :style="{
+            backgroundColor: '#6726FE',
+          }">인증하기</SubmitButton>
+  </StickyArea>
 </template>
 
 <style scoped>
 .page {
   padding: 16px;
+}
+
+.find-university {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  background-color: #fff;
 }
 </style>

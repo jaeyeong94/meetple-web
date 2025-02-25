@@ -677,7 +677,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }" />
       </StickyArea>
       <div class="content-container">
-        <PageTitleAndDescription title="프로필에 등록될<br>커리어를 인증해주세요." description="공개 가능한 선에서 커리어 정보를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요.<br>구체적으로 작성하실수록 좋아요!" />
+        <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'job'" title="프로필에 등록될<br>커리어를 인증해주세요." description="공개 가능한 선에서 커리어 정보를 입력한 후,<br>이를 인증할 수 있는 이미지를 제출해주세요.<br>구체적으로 작성하실수록 좋아요!" />
+        <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'school'" title="프로필에 나타낼<br>커리어 정보를 입력해보세요" description="공개 가능한 선에서 커리어 정보를 입력해보세요.<br>나에 대해 더 많은 정보를 입력할수록, 매칭확률이 높아져요.<br>구체적으로 작성하실수록 좋아요!" />
         <Gap :height="40" />
 
         <TextInput label="나의 커리어" placeholder="Ex. 대기업 개발자, 스타트업 PM, 회계사 등" optional-text="(직무, 규모 등)" :required="false" :validate="(val: string) => {
@@ -694,9 +695,10 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
             profileData.job = '';
           }
         }" :value="profileData.job" />
+        <span v-if="account.data.accountMeta.cert_flow === 'job'" style="color: #7F7F7F; font-size: 11px; font-weight: 500; line-height: 20px;">* 상대방의 입장에서 파악이 어렵다고 판단되는 경우 승인이 거절됩니다.</span>
         <Gap :height="20" />
 
-        <Image label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="명함, 재직 증명서, 면허 및 자격증 등의<br>이미지를 1장 등록해주세요." @error="(message: string) => {
+        <Image v-if="account.data.accountMeta.cert_flow === 'job'" label="증빙 이미지 등록" :required="true" :loading="JobUploaderLoading" :image-url="jobs[0]?.image_path" @change="JobUploader" description="명함, 재직 증명서, 면허 및 자격증 등의<br>이미지를 1장 등록해주세요." @error="(message: string) => {
           useModalStore().setModal({
             type: 'alert',
             data: {
@@ -723,7 +725,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         }" />
       </StickyArea>
       <div class="content-container">
-        <PageTitleAndDescription title="프로필에 등록될<br>대학교를 인증해주세요." description="" />
+        <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'job'" title="프로필에 나타낼<br>대학교를 입력할 수 있어요" description="나에 대해 더 많은 정보를 입력할수록, 매칭확률이 높아져요." />
+        <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'school'" title="프로필에 등록될<br>대학교를 인증해주세요." description="" />
         <Gap :height="40" />
 
         <TextInput label="학교 검색" placeholder="졸업·재학 대학교 이름을 검색해주세요" optional-text="" :required="false" :value="choiceSchool.name" @click="() => {
@@ -811,7 +814,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       ProfileUpdateAction('answer')
       moveRouter('join')
       mp?.trackEvent('click_profile_request');
-    }" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
+    }" :disabled="(profileData.descriptions ? !profileData.descriptions[0].answer : true) || (profileData.descriptions ? !profileData.descriptions[1].answer : true)" :style="{
         backgroundColor: '#6726FE',
       }">다음</SubmitButton>
   </StickyArea>
@@ -855,7 +858,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
         useModalStore().setModal({
           type: 'welcome',
           data: {
-            title: '환영해요!\nMeetple의 회원이 되셨어요!',
+            title: '환영해요!<br>Meetple의 회원이 되셨어요!',
             message: '추천 미팅 상대를을 문자로 알려드릴게요! 📮<br>문자로 보내드린 서비스 이용안내를 참고해주세요.'
           }
         })

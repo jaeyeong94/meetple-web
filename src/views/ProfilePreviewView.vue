@@ -48,6 +48,10 @@ onMounted(async () => {
   profileData.school = account.data.accountMeta.school
   profileData.job = account.data.accountMeta.job
   profileData.descriptions = account.data.accountMeta.descriptions ?? []
+  profileData.certFlow = account.data.accountMeta.cert_flow
+  profileData.certIsJob = account.data.accountMeta.cert_is_job
+  profileData.certIsSchool = account.data.accountMeta.cert_is_school
+  profileData.certSchoolEmail = account.data.accountMeta.cert_school_email
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -72,6 +76,8 @@ onMounted(async () => {
       :mbti="profileData.mbti"
       :location="`${profileData.occupiedAreaHigh} ${profileData.occupiedAreaLow}`"
       :school="profileData.school"
+      :job-badge="profileData.certIsJob"
+      :school-badge="profileData.certIsSchool"
     />
     <Gap :height="20" />
     <Questions :data="profileData.descriptions.map((line: any) => {
