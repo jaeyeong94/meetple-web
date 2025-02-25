@@ -51,7 +51,7 @@ const onBlur = () => {
   </label>
   <div class="container">
     <div style="display: flex; justify-content: space-between; flex-direction: row;">
-      <div style="position: relative; flex: 1">
+      <div style="position: relative; flex: 1; overflow: hidden;">
         <input
           ref="input"
           class="text-input"
@@ -67,7 +67,8 @@ const onBlur = () => {
         </button>
       </div>
       <div style="flex: 1; display: flex; align-items: center; justify-content: start; padding-left: 10px; color: #C2C2C2; font-size: 16px; font-weight: 500; line-break: auto; overflow: auto; max-width: 50%;">
-        @{{ domain }}
+        <span v-if="domain" style="color: #000;">@{{ domain }}</span>
+        <span style="color: #000;">@korea.co.kr</span>
       </div>
     </div>
 
@@ -98,7 +99,8 @@ label > span.required {
   color: #FF334B;
 }
 .text-input {
-  width: -webkit-fill-available;
+  width: 100%;
+  box-sizing: border-box;
   padding: 16px 16px 16px 16px;
   font-size: 16px;
   font-weight: 500;
