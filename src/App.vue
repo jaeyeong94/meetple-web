@@ -31,10 +31,8 @@ const updateBodyClass = () => {
   const shouldAddNoScroll = noScrollRoutes.some(path => route.path.startsWith(path));
 
   if (shouldAddNoScroll || route.name === 'start') {
-    document.body.classList.add('noScroll');
     appElement?.classList.add('noScroll');
   } else {
-    document.body.classList.remove('noScroll');
     appElement?.classList.remove('noScroll');
   }
 };
@@ -131,10 +129,10 @@ window.addEventListener('popstate', function(event) {
   width: 375px;
   margin-left: 565px;
   z-index: 1;
-  min-height: 100vh; /* 최소 높이를 화면 높이로 설정 */
-  height: auto; /* 내부 컨텐츠 크기에 맞게 자동 조절 */
-  display: flex;
-  flex-direction: column;
+  //min-height: 100vh; /* 최소 높이를 화면 높이로 설정 */
+  //height: auto; /* 내부 컨텐츠 크기에 맞게 자동 조절 */
+  //display: flex;
+  //flex-direction: column;
 }
 .page-container.cert-page {
   width: 400px;
