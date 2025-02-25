@@ -12,6 +12,7 @@ import DeleteAccountModal from '@/modals/DeleteAccountModal.vue'
 import PurchasePointModal from '@/modals/PurchasePointModal.vue'
 import SelectModal from '@/modals/SelectModal.vue'
 import DeepSelectModal from '@/modals/DeepSelectModal.vue'
+import Welcome from '@/modals/Welcome.vue'
 import type { PropType } from 'vue'
 import type { ModalType } from '@/types'
 
@@ -48,6 +49,7 @@ const emit = defineEmits(['close'])
     <DeepSelectModal v-if="props.activeModal === 'deep-select'" :data="props.data" @close="() => emit('close')" />
     <CodeRetry v-if="props.activeModal === 'code-retry'" :data="props.data" @close="() => emit('close')" />
     <Alert v-if="props.activeModal === 'alert'" :data="props.data" @close="() => emit('close')" />
+    <Welcome v-if="props.activeModal === 'welcome'" :data="props.data" @close="() => emit('close')" />
   </section>
 </template>
 

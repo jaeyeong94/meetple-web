@@ -9,7 +9,7 @@ export type NotificationType =
   'approve' |
   'match-reject';
 
-export type ModalType = 'request-match' | 'request-accept-match' | 'reject-match' | 'matched' | 'block-partner' | 'delete-partner' |
+export type ModalType = 'welcome' | 'request-match' | 'request-accept-match' | 'reject-match' | 'matched' | 'block-partner' | 'delete-partner' |
   'logout' | 'delete-account' | 'purchase-point' | 'code-retry' | 'select' | 'deep-select' | 'alert' | null;
 
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue'
 import CancelButton from '@/components/CancelButton.vue'
+import SubmitButton from '@/components/SubmitButton.vue'
 
 const props = defineProps({
   data: Object,
@@ -19,7 +20,7 @@ const emit = defineEmits(['close'])
             props.data?.onClickClose()
           }
 
-        }">확인</CancelButton>
+        }"><SubmitButton :style="{backgroundColor: '#6726FE'}">알겠어요</SubmitButton></CancelButton>
   </Modal>
 </template>
 
@@ -34,6 +35,6 @@ const emit = defineEmits(['close'])
   margin-bottom: 32px;
   font-size: 14px;
   font-weight: 500;
-  color: #6751FF;
+  color: #929292;
 }
 </style>

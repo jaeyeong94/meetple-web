@@ -267,7 +267,7 @@ const multipleProfileMove = (id: string) => {
     </div>
 
     <div v-else>
-      <Empty v-if="match.data" title="추천 매칭 준비중" description="추천될 매칭이 준비중에 있어요!<br>매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
+      <Empty v-if="match.data" title="추천 매칭 준비중" description="추천 매칭이 준비 중이에요!<br>매칭이 도착하면 알려드릴께요." style="position:absolute; top: 50%; left: 0; margin-top: -134px; width: 100%; padding: 0;" />
     </div>
   </div>
 </template>

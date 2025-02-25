@@ -178,6 +178,7 @@ const jobRequired: Ref<any> = ref(false);
 const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
 const root = inject<HTMLElement>('rootDiv');
+const schoolEmailId = ref('');
 
 // 질문
 const question1 = QUESTION1;
@@ -243,6 +244,15 @@ const accountDataUpdate = async () => {
   profileData.certIsJob = account.data.accountMeta.cert_is_job
   profileData.certIsSchool = account.data.accountMeta.cert_is_school
   profileData.certSchoolEmail = account.data.accountMeta.cert_school_email
+
+  // 학교 초이스
+  if(profileData.school) {
+    choiceSchool.name = profileData.school
+  }
+  if(profileData.certSchoolEmail) {
+    schoolEmailId.value = profileData.certSchoolEmail.split('@')[0]
+    choiceSchool.domain = profileData.certSchoolEmail.split('@')[1]
+  }
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -430,33 +440,14 @@ const JobUploader = (base64: string, file: any) => {
     })
 }
 
-const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean = false) => {
-  let nextFlow;
-  if(hold) {
-    nextFlow = routeFlow[routeFlow.indexOf(currentStage.value)];
-  } else {
-    if(next) {
-      nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) + 1];
-    } else {
-      nextFlow = routeFlow[routeFlow.indexOf(currentStage.value) - 1];
-    }
-  }
-
+const ProfileUpdateAction = (stage: string) => {
   http.post('/account/profile/update', {
     stage,
     data: toRaw(profileData)
   })
     .then(async (data: any) => {
-      if(nextFlow) {
-        await router.push(`/register/${nextFlow}`)
-      } else {
-        await router.push('/register/auto');
-      }
-
       await accountDataUpdate()
       await progressUpdate()
-      window.scrollTo(0, 0);
-      root!.scrollTo(0, 0);
     })
     .catch((error: any) => {
       console.log(error)
@@ -469,6 +460,12 @@ const ProfileUpdateAction = (stage: string, next: boolean = true, hold: boolean 
       })
       console.log(error, 'error')
     })
+}
+
+const moveRouter = async (stage: string) => {
+  await router.push(`/register/${stage}`)
+  window.scrollTo(0, 0)
+  root!.scrollTo(0, 0)
 }
 
 const handleUniversitySelect = (university: { schoolName: string; emailDomain: string }) => {
@@ -621,7 +618,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('school', false)
+          ProfileUpdateAction('normal')
+          moveRouter('normal')
           mp?.trackEvent('click_profile_answer_back');
         }" />
       </StickyArea>
@@ -669,7 +667,12 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
 <!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('join', false)
+          if(account.data.accountMeta.cert_flow === 'job') {
+            moveRouter('join')
+          } else {
+            ProfileUpdateAction('school')
+            moveRouter('school')
+          }
           mp?.trackEvent('click_profile_job_back');
         }" />
       </StickyArea>
@@ -710,7 +713,12 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
 <!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
         <SubHeader :show-back-button="true" @back="() => {
-          ProfileUpdateAction('job', false)
+          if(account.data.accountMeta.cert_flow === 'job') {
+            ProfileUpdateAction('job')
+            moveRouter('job')
+          } else {
+            moveRouter('join')
+          }
           mp?.trackEvent('click_profile_school_back');
         }" />
       </StickyArea>
@@ -722,14 +730,16 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
           findUniversityView = true;
         }" />
         <Gap :height="40" />
-        <TextInputSchool v-if="profileData?.certFlow == 'school'" label="학교 이메일" placeholder="이메일 @앞자리 입력" optional-text="" :required="false" :value="profileData.certSchoolEmail?.split('@')[0]" domain="korea.co.kr" />
+        <TextInputSchool v-if="profileData?.certFlow == 'school'" label="학교 이메일" placeholder="이메일 @앞자리 입력" optional-text="" :required="false" :value="schoolEmailId" :domain="choiceSchool.domain" @input="(v) => {
+          schoolEmailId = v;
+        }" />
       </div>
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'request'">
       <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
         <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />
-        <SubHeader :show-back-button="false" @back="() => {}" />
+        <SubHeader :show-back-button="false" />
       </StickyArea>
       <div class="content-container">
         <PageTitleAndDescription title="가입 승인을 위해<br>인증 심사중이에요." description="신뢰도 기반의 미팅을 위해 인증 절차를 진행하고 있어요.<br>인증이 승인되면 문자를 통해 안내해드릴게요!" />
@@ -789,6 +799,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'normal'">
     <SubmitButton @click="() => {
       ProfileUpdateAction('normal')
+      moveRouter('answer')
       mp?.trackEvent('click_profile_normal_update');
     }" :disabled="!profileData.nickName || !profileData.mbti || !profileData.occupiedAreaHigh || !profileData.occupiedAreaLow || !profileData.selfIntroduction" :style="{
           backgroundColor: '#6726FE',
@@ -797,7 +808,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
   <StickyArea position="bottom" :style="{ display: 'flex', flexDirection: 'row', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'answer'">
     <SubmitButton @click="() => {
-      ProfileUpdateAction('join')
+      ProfileUpdateAction('answer')
+      moveRouter('join')
       mp?.trackEvent('click_profile_request');
     }" :disabled="!profileData.descriptions[0].answer || !profileData.descriptions[1].answer" :style="{
         backgroundColor: '#6726FE',
@@ -807,7 +819,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
   <StickyArea position="bottom" style="flex-direction: column; gap: 7px;" :style="{ display: 'flex', padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'join'">
     <SubmitButton @click="() => {
       profileData.certFlow = 'school'
-      ProfileUpdateAction('school')
+      ProfileUpdateAction('join')
+      moveRouter('school')
       mp?.trackEvent('click_join_school_choice');
     }" :style="{
         backgroundColor: '#6726FE',
@@ -815,7 +828,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
     <SubmitButton @click="() => {
       profileData.certFlow = 'job'
-      ProfileUpdateAction('job')
+      ProfileUpdateAction('join')
+      moveRouter('job')
       mp?.trackEvent('click_join_job_choice');
     }" :style="{
         backgroundColor: '#6726FE',
@@ -825,7 +839,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'job'">
     <div class="job-flow" v-if="profileData.certFlow === 'job'">
       <SubmitButton @click="() => {
-        ProfileUpdateAction('school')
+        ProfileUpdateAction('job')
+        moveRouter('school')
         mp?.trackEvent('click_profile_job_update');
       }" :disabled="!profileData.job || !jobRequired" :style="{
             backgroundColor: '#6726FE',
@@ -834,7 +849,16 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
     <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
       <Button @click="() => {
-        ProfileUpdateAction('school')
+        ProfileUpdateAction('request')
+        router.push({ name: 'match' })
+
+        useModalStore().setModal({
+          type: 'welcome',
+          data: {
+            title: '환영해요!\nMeetple의 회원이 되셨어요!',
+            message: '추천 미팅 상대를을 문자로 알려드릴게요! 📮<br>문자로 보내드린 서비스 이용안내를 참고해주세요.'
+          }
+        })
       }" :style="{
         justifyContent: 'center',
         flex: 1,  /* 50% 영역을 자동으로 차지 */
@@ -845,7 +869,16 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       }">건너뛰기</Button>
 
       <SubmitButton @click="() => {
-      ProfileUpdateAction('school')
+        ProfileUpdateAction('request')
+        router.push({ name: 'match' })
+
+        useModalStore().setModal({
+          type: 'welcome',
+          data: {
+            title: '환영해요!<br>Meetple의 회원이 되셨어요!',
+            message: '추천 미팅 상대를을 문자로 알려드릴게요! 📮<br>문자로 보내드린 서비스 이용안내를 참고해주세요.'
+          }
+        })
     }" :disabled="!profileData.job || !jobRequired" :style="{
         flex: 1, /* 50% 영역을 자동으로 차지 */
         backgroundColor: '#6726FE',
@@ -859,6 +892,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
       <Button @click="() => {
         ProfileUpdateAction('request')
+        moveRouter('request')
       }" :style="{
         justifyContent: 'center',
         flex: 1,  /* 50% 영역을 자동으로 차지 */
@@ -871,6 +905,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       <SubmitButton @click="() => {
         profileData.school = choiceSchool.name
         ProfileUpdateAction('request')
+        moveRouter('request')
       }" :disabled="!choiceSchool.name" :style="{
           flex: 1, /* 50% 영역을 자동으로 차지 */
           backgroundColor: '#6726FE',
@@ -881,7 +916,10 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
     <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
       <SubmitButton @click="() => {
+        profileData.school = choiceSchool.name
+        profileData.certSchoolEmail = `${schoolEmailId}@${choiceSchool.domain}`
         ProfileUpdateAction('school')
+        moveRouter('job')
         mp?.trackEvent('click_profile_job_update');
       }" :disabled="!profileData.job || !jobRequired" :style="{
             backgroundColor: '#6726FE',

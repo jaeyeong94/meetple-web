@@ -58,7 +58,7 @@ const selectUniversity = (university: { schoolName: string; emailDomain: string 
     <ul class="search-results" v-if="searchResults.length > 0">
       <li
         v-for="university in searchResults"
-        :key="university.emailDomain"
+        :key="university.schoolName"
         @click="selectUniversity(university)"
         class="search-item"
       >
