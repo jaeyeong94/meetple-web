@@ -24,9 +24,13 @@ import http from '@/lib/http'
 import type MixpanelService from '@/lib/mixpanel'
 import { calculateAge, validateDate } from '@/lib/utils'
 import router from '@/router'
+import { useToastStore } from '@/stores/toast'
 import { useRoute } from 'vue-router'
 import { useModalStore } from '@/stores/modal'
 import { onMounted, type Reactive, reactive, type Ref, ref, toRaw, watch, inject } from 'vue'
+import ToastContainer from '@/components/ToastContainer.vue'
+
+const toastRef = ref<InstanceType<typeof ToastContainer> | null>(null)
 
 interface upHashFrontRequest {
   site_cd: string;
@@ -158,6 +162,7 @@ const defaultData = reactive({
 const choiceSchool = reactive({
   name: '',
   domain: '',
+  code: '',
   list: [] as any[]
 })
 
@@ -179,6 +184,8 @@ const photos: Ref<any> = ref([]);
 const jobs: Ref<any> = ref([]);
 const root = inject<HTMLElement>('rootDiv');
 const schoolEmailId = ref('');
+const universityIsVerifyView = ref(false);
+const universityISVerifyRetryView = ref(false);
 
 // 질문
 const question1 = QUESTION1;
@@ -246,13 +253,13 @@ const accountDataUpdate = async () => {
   profileData.certSchoolEmail = account.data.accountMeta.cert_school_email
 
   // 학교 초이스
-  if(profileData.school) {
-    choiceSchool.name = profileData.school
-  }
-  if(profileData.certSchoolEmail) {
-    schoolEmailId.value = profileData.certSchoolEmail.split('@')[0]
-    choiceSchool.domain = profileData.certSchoolEmail.split('@')[1]
-  }
+  // if(profileData.school) {
+    // choiceSchool.name = profileData.school
+  // }
+  // if(profileData.certSchoolEmail) {
+  //   schoolEmailId.value = profileData.certSchoolEmail.split('@')[0]
+  //   choiceSchool.domain = profileData.certSchoolEmail.split('@')[1]
+  // }
 
   account.data.accountProfiles.forEach((profile: any) => {
     if(profile.type === 'photo') {
@@ -476,6 +483,84 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
   findUniversityView.value = false;
 };
+
+const sendEmail = async () => {
+  if (!schoolEmailId.value) {
+    useModalStore().setModal({
+      type: 'alert',
+      data: {
+        title: '학교 이메일 입력',
+        message: '학교 이메일을 입력해주세요.'
+      }
+    })
+    return;
+  }
+
+  if (!choiceSchool.name) {
+    useModalStore().setModal({
+      type: 'alert',
+      data: {
+        title: '학교 선택',
+        message: '학교를 선택해주세요.'
+      }
+    })
+    return;
+  }
+
+  const response = await http.post('/account/email/university', {
+    // email: `${schoolEmailId.value}@${choiceSchool.domain}`
+    email: 'fksak80@gmail.com'
+  })
+
+  if (response.data.message == 'success') {
+    if(universityISVerifyRetryView.value) {
+      toastRef.value?.addToast('ok', '이메일을 다시 보내드렸어요.');
+    } else {
+      universityIsVerifyView.value = true;
+      universityISVerifyRetryView.value = false;
+    }
+  } else {
+    useModalStore().setModal({
+      type: 'alert',
+      data: {
+        title: '학교 이메일 전송 실패',
+        message: response.data.message
+      }
+    })
+  }
+}
+
+const sendEmailCodeVerify = async () => {
+  try {
+    const response = await http.post('/account/verify/university', {
+      code: choiceSchool.code
+    });
+
+    universityIsVerifyView.value = false;
+    universityISVerifyRetryView.value = false;
+    profileData.certIsSchool = true;
+    ProfileUpdateAction('school');
+    toastRef.value?.addToast('ok', '이메일 인증에 성공했어요!');
+    await moveRouter('job');
+  } catch(e: any) {
+    if(e.response.data.message === 'Invalid code') {
+      toastRef.value?.addToast('warning', '잘못된 인증번호에요. 다시 확인해주세요');
+    } else if(e.response.data.message === 'Expired code') {
+      toastRef.value?.addToast('warning', '유효기간이 만료되었어요.');
+    } else {
+      await router.push('/');
+    }
+    // console.log(response.data.message);
+    // useModalStore().setModal({
+    //   type: 'alert',
+    //   data: {
+    //     title: '학교 이메일 인증 실패',
+    //     message: response.data.message
+    //   }
+    // })
+  }
+}
+
 </script>
 
 <template>
@@ -712,8 +797,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     </div>
 
     <div v-if="account.data?.accountMeta.stage === 'school'">
-      <StickyArea position="top" :style="{ backgroundColor: '#fff'}">
-<!--        <ProgressBar class="progress-bar" :progress="progress" :processing="processing" style="z-index:1000;" />-->
+      <StickyArea position="top" :style="{ backgroundColor: '#fff'}" v-if="!universityIsVerifyView">
         <SubHeader :show-back-button="true" @back="() => {
           if(account.data.accountMeta.cert_flow === 'job') {
             ProfileUpdateAction('job')
@@ -724,7 +808,22 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
           mp?.trackEvent('click_profile_school_back');
         }" />
       </StickyArea>
-      <div class="content-container">
+
+      <StickyArea position="top" :style="{ backgroundColor: '#fff'}" v-else-if="universityIsVerifyView && !universityISVerifyRetryView">
+        <SubHeader :show-back-button="true" @back="() => {
+          universityIsVerifyView = false;
+        }" />
+      </StickyArea>
+
+      <StickyArea position="top" :style="{ backgroundColor: '#fff'}" v-else>
+        <ProgressBar class="progress-bar" :progress="40" :processing="processing" style="z-index: 1000;" />
+        <SubHeader :show-back-button="true" @back="() => {
+          universityIsVerifyView = false;
+          universityISVerifyRetryView = false;
+        }" />
+      </StickyArea>
+
+      <div class="content-container" v-if="!universityIsVerifyView">
         <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'job'" title="프로필에 나타낼<br>대학교를 입력할 수 있어요" description="나에 대해 더 많은 정보를 입력할수록, 매칭확률이 높아져요." />
         <PageTitleAndDescription v-if="account.data.accountMeta.cert_flow === 'school'" title="프로필에 등록될<br>대학교를 인증해주세요." description="" />
         <Gap :height="40" />
@@ -733,9 +832,49 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
           findUniversityView = true;
         }" />
         <Gap :height="40" />
-        <TextInputSchool v-if="profileData?.certFlow == 'school'" label="학교 이메일" placeholder="이메일 @앞자리 입력" optional-text="" :required="false" :value="schoolEmailId" :domain="choiceSchool.domain" @input="(v) => {
+        <TextInputSchool v-if="profileData?.certFlow == 'school'" label="학교 이메일" placeholder="아이디 입력" optional-text="" :required="false" :value="schoolEmailId" :domain="choiceSchool.domain" @input="(v) => {
           schoolEmailId = v;
         }" />
+      </div>
+
+      <div class="content-container" v-else-if="universityIsVerifyView && !universityISVerifyRetryView">
+        <div class="cert-container">
+          <PageTitleAndDescription title="<span style='line-height: 38px;'>보내드린 인증번호를<br>입력해주세요</span>" description="인증 번호를 보내드렸어요. 5분 내로 인증을 완료해주세요." />
+          <Gap :height="40" />
+          <TextInput label="인증번호" placeholder="인증번호를 입력해주세요" optional-text="" :required="false" :value="choiceSchool.code" @input="(e) => {
+            choiceSchool.code = e;
+          }" :validate="() => {
+            if(choiceSchool.code.length < 6 && choiceSchool.code.length > 0) {
+              return '인증번호를 입력해주세요.';
+            }
+            return null;
+          }" />
+          <Gap :height="10" />
+          <span class="sub-title">메일을 받지 못하신 경우 스팸 메일함을 확인해주세요</span>
+          <Gap :height="40" />
+          <span class="retry-title" @click="() => {
+            universityISVerifyRetryView = true;
+            sendEmail();
+          }">이메일 다시받기</span>
+        </div>
+      </div>
+
+      <div class="content-container" v-else>
+        <div class="cert-container">
+          <PageTitleAndDescription title="<span style='line-height: 38px;'>보내드린 인증번호를<br>입력해주세요</span>" :description="`<span style='color: #6726FE;'>${schoolEmailId}@${choiceSchool.domain}</span>로 인증 번호를 보내드렸어요.`" />
+          <Gap :height="40" />
+          <TextInput label="인증번호" placeholder="인증번호를 입력해주세요" optional-text="" :required="false" :value="choiceSchool.code" @input="(e) => {
+            choiceSchool.code = e;
+          }" :validate="() => {
+            if(choiceSchool.code.length < 6 && choiceSchool.code.length > 0) {
+              return '인증번호를 입력해주세요.';
+            }
+            return null;
+          }" />
+          <Gap :height="10" />
+          <span class="sub-title">메일을 받지 못하신 경우 스팸 메일함을 확인해주세요</span>
+          <Gap :height="40" />
+        </div>
       </div>
     </div>
 
@@ -824,6 +963,8 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
       profileData.certFlow = 'school'
       ProfileUpdateAction('join')
       moveRouter('school')
+      universityIsVerifyView = false;
+      universityISVerifyRetryView = false;
       mp?.trackEvent('click_join_school_choice');
     }" :style="{
         backgroundColor: '#6726FE',
@@ -891,7 +1032,7 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
     </div>
   </StickyArea>
 
-  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school'">
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school' && !universityIsVerifyView">
     <div class="job-flow" style="display: flex;" v-if="profileData.certFlow === 'job'">
       <Button @click="() => {
         ProfileUpdateAction('request')
@@ -919,25 +1060,33 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
 
     <div class="school-flow" :style="{ display: 'flex', flexDirection: 'row', gap: '12px' }" v-else>
       <SubmitButton @click="() => {
-        profileData.school = choiceSchool.name
+        profileData.school = choiceSchool.name;
         profileData.certSchoolEmail = `${schoolEmailId}@${choiceSchool.domain}`
-        ProfileUpdateAction('school')
-        moveRouter('job')
-        mp?.trackEvent('click_profile_job_update');
-      }" :disabled="!profileData.job || !jobRequired" :style="{
+        sendEmail();
+      }" :disabled="!choiceSchool.name || !schoolEmailId" :style="{
             backgroundColor: '#6726FE',
-          }">인증하기</SubmitButton>
+          }">인증 메일 받기</SubmitButton>
     </div>
+  </StickyArea>
+
+  <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'school' && universityIsVerifyView">
+    <SubmitButton @click="() => {
+      sendEmailCodeVerify();
+    }" :disabled="choiceSchool.code.length < 6" :style="{
+        backgroundColor: '#6726FE',
+      }">인증하기</SubmitButton>
   </StickyArea>
 
   <StickyArea position="bottom" :style="{ padding: '14px 16px' }" v-if="account.data?.accountMeta.stage === 'reject'">
     <SubmitButton @click="() => {
-      ProfileUpdateAction('job', false, true)
+      ProfileUpdateAction('job')
       mp?.trackEvent('click_profile_reject_update');
     }" :style="{
         backgroundColor: '#6726FE',
       }">인증 다시 진행하기</SubmitButton>
   </StickyArea>
+
+  <ToastContainer ref="toastRef" />
 
 </template>
 
@@ -1102,6 +1251,29 @@ const handleUniversitySelect = (university: { schoolName: string; emailDomain: s
   height: 100%;
   z-index: 1000;
   background-color: #fff;
+}
+
+.sub-title {
+  color: #7F7F7F;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 166.667% */
+}
+
+.retry-title {
+  cursor: pointer;
+  color: #7F7F7F;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 20px; /* 142.857% */
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
 }
 
 </style>

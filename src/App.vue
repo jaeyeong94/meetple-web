@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useToastStore } from '@/stores/toast'
 import { RouterView, useRoute } from 'vue-router'
 import ModalArea from '@/components/ModalArea.vue'
 import IcMainLogo from '@/components/icons/IcMainLogo.vue'
@@ -9,11 +10,19 @@ import { storeToRefs } from 'pinia'
 const route = useRoute()
 const page = ref<HTMLElement | null>(null);
 const pageContent = ref<HTMLElement | null>(null);
+
 const modalStore = useModalStore()
 const { modal } = storeToRefs(modalStore)
 const activeModal = computed(() => modal.value)
+
+const toastStore = useToastStore()
+const { toast } = storeToRefs(toastStore)
+const activeToast = computed(() => toast.value)
+
 const position = ref({ left: 0, width: 0 })
 const modalPosition = computed(() => position.value)
+const toastPosition = computed(() => position.value)
+
 let timeout = 0;
 
 // ✅ 특정 경로일 때 클래스 추가
@@ -81,6 +90,7 @@ window.addEventListener('popstate', function(event) {
   </div>
   <div ref="page" class="page-container" :class="pageClass">
     <RouterView />
+
     <ModalArea
       :activeModal="activeModal.type"
       :modal-position="modalPosition"
