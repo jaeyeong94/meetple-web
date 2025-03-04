@@ -299,8 +299,7 @@ const sendEmail = async () => {
   }
 
   const response = await http.post('/account/email/university', {
-    // email: `${schoolEmailId.value}@${choiceSchool.domain}`
-    email: 'fksak80@gmail.com'
+    email: `${newSchoolEmailId.value}@${choiceSchool.domain}`
   })
 
   if (response.data.message == 'success') {
