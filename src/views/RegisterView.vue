@@ -1023,7 +1023,7 @@ const sendEmailCodeVerify = async () => {
             message: '추천 미팅 상대를을 문자로 알려드릴게요! 📮<br>문자로 보내드린 서비스 이용안내를 참고해주세요.'
           }
         })
-    }" :disabled="!profileData.job || !jobRequired" :style="{
+    }" :disabled="!profileData.job" :style="{
         flex: 1, /* 50% 영역을 자동으로 차지 */
         backgroundColor: '#6726FE',
         height: '52px',
